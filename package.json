@@ -55,6 +55,7 @@
     "swagger-node-express": "^1.2.3",
     "teade": "^1.0.2",
     "ua-parser-js": "^0.7.28",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "web3": "^1.8.1"
   }
 }

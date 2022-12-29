@@ -15,7 +15,7 @@ const commonVariables = {
     pageLimit: 10,
     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],
     ASSEST_TYPE: ["TOKEN", "NFT"],
-    TRANSACTION_STATUS: ["PENDING","PROCESSING","COMPLETED","FAILED"]
+    TRANSACTION_STATUS: ["PENDING","PROCESSING","COMPLETED","FAILED"],
 }
 
 //setting the common variables

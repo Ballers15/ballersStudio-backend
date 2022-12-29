@@ -22,7 +22,9 @@ const addCryptoWallet = function (data, response, cb) {
           data.req.signature
         )
       );
-    }
+	}
+	
+	data.walletAddress=(data.walletAddress).toLowerCase();
   
   let findData = {
     walletAddress: data.walletAddress,

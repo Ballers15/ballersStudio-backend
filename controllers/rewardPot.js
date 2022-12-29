@@ -25,7 +25,6 @@ const createRewardPot = function (data, response, cb) {
 	waterFallFunctions.push(async.apply(addRewardPot, data));
 	waterFallFunctions.push(async.apply(potActionLogs, data));
 	async.waterfall(waterFallFunctions, cb);
-  
 
 };
 exports.createRewardPot = createRewardPot;

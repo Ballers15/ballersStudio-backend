@@ -1,6 +1,6 @@
 const async = require("async");
 const mongoose = require("mongoose");
-
+const RewardPot = require("../models/rewardPot");
 const UserBalance = require("../models/userBalance");
 const responseUtilities = require("../helpers/sendResponse");
 
@@ -24,11 +24,96 @@ const addUserBalance = function (data, response, cb) {
     }
 
     let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
 	waterFallFunctions.push(async.apply(addBalanceForUser, data));
 	async.waterfall(waterFallFunctions, cb);
   
 };
 exports.addUserBalance = addUserBalance;
+
+const getPotDetails = function (data, response, cb) {
+
+    if (!cb) {
+		cb = response;
+	}
+	
+	if (!data.potId) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potId",
+				"getPotDetails",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		_id: data.potId,
+	};
+
+	RewardPot.findOne(findData).exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getPotDetails",
+					null,
+					data.req.signature
+				)
+			);
+		}
+		data.potDetails = res;
+		console.log(data,'-------------------------------res line 80 =================>>>>>>>>>>>>>>>>>')
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Reward Pot fetched successfuly",
+				"getPotDetails",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+};
+
+const checkBalanceSubmissionDate = function (data, response, cb) {
+
+    if (!cb) {
+		cb = response;
+	}
+	let currentDate = new Date
+
+	if (data.potDetails.startDate < currentDate && currentDate <= data.potDetails.endDate) {
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"User will able to add balance",
+				"getAllUserBalances",
+				null,
+				data.req.signature
+			)
+		);
+	} else {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"User will not able to add balance, out of date",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+};
 
 const addBalanceForUser = function (data, response, cb) {
 

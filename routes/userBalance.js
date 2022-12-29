@@ -16,7 +16,7 @@ const authenticateRole = require('../middlewares/authenticateRole');
 const userBalance = require("../controllers/userBalance");
 
 
-router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
+router.post( "/v1/add/user/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
@@ -33,7 +33,7 @@ router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
 );
 
 
-router.get( "/v1/balance/all",[authenticator, authenticateRole(["USER"])],
+router.get( "/v1/user/balance/all",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
@@ -50,7 +50,7 @@ router.get( "/v1/balance/all",[authenticator, authenticateRole(["USER"])],
 );
 
 
-router.get( "/v1/balance/byid",[authenticator, authenticateRole(["USER"])],
+router.get( "/v1/user/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;

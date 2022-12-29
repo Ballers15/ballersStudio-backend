@@ -108,7 +108,7 @@ const potActionLogs = function (data, response, cb) {
 		  responseUtilities.responseStruct(
 			500,
 			null,
-			"addIdeaLogs",
+			"potActionLogs",
 			null,
 			data.req.signature
 		  )
@@ -120,7 +120,7 @@ const potActionLogs = function (data, response, cb) {
 		responseUtilities.responseStruct(
 		  200,
 		  "add Pot Action Logs",
-		  "addPotActionLogs",
+		  "potActionLogs",
 		  null,
 		  data.req.signature
 		)
@@ -264,7 +264,6 @@ const getAllRewardPots = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
 	}
-	
 	
 	let findData = {
 		isActive: true

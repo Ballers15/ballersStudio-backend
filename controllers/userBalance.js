@@ -5,7 +5,6 @@ const UserBalance = require("../models/userBalance");
 const responseUtilities = require("../helpers/sendResponse");
 
 
-
 const addUserBalance = function (data, response, cb) {
     if (!cb) {
 		cb = response;
@@ -33,7 +32,6 @@ const addUserBalance = function (data, response, cb) {
 exports.addUserBalance = addUserBalance;
 
 const getPotDetails = function (data, response, cb) {
-
     if (!cb) {
 		cb = response;
 	}
@@ -68,7 +66,6 @@ const getPotDetails = function (data, response, cb) {
 			);
 		}
 		data.potDetails = res;
-		console.log(data,'-------------------------------res line 80 =================>>>>>>>>>>>>>>>>>')
 
 		return cb(
 			null,
@@ -85,19 +82,17 @@ const getPotDetails = function (data, response, cb) {
 };
 
 const checkBalanceSubmissionDate = function (data, response, cb) {
-
     if (!cb) {
 		cb = response;
 	}
 	let currentDate = new Date
-
 	if (data.potDetails.startDate < currentDate && currentDate <= data.potDetails.endDate) {
 		return cb(
 			null,
 			responseUtilities.responseStruct(
 				200,
 				"User will able to add balance",
-				"getAllUserBalances",
+				"checkBalanceSubmissionDate",
 				null,
 				data.req.signature
 			)
@@ -116,11 +111,9 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
 };
 
 const addBalanceForUser = function (data, response, cb) {
-
     if (!cb) {
 		cb = response;
     }
-    console.log(data,'39')
 
 	let insertData = {
 		potId:data.potId,
@@ -128,7 +121,6 @@ const addBalanceForUser = function (data, response, cb) {
         amount:data.amount,
 		userId: data.req.auth.id,
     };
-    console.log()
 
     UserBalance.create(insertData, (err, res) => {
 		if (err) {
@@ -154,8 +146,6 @@ const addBalanceForUser = function (data, response, cb) {
 		  )
 		);
     });
-
-
 };
 
 const getAllUserBalances = function (data, response, cb) {
@@ -193,7 +183,6 @@ const getAllUserBalances = function (data, response, cb) {
 	});
 }
 exports.getAllUserBalances = getAllUserBalances;
-
 
 const getUserBalanceById = function (data, response, cb) {
 	if (!cb) {

@@ -7,6 +7,8 @@ var userBalanceSchema = new Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     walletAdress:String,
     amount: Number,
+    nftHolded:{type:Number,default:0},
+    rewardClaimed:{type:Boolean ,default:false}
 },{ timestamps: true });
 
 const userBalance = mongoose.model('userBalance', userBalanceSchema);

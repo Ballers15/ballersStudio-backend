@@ -23,9 +23,12 @@ const addUserBalance = function (data, response, cb) {
     }
 
     let waterFallFunctions = [];
+	// waterFallFunctions.push(async.apply(getUserGameBalance, data));	
 	waterFallFunctions.push(async.apply(getPotDetails, data));
 	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
 	waterFallFunctions.push(async.apply(addBalanceForUser, data));
+	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	
+
 	async.waterfall(waterFallFunctions, cb);
   
 };
@@ -205,7 +208,7 @@ const getUserBalanceById = function (data, response, cb) {
 		_id: data.balanceId,
 	};
 
-	UserBalance.find(findData).populate("userId potId").exec((err, res) => {
+	UserBalance.find(findData).populate("potId").exec((err, res) => {
 		if (err) {
 			console.error(err);
 			return cb(

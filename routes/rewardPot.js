@@ -69,6 +69,7 @@ router.patch( "/v1/admin/delete/reward/pot",
 );
 
 
+
 router.get( "/v1/admin/getall/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {

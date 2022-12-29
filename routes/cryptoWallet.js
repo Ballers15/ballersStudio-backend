@@ -31,7 +31,7 @@ router.post( "/v1/add/chain/wallet",
   }
 );
 
-router.get( "/v1/getall/chain/wallet",
+router.get( "/v1/get/all/chain/wallet",
   [authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;
@@ -48,7 +48,7 @@ router.get( "/v1/getall/chain/wallet",
   }
 );
 
-router.get( "/v1/get/chain/wallet",
+router.get( "/v1/get/user/chain/wallet",
   [authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;

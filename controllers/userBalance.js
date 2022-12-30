@@ -10,7 +10,7 @@ const addUserBalance = function (data, response, cb) {
 		cb = response;
     }
 
-    if (!data.walletAdress || !data.amount ||!data.potId) {
+    if (!data.walletAddress || !data.amount ||!data.potId) {
 		return cb(
 			responseUtilities.responseStruct(
 				400,
@@ -120,7 +120,7 @@ const addBalanceForUser = function (data, response, cb) {
 
 	let insertData = {
 		potId:data.potId,
-        walletAdress: data.walletAdress,
+        walletAddress: data.walletAddress,
         amount:data.amount,
 		userId: data.req.auth.id,
     };

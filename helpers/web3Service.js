@@ -1,20 +1,8 @@
 const Web3 = require("web3");
 const abi = require("./abi.js");
 
-let polygon;
-let POLYGON_FORK;
-let web3;
-
-if (process.env.DEV == "true") {
-     polygon = "https://rpc-mumbai.maticvigil.com";  
-     web3 = new Web3(new Web3.providers.HttpProvider(polygon));
-  }
-
-  if (process.env.DEV == "false") {
-     polygon = "https://rpc-mainnet.maticvigil.com";
-     web3 = new Web3(new Web3.providers.HttpProvider(polygon));
-}
-
+let polygon = process.env.POLYGON_RPC_URL;  
+let web3=new Web3(new Web3.providers.HttpProvider(polygon));
 
 
 

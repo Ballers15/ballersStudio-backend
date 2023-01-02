@@ -16,7 +16,9 @@ let activateRewardPots = async () => {
     let  options   = {
         multi:true
     }
-    let rewardPot = await RewardPot.updateMany(findDate, { "$set": { "isActive": true } }, options);
+    let updateData = { "$set": { "isActive": true } };
+
+    let rewardPot = await RewardPot.updateMany(findDate, updateData, options);
     let rewardPotdata = await RewardPot.find({})
     console.log(rewardPot,'-------------------------------->>>>>>>>>>>>-------------->>>>>>>>>>>>>>>>>>>>>>>>>>')
     console.log(rewardPotdata,'-------------------------------->>>>>>>>>>>>-------------->>>>>>>>>>>>>>>>>>>>>>>>>>')

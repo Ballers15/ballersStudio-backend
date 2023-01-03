@@ -7,6 +7,7 @@ var userBalanceSchema = new Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     walletAddress:String,
     amount: Number,
+    lotteryNumbers:[],
     nftHolded:{type:Number,default:0},
     rewardedTokenAmount:{type:Number,default:0},
     rewardPoints:{type:Number,default:0},

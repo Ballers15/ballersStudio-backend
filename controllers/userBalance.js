@@ -68,6 +68,17 @@ const getPotDetails = function (data, response, cb) {
 				)
 			);
 		}
+		if (!res) {
+			return cb(
+				responseUtilities.responseStruct(
+					400,
+					"pot details not found",
+					"getPotDetails",
+					null,
+					data.req.signature
+				)
+			);
+		}
 		data.potDetails = res;
 
 		return cb(
@@ -88,13 +99,28 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
     if (!cb) {
 		cb = response;
 	}
+	if (!data.potDetails) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potDetails",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
 	let currentDate = new Date
+	console.log(currentDate)
+	console.log(data.potDetails.startDate)
+	console.log(data.potDetails.endDate)
 	if (data.potDetails.startDate < currentDate && currentDate <= data.potDetails.endDate) {
 		return cb(
 			null,
 			responseUtilities.responseStruct(
 				200,
-				"User will able to add balance",
+				"User will able to add",
 				"checkBalanceSubmissionDate",
 				null,
 				data.req.signature
@@ -104,7 +130,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
 		return cb(
 			responseUtilities.responseStruct(
 				400,
-				"User will not able to add balance, out of date",
+				"User will not able to add, out of date",
 				"checkBalanceSubmissionDate",
 				null,
 				data.req.signature
@@ -122,14 +148,10 @@ const addBalanceForUser = function (data, response, cb) {
 		potId:data.potId,
         walletAddress: data.walletAddress,
 		userId: data.req.auth.id,
-		
     };
 
 	let updateData = {
-
 		$inc: { amount: data.amount },
-
-
 	}
 
 	let options = {
@@ -160,6 +182,93 @@ const addBalanceForUser = function (data, response, cb) {
 		  )
 		);
     });
+};
+
+const updateLotterNumber = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+
+	if (!data.walletAddress ||!data.potId||!data.lotteryNumbers) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"updateLotterNumber",
+				null,
+				data.req.signature
+			)
+		);
+	}
+	
+
+    let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+	waterFallFunctions.push(async.apply(addLotterNumber, data));
+
+	async.waterfall(waterFallFunctions, cb);
+}
+exports.updateLotterNumber = updateLotterNumber;
+
+
+const  addLotterNumber = async function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+	}
+	if (!data.lotteryNumbers || !data.potId || !data.walletAddress) {
+		console.log("data", data);
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"addLotterNumber",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		potId:data.potId,
+        walletAddress: data.walletAddress,
+		userId: data.req.auth.id
+	};
+
+	let options = {
+		upsert: true,
+	};
+	
+	let updateData = { "$addToSet": { "lotteryNumbers": { $each: data.lotteryNumbers } } };
+
+	UserBalance.findOneAndUpdate(findData,updateData,options, (err, res) => {
+		if (err) {
+			console.log("UserBalance Error : ", err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in adding lottery number",
+					"addLotterNumber",
+					null,
+					data.req.signature
+				)
+			);
+        }
+        return cb(
+		  null,
+		  responseUtilities.responseStruct(
+		    200,
+		    "Lottery number added succesfully",
+		    "addLotterNumber",
+		    res,
+		    data.req.signature
+		  )
+		);
+    });
+	
+	
+
+	
 };
 
 const getAllUserBalances = function (data, response, cb) {

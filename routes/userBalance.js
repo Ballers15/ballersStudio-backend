@@ -32,6 +32,22 @@ router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
   }
 );
 
+router.post( "/v1/update/lotterynumber",[authenticator, authenticateRole(["USER"])],
+  function (req, res, next) {
+      let data = req.body;
+    data.req = req.data;
+    userBalance.updateLotterNumber(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
 
 router.get( "/v1/balance/all",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {

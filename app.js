@@ -58,13 +58,13 @@ const auth = require('./routes/auth');
 const cryptoWallet = require('./routes/cryptoWallet')
 const rewardPot = require('./routes/rewardPot')
 const userBalance=require('./routes/userBalance')
-const transactions=require('./routes/transactions')
+const withdrawls=require('./routes/withdrawls')
 
 app.use('/auth', auth);
 app.use('/crypto/wallet', cryptoWallet);
 app.use('/pot', rewardPot);
 app.use('/user', userBalance);
-app.use('/transactions', transactions);
+app.use('/withdrawls', withdrawls);
 
 
 

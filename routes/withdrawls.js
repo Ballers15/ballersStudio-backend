@@ -13,7 +13,52 @@ const data = {};
 const authenticator = require('../middlewares/authenticator')(clients, data);
 const authenticateRole = require('../middlewares/authenticateRole');
 
-const transactions = require("../controllers/transactions");
+const withdrawls = require("../controllers/withdrawls");
+
+
+router.post("/v1/create/claim/withdrawl",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  withdrawls.createClaimWithdrawl(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+router.post("/v1/update/withdrawl",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  withdrawls.updateWithdrawl(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+
+
+
+
+
+
+
+
+
 
 
 router.post( "/v1/create/transaction",
@@ -21,7 +66,7 @@ router.post( "/v1/create/transaction",
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
-    transactions.createTransaction(data, function (err, response) {
+    withdrawls.createTransaction(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -39,7 +84,7 @@ router.get( "/v1/all/transaction",
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
-    transactions.getAllTransactions(data, function (err, response) {
+    withdrawls.getAllwithdrawls(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -56,7 +101,7 @@ router.get( "/v1/transaction",
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
-    transactions.getTransactionById(data, function (err, response) {
+    withdrawls.getTransactionById(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;

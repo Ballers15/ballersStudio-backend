@@ -1,5 +1,9 @@
 const Web3 = require("web3");
 const abi = require("./abi.js");
+const { ethers}=require("ethers");
+const responseUtilities = require("./sendResponse");
+
+
 
 // let polygon = process.env.POLYGON_RPC_URL;  
 let polygon="https://rpc-mumbai.maticvigil.com"
@@ -56,59 +60,171 @@ console.log("finalArray",userNftDetails);
 
 }
 
-getuserNftBalance(
-    {
-    "userBalanceDetails":[
-    {
-        "_id" : "63ad81340ad3d036518d172c",
-        "potId" : "63ad8073c2a633330e60b69f",
-        "walletAdress" : "0xd946F28962A96C45d9Bc16F16ca50d8350296A4E",
-        "amount" : 1e+20,
-        "userId" : "601e3c6ef5eb242d4408dcc7",
-        "createdAt" : "2022-12-29T11:59:48.619Z",
-        "updatedAt" : "2022-12-29T11:59:48.619Z",
-        "__v" : 0
-    },
+// getuserNftBalance(
+//     {
+//     "userBalanceDetails":[
+//     {
+//         "_id" : "63ad81340ad3d036518d172c",
+//         "potId" : "63ad8073c2a633330e60b69f",
+//         "walletAdress" : "0xd946F28962A96C45d9Bc16F16ca50d8350296A4E",
+//         "amount" : 1e+20,
+//         "userId" : "601e3c6ef5eb242d4408dcc7",
+//         "createdAt" : "2022-12-29T11:59:48.619Z",
+//         "updatedAt" : "2022-12-29T11:59:48.619Z",
+//         "__v" : 0
+//     },
     
-    /* 2 */
-    {
-        "_id" : "63aeb1171a829269ceb32390",
-        "potId" : "63ad8073c2a633330e60b69f",
-        "walletAdress" : "0xf09EDE432534583Efe8c0863292daC19da8ba6af",
-        "amount" : 1.63609149704,
-        "userId" : "601e3c6ef5eb242d4408dcc7",
-        "createdAt" : "2022-12-29T11:59:48.619Z",
-        "updatedAt" : "2022-12-29T11:59:48.619Z",
-        "__v" : 0
+//     /* 2 */
+//     {
+//         "_id" : "63aeb1171a829269ceb32390",
+//         "potId" : "63ad8073c2a633330e60b69f",
+//         "walletAdress" : "0xf09EDE432534583Efe8c0863292daC19da8ba6af",
+//         "amount" : 1.63609149704,
+//         "userId" : "601e3c6ef5eb242d4408dcc7",
+//         "createdAt" : "2022-12-29T11:59:48.619Z",
+//         "updatedAt" : "2022-12-29T11:59:48.619Z",
+//         "__v" : 0
+//     }
+//     ,
+//     /* 3 */
+//     {
+//         "_id" : "63aeb17b08b5e90bba83bd06",
+//         "nftHolded" : 0,
+//         "rewardClaimed" : false,
+//         "potId" : "63ad8073c2a633330e60b69f",
+//         "walletAdress" : "0x7e6fBBc28F3b42c639369fD2cFD9F4806772536d",
+//         "amount" : 1.63609149704,
+//         "userId" : "601e3c6ef5eb242d4408dcc7",
+//         "createdAt" : "2022-12-30T09:38:03.918Z",
+//         "updatedAt" : "2022-12-30T09:38:03.918Z",
+//         "__v" : 0
+//     }
+// ]
+//     }
+// )
+
+
+
+const createUserSignature =async function(data,response,cb){
+    if(!cb){
+        cb=response;
     }
-    ,
-    /* 3 */
-    {
-        "_id" : "63aeb17b08b5e90bba83bd06",
-        "nftHolded" : 0,
-        "rewardClaimed" : false,
-        "potId" : "63ad8073c2a633330e60b69f",
-        "walletAdress" : "0x7e6fBBc28F3b42c639369fD2cFD9F4806772536d",
-        "amount" : 1.63609149704,
-        "userId" : "601e3c6ef5eb242d4408dcc7",
-        "createdAt" : "2022-12-30T09:38:03.918Z",
-        "updatedAt" : "2022-12-30T09:38:03.918Z",
-        "__v" : 0
+
+    if(data.signatureExist){
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Withdrawls fetched Successfully",
+				"getAllWithdrawls",
+				response.data,
+				data.req.signature
+			)
+		);
+	}
+
+
+
+    let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
+    let amount=data.amount;
+    let nonce=data.nonce;
+    let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;
+    let privateKey=process.env.SIGNER_KEY;
+    let callerAddress=data.walletAddress;
+
+    let txn = {tokenAddress,amount,callerAddress,nonce,contractAddress};
+    console.log(txn);
+    let messages = ethers.utils.solidityKeccak256(
+        ['address','uint256','address','uint256','address'],
+        [txn.tokenAddress,txn.amount,txn.callerAddress,txn.nonce,txn.contractAddress]
+    );   
+
+    let messageBytes = ethers.utils.arrayify(messages);
+    let signerS = new ethers.Wallet(privateKey);
+    let signature = await signerS.signMessage(messageBytes);
+    console.log("signature$$$$$$----",signature);
+    let userSignature={
+        signature
     }
-]
+
+    return cb(
+        null,
+        responseUtilities.responseStruct(
+            200,
+            "Withdrawls fetched Successfully",
+            "getAllWithdrawls",
+            userSignature,
+            data.req.signature
+        ));}
+
+
+
+
+
+
+
+
+
+const getTransactionStatus=async function (data,response,cb){
+    
+    if(!cb){
+        cb=response;
     }
-)
 
+    let web3 = new Web3(new Web3.providers.HttpProvider(polygon));
+    
+    try{
+        let hash = data.txnHash;
+        let receipt = await web3.eth.getTransactionReceipt(hash);
+        console.log("receipt",receipt);
+        let statusResponse;
+        if (receipt) {
+            console.log("RECEIPT", receipt)
+            if (receipt.status == true) {
+                statusResponse={
+                    status: "COMPLETED"
+                }
 
+            }
+            else if (receipt.status == false) {
+                statusResponse={
+                    status: "FAILED"
+                }
 
+            }
+        }
+        else {
+            statusResponse={
+                status: "PROCESSING"
+            }
+        }
+        console.log("errrr");
+        return cb(
+            null,
+            responseUtilities.responseStruct(
+                200,
+                "Withdrawls fetched Successfully",
+                "getAllWithdrawls",
+                statusResponse,
+                data.req.signature
+            ));
+    
+    }
+    catch(err){
+        console.log("errrr",err);
+        return cb(
+            responseUtilities.responseStruct(
+                500,
+                "getTransactionStatus",
+                "getTransactionStatus",
+                null,
+                data.req.signature
+            )
+        );
+    }
 
-
-
-
-
-
-
-
+        
+ }
 
 
 
@@ -122,5 +238,7 @@ getuserNftBalance(
 
 module.exports ={
 
-    getuserNftBalance
+    getuserNftBalance,
+    createUserSignature,
+    getTransactionStatus
 }

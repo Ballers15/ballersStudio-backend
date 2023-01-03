@@ -118,14 +118,25 @@ const addBalanceForUser = function (data, response, cb) {
 		cb = response;
     }
 
-	let insertData = {
+	let findData = {
 		potId:data.potId,
         walletAddress: data.walletAddress,
-        amount:data.amount,
 		userId: data.req.auth.id,
+		
     };
 
-    UserBalance.create(insertData, (err, res) => {
+	let updateData = {
+
+		$inc: { amount: data.amount },
+
+
+	}
+
+	let options = {
+		upsert: true,
+		new: true,
+	  };
+    UserBalance.findOneAndUpdate(findData,updateData,options, (err, res) => {
 		if (err) {
 			console.log("UserBalance Error : ", err);
 			return cb(

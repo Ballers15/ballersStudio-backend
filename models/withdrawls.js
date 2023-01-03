@@ -2,7 +2,7 @@ let mongoose = require('./db');
 
 let Schema = mongoose.Schema;
 
-var transactionsSchema = new Schema({
+var withdrawlsSchema = new Schema({
     potId: { type: mongoose.Schema.Types.ObjectId, ref: "rewardPot" },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     walletAddress:String,   
@@ -17,10 +17,13 @@ var transactionsSchema = new Schema({
     status:{
         type: String,
         enum: { values: process.env.TRANSACTION_STATUS.split(",") },
+        default: "PENDING",
+
       }
+    
    
 },{ timestamps: true });
 
-const transactions = mongoose.model('transactions', transactionsSchema);
+const withdrawls = mongoose.model('withdrawls', withdrawlsSchema);
 
-module.exports = transactions;
+module.exports = withdrawls;

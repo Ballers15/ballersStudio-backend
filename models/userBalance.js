@@ -8,7 +8,11 @@ var userBalanceSchema = new Schema({
     walletAddress:String,
     amount: Number,
     nftHolded:{type:Number,default:0},
-    rewardClaimed:{type:Boolean ,default:false}
+    rewardedTokenAmount:{type:Number,default:0},
+    rewardPoints:{type:Number,default:0},
+    rewardClaimed:{type:Boolean ,default:false},
+
+
 },{ timestamps: true });
 
 const userBalance = mongoose.model('userBalance', userBalanceSchema);

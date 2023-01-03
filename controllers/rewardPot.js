@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const PotActionLogs=require("../models/potActionLogs")
 const RewardPot = require("../models/rewardPot");
 const responseUtilities = require("../helpers/sendResponse");
-
 const createRewardPot = function (data, response, cb) {
     if (!cb) {
 		cb = response;

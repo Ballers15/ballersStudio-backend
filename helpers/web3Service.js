@@ -29,7 +29,7 @@ for(let i= 0;i<tokenIds.length;i++){
 
     console.log("tokenIdDetails",tokenIds[i]);
     let extractWallets=data.userBalanceDetails.map((el)=>{
-        return el.walletAdress
+        return el.walletAddress
     })
     let tokenIdDetails= Array(extractWallets.length).fill(tokenIds[i]);
     let balanceOfbatch=await nftContract.methods.balanceOfBatch(extractWallets,tokenIdDetails).call();
@@ -56,7 +56,17 @@ let count=0;
     
 }
 console.log("finalArray",userNftDetails);
+    let dataToReturn = userNftDetails.map((el) => {
+        return ({
+            userBalanceId: el._id,
+            nftHolded: el.nftHolded,
+            rewardedTokenAmount: el.rewardedTokenAmount,
+            rewardPoints: el.rewardPoints,
+            rewardClaimed:el.rewardClaimed
+    })
+    });
 
+    return dataToReturn;
 
 }
 

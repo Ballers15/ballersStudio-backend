@@ -36,7 +36,7 @@ require('swagger-node-express').setAppHandler(app);
 
 // All domain list which can access this backend server
 var whitelistOrigin = [
-    'http://localhost:4200',
+    'http://localhost:3000',
 
   ];
   app.set('whitelistOrigin', whitelistOrigin);

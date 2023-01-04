@@ -15,7 +15,8 @@ let activateRewardPots = async (cb) => {
         console.log("currentTime",currentTime);
     let findData = {
         isActive: true,
-        endDate: { $lte: currentTime }
+        endDate: { $lte: currentTime },
+        potType:"REWARDPOT"
     }
 
     RewardPot.find(findData).exec((err, res) => {

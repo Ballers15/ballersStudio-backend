@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const RewardPot = require("../models/rewardPot");
 const UserBalance = require("../models/userBalance");
 const responseUtilities = require("../helpers/sendResponse");
-
+const web3Service=require("../helpers/web3Service");
 
 const addUserBalance = function (data, response, cb) {
     if (!cb) {
@@ -24,6 +24,8 @@ const addUserBalance = function (data, response, cb) {
 
     let waterFallFunctions = [];
 	// waterFallFunctions.push(async.apply(getUserGameBalance, data));	
+	waterFallFunctions.push(async.apply(web3Service.checkUserHoldsNft,data));
+
 	waterFallFunctions.push(async.apply(getPotDetails, data));
 	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
 	waterFallFunctions.push(async.apply(addBalanceForUser, data));

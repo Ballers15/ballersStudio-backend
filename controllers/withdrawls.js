@@ -516,7 +516,8 @@ const updateWithdrawl =function(data,response,cb){
 	let waterFallFunctions = [];
 	waterFallFunctions.push(async.apply(web3Service.getTransactionStatus, data));
 	waterFallFunctions.push(async.apply(updateTransactionDetails, data));
-	
+	waterFallFunctions.push(async.apply(updateUserBalance, data));
+
 	async.waterfall(waterFallFunctions, cb);
 
     
@@ -532,7 +533,9 @@ const updateTransactionDetails =function(data,response,cb){
 	console.log("transactionStatus",transactionStatus,data.txnHash);
 	let findData = {
         _id:data.withdrawlId,
-		potId:data.potId
+		potId:data.potId,
+		walletAddress:data.wupdateDataalletAddress,
+		userId:data.req.auth.id
 
     }
 
@@ -561,7 +564,7 @@ const updateTransactionDetails =function(data,response,cb){
 				200,
 				"updated Successfully",
 				"updateTransactionDetails",
-				res,
+				transactionStatus,
 				data.req.signature
 			)
 		);
@@ -570,6 +573,50 @@ const updateTransactionDetails =function(data,response,cb){
 
 
 
+
+
+}
+
+const updateUserBalance =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	let transactionStatus=response.data;
+	let findData = {
+		potId:data.potId,
+		walletAddress:data.walletAddress,
+		userId:data.req.auth.id
+    }
+
+	let updateData={
+        rewardClaimed:transactionStatus.status=="COMPLETED"?true :false
+
+    }
+
+	UserBalance.findOneAndUpdate(findData,updateData).exec((err,res)=>{
+		if(err){
+			console.log("err",err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in updating",
+					"updateTransactionDetails",
+					null,
+					data.req.signature
+				)
+			);	
+		}
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"updated Successfully",
+				"updateTransactionDetails",
+				res,
+				data.req.signature
+			)
+		);
+	})
 
 
 }

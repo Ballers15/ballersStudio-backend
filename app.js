@@ -59,7 +59,6 @@ const cryptoWallet = require('./routes/cryptoWallet')
 const rewardPot = require('./routes/rewardPot')
 const userBalance=require('./routes/userBalance')
 const withdrawls=require('./routes/withdrawls')
-
 app.use('/auth', auth);
 app.use('/crypto/wallet', cryptoWallet);
 app.use('/pot', rewardPot);

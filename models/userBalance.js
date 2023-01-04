@@ -10,6 +10,7 @@ var userBalanceSchema = new Schema({
     lotteryNumbers:[],
     nftHolded:{type:Number,default:0},
     rewardedTokenAmount:{type:Number,default:0},
+    rewardPointsPercentage:{type:Number,default:0},
     rewardPoints:{type:Number,default:0},
     rewardClaimed:{type:Boolean ,default:false},
 

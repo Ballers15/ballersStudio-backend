@@ -665,6 +665,7 @@ const encryptData = function (data, response, cb) {
                 name: data.name,
                 accountId: data.accountId,
                 provider:data.provider,
+                role:data.role,
             },
             token: cipher
         }, data.req.signature));

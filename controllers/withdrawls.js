@@ -181,6 +181,8 @@ const createClaimWithdrawl = function(data,response,cb){
     
 
 	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails,data));
+	waterFallFunctions.push(async.apply(checkClaimExpired, data));
 	waterFallFunctions.push(async.apply(checkIfUserBalanceExist, data));
 	waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
 	waterFallFunctions.push(async.apply(getLatestNonce, data));
@@ -188,6 +190,124 @@ const createClaimWithdrawl = function(data,response,cb){
 	waterFallFunctions.push(async.apply(initiateWithdrawl, data));
 	async.waterfall(waterFallFunctions, cb);
 }
+
+
+const getPotDetails = function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+	}
+	
+	if (!data.potId) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potId",
+				"getPotDetails",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		_id: data.potId,
+	};
+
+	RewardPot.findOne(findData).exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getPotDetails",
+					null,
+					data.req.signature
+				)
+			);
+		}
+		if (!res) {
+			return cb(
+				responseUtilities.responseStruct(
+					400,
+					"pot details not found",
+					"getPotDetails",
+					null,
+					data.req.signature
+				)
+			);
+		}
+		data.potDetails = res;
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Reward Pot fetched successfuly",
+				"getPotDetails",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+};
+
+const checkClaimExpired = function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+	}
+	if (!data.potDetails) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potDetails",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let currentDate = new Date;
+	console.log(currentDate)
+	console.log(data.potDetails.startDate)
+	console.log(data.potDetails.endDate)
+	if (data.potDetails.endDate < currentDate && currentDate <= data.potDetails.claimExpiryDate) {
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"User will able to claim",
+				"checkClaimExpired",
+				null,
+				data.req.signature
+			)
+		);
+	} else {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"User will not able to claim, out of date",
+				"checkClaimExpired",
+				null,
+				data.req.signature
+			)
+		);
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 const checkIfUserBalanceExist =function(data,response,cb){

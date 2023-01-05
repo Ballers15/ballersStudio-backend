@@ -11,6 +11,7 @@ var rewardPotSchema = new Schema({
     },
     startDate: Date,
     endDate: Date,
+    claimExpiryDate: Date,
     assetType:{
       type: String,
       enum: { values: process.env.ASSEST_TYPE.split(",") },

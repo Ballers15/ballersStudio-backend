@@ -39,6 +39,7 @@ let insertUser = [
     emailVerified:true,
     isActive:true
   }
+  
 
 ]
 

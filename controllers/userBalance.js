@@ -24,9 +24,8 @@ const addUserBalance = function (data, response, cb) {
 
     let waterFallFunctions = [];
 	// waterFallFunctions.push(async.apply(getUserGameBalance, data));	
-	waterFallFunctions.push(async.apply(web3Service.checkUserHoldsNft,data));
-
 	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkPremiumPot, data));
 	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
 	waterFallFunctions.push(async.apply(addBalanceForUser, data));
 	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	
@@ -97,6 +96,33 @@ const getPotDetails = function (data, response, cb) {
 
 };
 
+
+
+const checkPremiumPot =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	// data.potDetails
+	if(data.potDetails.potType=="REWARDPOT"){
+		let waterFallFunctions = [];
+
+		waterFallFunctions.push(async.apply(web3Service.checkUserHoldsNft,data));
+		async.waterfall(waterFallFunctions, cb);
+	}else{
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"check Premium Pot",
+				"checkPremiumPot",
+				null,
+				data.req.signature
+			)
+		);
+
+	}
+
+}
 const checkBalanceSubmissionDate = function (data, response, cb) {
     if (!cb) {
 		cb = response;
@@ -114,7 +140,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
 	}
 
 	let currentDate = new Date
-	console.log(currentDate)
+	console.log("currentDate",currentDate)
 	console.log(data.potDetails.startDate)
 	console.log(data.potDetails.endDate)
 	if (data.potDetails.startDate < currentDate && currentDate <= data.potDetails.endDate) {
@@ -132,7 +158,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
 		return cb(
 			responseUtilities.responseStruct(
 				400,
-				"User will not able to add, out of date",
+				"Submission for  pot is not allowed for this moment",
 				"checkBalanceSubmissionDate",
 				null,
 				data.req.signature

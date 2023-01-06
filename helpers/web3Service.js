@@ -226,39 +226,55 @@ const checkUserHoldsNft=async function(data,response,cb){
 if(!cb){
     cb=response;
 }
-    let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);
+    try{
 
-    let walletDetail= Array(tokenIds.length).fill(walletAddress);
-    let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
-    let exist=false;
-    balanceOfbatch.filter((el)=>{
-        let value=parseFloat(el);
-        console.log("value",value);
-        if(value==1){
-            exist=true; 
+        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);
+    
+        let walletDetail= Array(tokenIds.length).fill(walletAddress);
+        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
+        let exist=false;
+        balanceOfbatch.filter((el)=>{
+            let value=parseFloat(el);
+            console.log("value",value);
+            if(value==1){
+                exist=true; 
+            }
+        })
+        if(!exist){
+            return cb(
+                responseUtilities.responseStruct(
+                    400,
+                    "No NFT found for this wallet address",
+                    "checkUserHoldsNft",
+                    null,
+                    data.req.signature
+                )
+            );
         }
-    })
-    if(!exist){
+    
+        return cb(
+            null,
+            responseUtilities.responseStruct(
+                200,
+                "check User Holds Nft",
+                "checkUserHoldsNft",
+                {exist:exist},
+                data.req.signature
+        ));
+    }
+    catch(err){
+
         return cb(
             responseUtilities.responseStruct(
                 400,
-                "No NFT found for this wallet address",
+                `${err}`,
                 "checkUserHoldsNft",
                 null,
                 data.req.signature
             )
         );
-    }
 
-    return cb(
-        null,
-        responseUtilities.responseStruct(
-            200,
-            "check User Holds Nft",
-            "checkUserHoldsNft",
-            {exist:exist},
-            data.req.signature
-    ));
+    }
 
 }
 

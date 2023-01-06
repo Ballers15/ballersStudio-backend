@@ -186,6 +186,9 @@ const addBalanceForUser = function (data, response, cb) {
     });
 };
 
+
+
+
 const updateLotterNumber = function (data, response, cb) {
 	if (!cb) {
 		cb = response;

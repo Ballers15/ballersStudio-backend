@@ -8,7 +8,7 @@ const createRewardPot = function (data, response, cb) {
 		cb = response;
     }
 
-    if (!data.rewardTokenAmount || !data.assetDetails.contractAddress || !data.startDate || !data.endDate || !data.assetType || !data.potType ||!data.claimExpiryDate ) {
+    if (!data.rewardTokenAmount || !data.assetDetails.contractAddress || !data.startDate || !data.endDate || !data.assetType || !data.potType ||!data.claimExpiryDate) {
 		return cb(
 			responseUtilities.responseStruct(
 				400,
@@ -44,6 +44,7 @@ const addRewardPot = function (data, response, cb) {
 		startDate: data.startDate,
 		endDate: data.endDate,
 		claimExpiryDate:data.claimExpiryDate,
+		isActive:data.isActive ||false,
 		assetType: data.assetType,
 		potType: data.potType,
 		createdBy: data.req.auth.id,

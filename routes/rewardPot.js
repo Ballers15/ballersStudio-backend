@@ -51,6 +51,24 @@ router.patch( "/v1/admin/update/reward/pot",
 );
 
 
+router.patch( "/v1/admin/reward/pot/status",
+  [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.body;
+    data.req = req.data;
+    rewardPot.updateRewardPotStatus(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
 router.patch( "/v1/admin/delete/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {

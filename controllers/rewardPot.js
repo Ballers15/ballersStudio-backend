@@ -28,7 +28,6 @@ const createRewardPot = function (data, response, cb) {
 };
 exports.createRewardPot = createRewardPot;
 
-
 const addRewardPot = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
@@ -127,7 +126,79 @@ const potActionLogs = function (data, response, cb) {
 		)
 	  );
 	});
-  }
+}
+
+const updateRewardPotStatus = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+	if (!data.potId ) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"updateRewardPotStatus",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(updatePotStatus, data));
+	waterFallFunctions.push(async.apply(potActionLogs, data));
+	async.waterfall(waterFallFunctions, cb);
+
+	
+}
+exports.updateRewardPotStatus = updateRewardPotStatus;
+
+const updatePotStatus = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+
+	let updateData = {
+		isActive:data.isActive
+	};
+	
+	let findData = {
+		_id: data.potId,
+	};
+
+	RewardPot.findOneAndUpdate(findData, updateData, (err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"updatePotStatus",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+		data.insertActionLogData = {
+			potId: res._id,
+			editedBy: data.req.auth.id,
+			message: "Pot Status Change"
+		};
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Pot status updated succesfully",
+				"updatePotStatus",
+				null,
+				data.req.signature
+			)
+		);
+
+	});
+}
 
 const updateRewardPot = function (data, response, cb) {
 	if (!cb) {
@@ -169,6 +240,7 @@ const updatePot = function (data, response, cb) {
 		endDate: data.endDate,
 		assetType: data.assetType,
 		potType: data.potType,
+		isActive:data.isActive
 	};
 	
 	let findData = {
@@ -266,11 +338,12 @@ const getAllRewardPots = function (data, response, cb) {
 		cb = response;
 	}
 	
-	let findData = {
-		isActive: true
-	};
+	// let findData = {
+	// 	isActive: true
+	// };
 
-	RewardPot.find(findData)
+	// RewardPot.find(findData)
+	RewardPot.find()
 		.populate("createdBy" )
 		.exec((err, res) => {
 		if (err) {

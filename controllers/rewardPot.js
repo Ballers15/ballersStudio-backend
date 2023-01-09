@@ -239,8 +239,9 @@ const updatePot = function (data, response, cb) {
 		startDate: data.startDate,
 		endDate: data.endDate,
 		assetType: data.assetType,
+		claimExpiryDate:data.claimExpiryDate,
 		potType: data.potType,
-		isActive:data.isActive
+		isActive:data.isActive||false
 	};
 	
 	let findData = {

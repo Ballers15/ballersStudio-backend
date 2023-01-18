@@ -216,7 +216,7 @@ console.log(updateDate,findData);
                 // return cb(null)
             }
         })
-        console.log("asssssssssssssssss",i);
+        console.log("last waterfall executed",i);
         
     }
 

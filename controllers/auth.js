@@ -16,6 +16,8 @@ const LoginStats = require('../models/loginStats');
 // Helpers Service
 const utilities = require('../helpers/security');
 const responseUtilities = require('../helpers/sendResponse');
+const mailJetService = require("../helpers/mailJetService");
+
 // const email = require('../helpers/email');
 
 
@@ -1106,3 +1108,172 @@ exports.verifyCaptcha = function (data, response, cb) {
     });
  };
  
+
+ exports.registryInMailjet = function (data, response, cb) {
+    if(!cb){
+        cb=response;
+    }
+
+    if (!data.email) {
+        return cb(
+          responseUtilities.responseStruct(
+            400,
+            "Email Missing",
+            "registryInMailjet",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      let waterFallFunctions = [];
+     waterFallFunctions.push(async.apply(checkContactByMailId, data));
+     waterFallFunctions.push(async.apply(addContactToMailJet, data));
+     waterFallFunctions.push(async.apply(addMailToContactList, data));
+     async.waterfall(waterFallFunctions, cb);
+
+ }
+
+
+ const checkContactByMailId= function (data, response, cb) {
+    if(!cb) {
+      cb = response;
+    }
+  
+   let sendData = {
+     email:data.email
+   }
+    mailJetService.checkContactByMailId(sendData, (err, res) => {
+      if (err) {
+        console.error("mailJetServiceError", err);
+        return cb(
+          null,
+          responseUtilities.responseStruct(
+            200,
+            "check Contact By MailId",
+            "checkContactByMailId",
+            null,
+            data.req.signature
+          )
+        );
+        
+      }
+      console.log("RES IS ",res);
+       if(res.Data.length)
+       data.mailJetId = res.Data[0].ID;
+       
+      
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "check Contact By MailId",
+          "checkContactByMailId",
+          null,
+          data.req.signature
+        )
+      );
+    });
+  }
+  
+
+  const addContactToMailJet =function (data, response, cb) {
+    if(!cb) {
+      cb = response;
+    }
+  
+   if(data.mailJetId)
+   {  return cb(
+    null,
+    responseUtilities.responseStruct(
+      200,
+      "contact already added",
+      "addContactToMailJet",
+      null,
+      data.req.signature
+      )
+     );
+  
+   } 
+  
+   let sendData = {
+     email:data.email,
+   }
+    mailJetService.addContactToMailJet(sendData, (err, res) => {
+      if (err) {
+        console.error("mailJetServiceError", err);
+        return cb(
+          null,
+          responseUtilities.responseStruct(
+            200,
+            "add Contact To MailJet",
+            "addContactToMailJet",
+            null,
+            data.req.signature
+          )
+        );
+        
+      }
+       console.log("ADDING CONTACT TO MAIL JET",res.Data);
+      if(res.Data)
+      {
+      data.mailJetId=res.Data[0].ID
+      }
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "addContactToMailJet",
+          "addContactToMailJet",
+          null,
+          data.req.signature
+        )
+      );
+    });
+}
+
+
+const addMailToContactList=function(data,response,cb) {
+    if(!cb){
+      cb = response 
+    }
+    console.log("mailJetContactList",process.env.MAILJET_CONTACT_LIST);
+  
+    let sendData = {
+      listId:JSON.parse(process.env.MAILJET_CONTACT_LIST).ballers,
+      mailJetId:data.email
+    }
+   
+    console.log("addMailToContactList send data",sendData);
+  
+     mailJetService.addMailToContactList(sendData, (err, res) => {
+      if (err) {
+        console.error("mailJetServiceError", err);
+        return cb(
+          null,
+          responseUtilities.responseStruct(
+            200,
+            "addMailToContactList",
+            "addMailToContactList",
+            null,
+            data.req.signature
+          )
+        );
+        
+      }
+  
+      console.log("ADDED IN MAILLLLLLL",res);
+   
+       return cb(
+         null,
+         responseUtilities.responseStruct(
+           200,
+           "add Mail To ContactList",
+           "addMailToContactList",
+           null,
+           data.req.signature
+         )
+       );
+     });
+  
+  }
+  

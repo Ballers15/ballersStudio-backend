@@ -45,12 +45,13 @@ for(let i= 0;i<tokenIds.length;i++){
     finalArray.push(balanceOfbatch);
 
 }
+console.log("finalArray",finalArray);
 
 
 for(let i in userNftDetails){
 let count=0;
 
-    for(let j in finalArray){s
+    for(let j in finalArray){
         let nftCount=parseFloat(finalArray[j][i]);
         if(nftCount>0){
             count+=1;
@@ -65,7 +66,7 @@ let count=0;
 
         totalInGameCashInPool=new BigNumber(userNftDetails[i].amount).plus(totalInGameCashInPool);
     }
-    console.log(totalInGameCashInPool.toString());
+    console.log("Total in game cash",totalInGameCashInPool.toString());
 }
 
 for(let i in userNftDetails){
@@ -134,8 +135,8 @@ const createUserSignature =async function(data,response,cb){
     );   
 
     let messageBytes = ethers.utils.arrayify(messages);
-    let signerS = new ethers.Wallet(privateKey);
-    let signature = await signerS.signMessage(messageBytes);
+    let signer = new ethers.Wallet(privateKey);
+    let signature = await signer.signMessage(messageBytes);
     console.log("signature$$$$$$----",signature);
     let userSignature={
         signature

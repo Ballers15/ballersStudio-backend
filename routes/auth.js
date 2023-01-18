@@ -177,21 +177,31 @@ router.patch('/v1/user/reset/password', [authenticator,authenticateRole(['USER']
     });
 });
 
-/* POST user verify captcha */
-// router.post('/v1/verify/captcha', function(req, res, next) {
-//     let data = req.body;
-//     data.req = req.data;
 
-//     auth.verifyCaptcha(data, function(err, response) {
-//         let status = 0;
-//         if (err) {
-//             status = err.status;
-//             return res.status(status).send(err);
-//         }
-//         status = response.status;
-//         return res.status(status).send(response);
-//     });
-// });
+/* Mailjet */
+router.post("/v1/user/register/mailjet", function (req, res, next) {
+ 
+    let data = req.body;
+    data.req = req.data;
+    auth.registryInMailjet(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  });
+  
+
+
+
+
+
+
+
+
 
 // /**Social Connections */
 

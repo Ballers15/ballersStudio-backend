@@ -17,10 +17,11 @@ const opt = {
     
 };
 
-const connstring = process.env.mongoConnectionString;
+let connstring = process.env.mongoConnectionString;
 console.log("connstring:",connstring);
 
 const connectWithRetry = function() {
+    console.log("connstringconnstringconnstring",connstring);
     return mongoose.connect(connstring, opt, function(err) {
         if (err) {
             console.error('Failed to connect to mongo on startup - retrying in 5 sec', err);

@@ -18,7 +18,7 @@ const opt = {
 };
 
 let connstring = process.env.mongoConnectionString;
-connstring= "mongodb://mongo:27017/ballers";
+// connstring= "mongodb://mongo:27017/ballers";
 console.log("connstring:",connstring);
 
 const connectWithRetry = function() {

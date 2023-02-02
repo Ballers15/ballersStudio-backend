@@ -29,6 +29,7 @@ if (env === 'development') {
     const developmentEnvConfig = require('./development');
     Object.keys(developmentEnvConfig).forEach((key) => {
         process.env[key] = developmentEnvConfig[key];
+    
     })
 } else { // PRODUCTION
 

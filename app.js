@@ -2,6 +2,7 @@ if(!process.env.NODE_ENV){
   process.env.NODE_ENV = "development"
 }
 
+console.log("process.env.NODE_ENV");
 // Required Files to make default Connection
 require('./config/index');
 require('./models/db');

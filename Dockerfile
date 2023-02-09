@@ -1,8 +1,11 @@
 # Specify a base image
 FROM node:16
+RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "./"]
+
+COPY package.json /usr/src/app/
+
 
 
 # Install some depenendencies

@@ -1,6 +1,6 @@
 # Specify a base image
 FROM node:16
-
+RUN npm install -g nodemon
 WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "./"]
 

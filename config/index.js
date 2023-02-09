@@ -10,7 +10,6 @@ const commonVariables = {
     SERVICE_RPC_HOST: 'http://localhost',
     SERVICE_REST_PORT: '8001',
     SERVICE_RPC_PORT: '8002',
-    CORE_USER_PORT: '8500',
     DB_ENV: 'development',
     pageLimit: 10,
     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],

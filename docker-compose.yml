@@ -6,7 +6,7 @@ services:
     env_file: "./config/development.js"
     environment:
     # mongodb://localhost/ballers
-      - DOCKER_URL="mongodb://mongo:27017/ballers"
+      - DOCKER_URL=mongodb://mongo:27017/ballers
     ports:
     - "8001:8001"
     volumes:
@@ -17,6 +17,8 @@ services:
     - mongo
   mongo:
     image: mongo
+    volumes:  
+      - /dbdata:/data/db
     ports:
     - "27019:27017"
 

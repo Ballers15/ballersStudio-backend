@@ -5,7 +5,7 @@ router.use(formatRequest);
 const clients = {
     users: {
         host: process.env.SERVICE_RPC_HOST,
-        port: process.env.CORE_USER_PORT
+        port: process.env.SERVICE_RPC_PORT
     }
 };
 

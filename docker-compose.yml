@@ -11,6 +11,8 @@ services:
     - "8001:8001"
     volumes:
     - .:/usr/src/app
+    - node_modules:/usr/src/app/node_modules
+
     depends_on:
     - mongo
   mongo:

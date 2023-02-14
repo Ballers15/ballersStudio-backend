@@ -14,6 +14,7 @@ const getAllUsers = function (data, response, cb) {
 	let findData = {
 		role:'USER',
 	};
+
 	let projection = {
 		_id: 1,
 		role: 1,
@@ -25,9 +26,16 @@ const getAllUsers = function (data, response, cb) {
 		accountId: 1,
 		email: 1,
 		name: 1,
-	  };
+	};
+	
+	let limit = parseInt(process.env.pageLimit);
+	let skip = 0;
+	if (data.currentPage) {
+	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
+	}
+  
 
-	Users.find(findData,projection).exec((err, res) => {
+	Users.find(findData,projection) .skip(skip).limit(limit).sort({ createdAt: -1 }).exec((err, res) => {
 		if (err) {
 			console.error(err);
 			return cb(
@@ -40,17 +48,32 @@ const getAllUsers = function (data, response, cb) {
 				)
 			);
 		}
-		console.log("res", res);
-		return cb(
-			null,
-			responseUtilities.responseStruct(
+		Users.countDocuments(findData, (err, count) => {
+			if (err) {
+			  console.error(err);
+			  return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "getAllUsers",
+				  null,
+				  null
+				)
+			  );
+			}
+			return cb(
+			  null,
+			  responseUtilities.responseStruct(
 				200,
 				"Users fetched successfuly",
 				"getAllUsers",
-				res,
-				data.req.signature
-			)
-		);
+				{ Users:res,count: count,pageLimit:limit},
+				null
+			  )
+			);
+		  });
 	});
+
+	
 }
 exports.getAllUsers = getAllUsers;

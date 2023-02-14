@@ -4,6 +4,7 @@ const Users = require("../models/users");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 
+// ` Users.find({ createdAt : {$gte: data.startDate, $lt:data.endDate}})`
 
 
 const getAllUsers = function (data, response, cb) {
@@ -14,6 +15,7 @@ const getAllUsers = function (data, response, cb) {
 	let findData = {
 		role:'USER',
 	};
+	let createdAt={};
 
 	let projection = {
 		_id: 1,
@@ -33,7 +35,17 @@ const getAllUsers = function (data, response, cb) {
 	if (data.currentPage) {
 	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
 	}
-  
+	if (data.startDate) {
+		createdAt["$gte"] = new Date(data.startDate);
+  }
+	if (data.endDate) {
+		createdAt["$lte"] = new Date(data.endDate);
+	}
+	if (data.startDate || data.endDate) {
+		findData.createdAt = createdAt;
+	}
+
+	console.log(findData,'-----------------------find date')
 
 	Users.find(findData,projection) .skip(skip).limit(limit).sort({ createdAt: -1 }).exec((err, res) => {
 		if (err) {

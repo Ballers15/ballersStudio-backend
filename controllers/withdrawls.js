@@ -75,7 +75,6 @@ const getAllWithdrawls = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
 	}
-	
 
 	Withdrawls.find()
 		.populate("userId potId " )

@@ -49,8 +49,6 @@ Insert predefined seed data (one time operation)
 
 ```shell
 npm run seeds
-node ./seeds/seedSkill.js
-
 ```
 
 ## Run It

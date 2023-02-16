@@ -17,7 +17,7 @@ Version MongoDB 4.4
 
 ## Version 0.0.1
 
-View Current & Previous Versions details [linky](./VERSIONS.md)
+View Current & Previous Versions details [linky](./VERSION.md)
 
 ## Get Started
 

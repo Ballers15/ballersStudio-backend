@@ -1,10 +1,10 @@
-## BIZTHON (ERP BACKEND)
+## Ballers (BACKEND)
 
 ## Description
 
-Gaming Portal - Reward withdrawal portal.
-This project is an Express backend for a web application.
-This project was created with [EXPRESS SERVER](https://github.com/expressjs/express) version ^4.16.3.
+* Gaming Portal - Reward withdrawal portal.
+* This project is an Express backend for a web application.
+* This project was created with [EXPRESS SERVER](https://github.com/expressjs/express) version ^4.16.3.
 ## Prerequisites
 
 Make sure you have installed all of the following prerequisites on your development machine:
@@ -73,11 +73,11 @@ NODE_ENV=production npm start
 
 ## Documentation
 
-* Open you're browser to [https://testapi.recru.in](https://testapi.recru.in)
+* Open you're browser to [https://testapi.recru.in](https://testapi.ballers.in)
 * Run api described in swagger doc
 * Invoke the `/examples` endpoint
   ```shell
-  curl https://testapi.recru.in/api/v1/examples
+  curl https://testapi.ballers.in/api/v1/examples
   ```
 
 ## Config

@@ -71,7 +71,7 @@ NODE_ENV=production npm start
 
 ## Documentation
 
-* Open you're browser to [https://testapi.recru.in](https://testapi.ballers.in)
+* Open you're browser to [https://testapi.ballers.in](https://testapi.ballers.in)
 * Run api described in swagger doc
 * Invoke the `/examples` endpoint
   ```shell

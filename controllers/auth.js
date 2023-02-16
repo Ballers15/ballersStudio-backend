@@ -490,6 +490,7 @@ const checkUserName = function (data, response, cb) {
     if (!cb) {
         cb = response;
     }
+    console.log(data,'-------------------------------data response')
     if (!data.userName || !data.email) {
         return cb(responseUtilities.responseStruct(400, null, "checkUserName", null, data.req.signature));
     }
@@ -498,6 +499,7 @@ const checkUserName = function (data, response, cb) {
         userName: data.userName
     }
 
+
     Users.findOne(where, function (err, res) {
         if (err) {
             console.error(err);
@@ -505,6 +507,7 @@ const checkUserName = function (data, response, cb) {
         }
         
         if(res){
+            console.log(data,'-------------------------------data response')
             if(data.email && (res.email == data.email)){
                 return cb(null, responseUtilities.responseStruct(200, null, "checkUserName", null, data.req.signature));
             }

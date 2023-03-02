@@ -17,10 +17,8 @@ services:
     - mongo
   mongo:
     image: mongo
-    volumes:  
-      - /dbdata:/data/db
     ports:
-    - "27019:27017"
+    - "27017:27017"
 
 
 

@@ -861,13 +861,16 @@ const checkResetPasswordsRequest = function (data, response, cb) {
 
                 data.token = btoa(newPassReq._id.toString());
                 console.log("Token", data.token);
-                return cb(null,responseUtilities.responseStruct(200, "Verified Link created", "checkResetPasswordsRequest", null, null));
+                let resetToken=data.token;  //chane this
+//TODO
+                return cb(null,responseUtilities.responseStruct(200, "Verified Link created", "checkResetPasswordsRequest", {token:resetToken}, null));
             })
         } else {
             data.token = btoa(res._id.toString());
             console.log("Token", data.token);
-
-            return cb(null,responseUtilities.responseStruct(200, "Verified Link created", "checkResetPasswordsRequest", null, null));
+    //TODO
+            let resetToken=data.token;
+            return cb(null,responseUtilities.responseStruct(200, "Verified Link created", "checkResetPasswordsRequest", {token:resetToken}, null));
         }
     })
 };

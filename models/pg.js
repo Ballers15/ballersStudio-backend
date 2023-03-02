@@ -1,7 +1,7 @@
 const { Client } = require('pg')
 
 
-
+// production
 // 	dsn := "host=localhost user=postgres  dbname=template1 port=5432 sslmode=disable"
 
 const client = new Client({
@@ -22,7 +22,7 @@ const connectWithRetry = function() {
             console.error('Failed to connect to pg on startup - retrying in 5 sec', err);
             setTimeout(connectWithRetry, 5000);
         };
-        console.log("Connected to postgres!");
+        console.log("Postgres Connection Established");
       });
 
 

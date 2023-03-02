@@ -6,9 +6,7 @@ if(!process.env.NODE_ENV){
 // require('./models/pg');
 require('./config/index');
 require('./models/db');
-
 require('./server');
-
 require('./helpers/social');
 
 //Required Modules for framework connection
@@ -61,12 +59,15 @@ const auth = require('./routes/auth');
 const cryptoWallet = require('./routes/cryptoWallet')
 const rewardPot = require('./routes/rewardPot')
 const userBalance=require('./routes/userBalance')
-const withdrawls=require('./routes/withdrawls')
+const withdrawls = require('./routes/withdrawls')
+const users = require('./routes/user')
+
 app.use('/auth', auth);
 app.use('/crypto/wallet', cryptoWallet);
 app.use('/pot', rewardPot);
 app.use('/user', userBalance);
 app.use('/withdrawls', withdrawls);
+app.use('/users', users);
 
 
 

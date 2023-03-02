@@ -12,7 +12,6 @@ const clients = {
 const data = {};
 const authenticator = require('../middlewares/authenticator')(clients, data);
 const authenticateRole = require('../middlewares/authenticateRole');
-
 const withdrawls = require("../controllers/withdrawls");
 
 

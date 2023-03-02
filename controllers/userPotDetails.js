@@ -1,195 +1,41 @@
 const async = require("async");
 const mongoose = require("mongoose");
-
-const Withdrawls = require("../models/withdrawls");
+const RewardPot = require("../models/rewardPot");
+const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
-const userPotDetails =require("../models/userPotDetails");
-const web3Service =require("../helpers/web3Service");
-const createWithdrawl = function (data, response, cb) {
+const web3Service=require("../helpers/web3Service");
+
+const adduserPotDetails = function (data, response, cb) {
     if (!cb) {
 		cb = response;
     }
-    
 
-    if (!data.potId || !data.walletAddress || !data.amount || !data.token.ticker || !data.token.contractAddress || !data.signature|| !data.nonce|| !data.hash|| !data.status ) {
+    if (!data.walletAddress || !data.amount ||!data.potId) {
 		return cb(
 			responseUtilities.responseStruct(
 				400,
 				null,
-				"createWithdrawl",
+				"adduserPotDetails",
 				null,
 				data.req.signature
 			)
 		);
     }
-    
 
-    let insertData = {
-		potId: data.potId,
-		token: {
-			contractAddress: data.token.contractAddress,
-			ticker: data.token.ticker,
-		},
-		walletAddress: data.walletAddress,
-		amount: data.amount,
-		signature: data.signature,
-		nonce: data.nonce,
-		hash: data.hash,
-		status: data.status,
-		userId: data.req.auth.id,
+    let waterFallFunctions = [];
 
-    };
-    
+	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+	waterFallFunctions.push(async.apply(checkPremiumPot, data));
+	// waterFallFunctions.push(async.apply(getUserGameBalance, data));	
+	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	
 
-    Withdrawls.create(insertData, (err, res) => {
-		if (err) {
-			console.log("Withdrawls Error : ", err);
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					"Error in creating Withdrawl",
-					"createWithdrawl",
-					null,
-					data.req.signature
-				)
-			);
-        }
-        return cb(
-		  null,
-		  responseUtilities.responseStruct(
-		    200,
-		    "Withdrawl created Successfully",
-		    "createWithdrawl",
-		    res,
-		    data.req.signature
-		  )
-		);
-	
-	});
+	waterFallFunctions.push(async.apply(addBalanceForUser, data));
+
+	async.waterfall(waterFallFunctions, cb);
   
 };
-exports.createWithdrawl = createWithdrawl;
-
-
-const getAllWithdrawls = function (data, response, cb) {
-	if (!cb) {
-		cb = response;
-	}
-
-	Withdrawls.find()
-		.populate("userId potId " )
-		.exec((err, res) => {
-		if (err) {
-			console.error(err);
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					null,
-					"getAllWithdrawls",
-					null,
-					data.req.signature
-				)
-			);
-		}
-
-		return cb(
-			null,
-			responseUtilities.responseStruct(
-				200,
-				"Withdrawls fetched Successfully",
-				"getAllWithdrawls",
-				res,
-				data.req.signature
-			)
-		);
-	});
-}
-exports.getAllWithdrawls = getAllWithdrawls;
-
-
-const getWithdrawlById = function (data, response, cb) {
-	if (!cb) {
-		cb = response;
-	}
-
-	if (!data.WithdrawlId) {
-		return cb(
-			responseUtilities.responseStruct(
-				400,
-				"missing WithdrawlId",
-				"getWithdrawlById",
-				null,
-				data.req.signature
-			)
-		);
-	}
-
-	let findData = {
-		_id: data.WithdrawlId,
-	};
-
-	Withdrawls.find(findData).populate("userId potId").exec((err, res) => {
-		if (err) {
-			console.error(err);
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					null,
-					"getWithdrawlById",
-					null,
-					data.req.signature
-				)
-			);
-		}
-		console.log("res", res);
-		return cb(
-			null,
-			responseUtilities.responseStruct(
-				200,
-				"Withdrawl fetched successfuly",
-				"getWithdrawlById",
-				res,
-				data.req.signature
-			)
-		);
-	});
-
-
-}
-exports.getWithdrawlById = getWithdrawlById;
-
-
-const createClaimWithdrawl = function(data,response,cb){
-
-	if (!cb) {
-		cb = response;
-    }
-    
-
-    if (!data.potId || !data.walletAddress ) {
-		return cb(
-			responseUtilities.responseStruct(
-				400,
-				null,
-				"createClaimWithdrawl",
-				null,
-				data.req.signature
-			)
-		);
-    }
-    
-
-	let waterFallFunctions = [];
-	waterFallFunctions.push(async.apply(getPotDetails,data));
-	waterFallFunctions.push(async.apply(checkClaimExpired, data));
-	waterFallFunctions.push(async.apply(checkIfuserPotDetailsExist, data));
-	waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
-	waterFallFunctions.push(async.apply(getLatestNonce, data));
-	waterFallFunctions.push(async.apply(web3Service.createUserSignature, data));
-	waterFallFunctions.push(async.apply(initiateWithdrawl, data));
-	async.waterfall(waterFallFunctions, cb);
-}
-
+exports.adduserPotDetails = adduserPotDetails;
 
 const getPotDetails = function (data, response, cb) {
     if (!cb) {
@@ -252,6 +98,392 @@ const getPotDetails = function (data, response, cb) {
 
 };
 
+
+
+const checkPremiumPot =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	// data.potDetails
+	if(data.potDetails.potType=="REWARDPOT"){
+		let waterFallFunctions = [];
+
+		waterFallFunctions.push(async.apply(web3Service.checkUserHoldsNft,data));
+		async.waterfall(waterFallFunctions, cb);
+	}else{
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"check Premium Pot",
+				"checkPremiumPot",
+				null,
+				data.req.signature
+			)
+		);
+
+	}
+
+}
+const checkBalanceSubmissionDate = function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+	}
+	if (!data.potDetails) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potDetails",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let currentDate = new Date
+	console.log("currentDate",currentDate)
+	console.log(data.potDetails.startDate)
+	console.log(data.potDetails.endDate)
+	//check for is pot active or closed
+	
+	if(!data.potDetails.isActive) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"Submission for  pot is not allowed for this moment pot is closed",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+
+	if (data.potDetails.startDate < currentDate && currentDate <= data.potDetails.endDate) {
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"User will able to add",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	} else {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"Submission for  pot is not allowed for this moment",
+				"checkBalanceSubmissionDate",
+				null,
+				data.req.signature
+			)
+		);
+	}
+};
+
+const addBalanceForUser = function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+    }
+
+	let findData = {
+		potId:data.potId,
+        walletAddress: data.walletAddress,
+		userId: data.req.auth.id,
+    };
+	console.log("findara",findData);
+
+	let updateData = {
+		$inc: { amount: data.amount },
+	}
+
+	
+	  let options ={
+        upsert:true,
+        new:true,
+        setDefaultsOnInsert:true
+    }   
+    userPotDetails.findOneAndUpdate(findData,updateData,options, (err, res) => {
+		if (err) {
+			console.log("userPotDetails Error : ", err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in creating userPotDetails",
+					"addBalanceForUser",
+					null,
+					data.req.signature
+				)
+			);
+        }
+        return cb(
+		  null,
+		  responseUtilities.responseStruct(
+		    200,
+		    "User Balance Added Successfully",
+		    "addBalanceForUser",
+		    res,
+		    data.req.signature
+		  )
+		);
+    });
+};
+
+
+
+//not in use
+const updateLotterNumber = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+
+	if (!data.walletAddress ||!data.potId||!data.lotteryNumbers) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"updateLotterNumber",
+				null,
+				data.req.signature
+			)
+		);
+	}
+	
+
+    let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+	waterFallFunctions.push(async.apply(addLotterNumber, data));
+
+	async.waterfall(waterFallFunctions, cb);
+}
+exports.updateLotterNumber = updateLotterNumber;
+
+//not in use
+const  addLotterNumber = async function (data, response, cb) {
+    if (!cb) {
+		cb = response;
+	}
+	if (!data.lotteryNumbers || !data.potId || !data.walletAddress) {
+		console.log("data", data);
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"addLotterNumber",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		potId:data.potId,
+        walletAddress: data.walletAddress,
+		userId: data.req.auth.id
+	};
+
+	let options = {
+		upsert: true,
+	};
+	
+	let updateData = { "$addToSet": { "lotteryNumbers": { $each: data.lotteryNumbers } } };
+
+	userPotDetails.findOneAndUpdate(findData,updateData,options, (err, res) => {
+		if (err) {
+			console.log("userPotDetails Error : ", err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in adding lottery number",
+					"addLotterNumber",
+					null,
+					data.req.signature
+				)
+			);
+        }
+        return cb(
+		  null,
+		  responseUtilities.responseStruct(
+		    200,
+		    "Lottery number added succesfully",
+		    "addLotterNumber",
+		    res,
+		    data.req.signature
+		  )
+		);
+    });
+	
+	
+
+	
+};
+
+
+
+
+
+const getAlluserPotDetails = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+	
+	
+	userPotDetails.find()
+		.populate("userId potId" )
+		.exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getAlluserPotDetails",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"User Balances fetched Successfully",
+				"getAlluserPotDetails",
+				res,
+				data.req.signature
+			)
+		);
+	});
+}
+exports.getAlluserPotDetails = getAlluserPotDetails;
+
+const getuserPotDetailsById = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+
+	if (!data.balanceId) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing balanceId",
+				"getuserPotDetailsById",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		_id: data.balanceId,
+	};
+
+	userPotDetails.find(findData).populate("potId").exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getuserPotDetailsById",
+					null,
+					data.req.signature
+				)
+			);
+		}
+		console.log("res", res);
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"User Balance fetched successfuly",
+				"getuserPotDetailsById",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+
+}
+exports.getuserPotDetailsById = getuserPotDetailsById;
+
+
+
+
+const addLotteryPotBalance = function(data,response,cb){
+
+	if(!cb){
+		cb=response;
+	}
+
+
+	if (!data.walletAddress ||!data.potId) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"addLotteryPotBalance",
+				null,
+				data.req.signature
+			)
+		);
+    }
+
+    let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails, data));
+	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+    // waterFallFunctions.push(async.apply(getUserGameBalance, data));
+	//add data.amount from here	
+	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	
+	waterFallFunctions.push(async.apply(addBalanceForUser, data));
+
+	async.waterfall(waterFallFunctions, cb);
+	
+}
+exports.addLotteryPotBalance=addLotteryPotBalance
+
+
+
+
+const createClaimWithdrawl = function(data,response,cb){
+
+	if (!cb) {
+		cb = response;
+    }
+    
+
+    if (!data.potId || !data.walletAddress ) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"createClaimWithdrawl",
+				null,
+				data.req.signature
+			)
+		);
+    }
+    
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails,data));
+	waterFallFunctions.push(async.apply(checkClaimExpired, data));
+	waterFallFunctions.push(async.apply(checkIfuserPotDetailsExist, data));
+	waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
+	waterFallFunctions.push(async.apply(getLatestNonce, data));
+	waterFallFunctions.push(async.apply(web3Service.createUserSignature, data));
+	waterFallFunctions.push(async.apply(initiateWithdrawl, data));
+	async.waterfall(waterFallFunctions, cb);
+}
+
+exports.createClaimWithdrawl=createClaimWithdrawl;
+
 const checkClaimExpired = function (data, response, cb) {
     if (!cb) {
 		cb = response;
@@ -297,18 +529,6 @@ const checkClaimExpired = function (data, response, cb) {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 const checkIfuserPotDetailsExist =function(data,response,cb){
 
 	if(!cb){
@@ -341,9 +561,16 @@ const checkIfuserPotDetailsExist =function(data,response,cb){
 		}
 		console.log(res);
 
-		let userBal=res.amount;
-		let nftCount=res.nftHolded;
+		let userBal=0;
+		let nftCount=0;
+
+//check if only nft has weightage
+
+		if(res){
+			 userBal=res.amount;
+		 nftCount=res.nftHolded;
 		data.amount=res.amount;
+		}
 
 		if(userBal>0&&nftCount>0){
 	
@@ -363,7 +590,7 @@ const checkIfuserPotDetailsExist =function(data,response,cb){
 		return cb(
 			responseUtilities.responseStruct(
 				400,
-				"No balance exist for user",
+				"No balance exist for the logined user with this wallet address and no nft found in the wallet",
 				"checkIfuserPotDetailsExist",
 				null,
 				data.req.signature
@@ -372,56 +599,7 @@ const checkIfuserPotDetailsExist =function(data,response,cb){
 	})
 
 }
-//to check if nonce exist for particular user for same pot
-const checkIfUserNonceExist = function(data,response,cb){
 
-
-	if(!cb){
-
-		cb=response;
-	}
-
-	let findData={
-		potId:data.potId,
-		walletAddress:data.walletAddress,
-		userId:data.req.auth.id
-	};
-	Withdrawls.findOne(findData).sort({"createdAt":-1}).exec((err,res)=>{
-		if(err){
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					"Error in creating Withdrawl",
-					"getLatestNonce",
-					null,
-					data.req.signature
-				)
-			);
-		}
-		console.log(res);
-		if(res){
-			data.nonce=res.nonce;
-		}
-		return cb(
-			null,
-			responseUtilities.responseStruct(
-				200,
-				"Withdrawls fetched Successfully",
-				"getAllWithdrawls",
-				res,
-				data.req.signature
-			)
-		);
-
-
-
-
-	})
-
-
-
-
-}
 
 const checkIfSignatureExist = function(data,response,cb){
 
@@ -436,7 +614,7 @@ const checkIfSignatureExist = function(data,response,cb){
 		walletAddress:data.walletAddress,
 		userId:data.req.auth.id
 	};
-	Withdrawls.findOne(findData).exec((err,res)=>{
+	userPotDetails.findOne(findData).exec((err,res)=>{
 		if(err){
 			return cb(
 				responseUtilities.responseStruct(
@@ -497,7 +675,7 @@ const getLatestNonce =function(data,response,cb){
 	}
 
 
-	Withdrawls.find().sort({"createdAt":-1}).exec((err,res)=>{
+	userPotDetails.find().sort({"createdAt":-1}).exec((err,res)=>{
 		if(err){
 			return cb(
 				responseUtilities.responseStruct(
@@ -538,8 +716,6 @@ const getLatestNonce =function(data,response,cb){
 	})
 
 }
-exports.createClaimWithdrawl = createClaimWithdrawl;
-
 
 
 const initiateWithdrawl =function(data,response,cb){
@@ -583,7 +759,7 @@ if(data.signatureExist){
 
 	}
 	console.log("findData",findData,updateData,options);
-	Withdrawls.findOneAndUpdate(findData,updateData,options).exec((err,res)=>{
+	userPotDetails.findOneAndUpdate(findData,updateData,options).exec((err,res)=>{
 		if(err){
 			console.log("err",err);
 			return cb(
@@ -612,14 +788,16 @@ if(data.signatureExist){
 	})
 }
 
-//if this goes in pending i will create a cron that checks every withdrawl
 
+
+///////////////////////////////////
 
 const updateWithdrawl =function(data,response,cb){
+
 	if(!cb){
 		cb=response;
-
 	}
+
 	if (!data.potId || !data.walletAddress ||!data.txnHash ||!data.withdrawlId ) {
 		return cb(
 			responseUtilities.responseStruct(
@@ -636,11 +814,8 @@ const updateWithdrawl =function(data,response,cb){
 	let waterFallFunctions = [];
 	waterFallFunctions.push(async.apply(web3Service.getTransactionStatus, data));
 	waterFallFunctions.push(async.apply(updateTransactionDetails, data));
-	waterFallFunctions.push(async.apply(updateuserPotDetails, data));
-
 	async.waterfall(waterFallFunctions, cb);
-
-    
+   
 }
 exports.updateWithdrawl = updateWithdrawl;
 
@@ -650,7 +825,9 @@ const updateTransactionDetails =function(data,response,cb){
 		cb=response;
 	}
 	let  transactionStatus=response.data;
+
 	console.log("transactionStatus",transactionStatus,data.txnHash);
+
 	let findData = {
         _id:data.withdrawlId,
 		potId:data.potId,
@@ -659,13 +836,15 @@ const updateTransactionDetails =function(data,response,cb){
 
     }
 
+
 	let updateData={
         hash:data.txnHash,
         status:transactionStatus.status,
+        rewardClaimed:transactionStatus.status=="COMPLETED"?true :false
 
     }
 
-	Withdrawls.findOneAndUpdate(findData,updateData).exec((err,res)=>{
+	userPotDetails.findOneAndUpdate(findData,updateData).exec((err,res)=>{
 		if(err){
 			console.log("err",err);
 			return cb(
@@ -693,50 +872,6 @@ const updateTransactionDetails =function(data,response,cb){
 
 
 
-
-
-}
-
-const updateuserPotDetails =function(data,response,cb){
-	if(!cb){
-		cb=response;
-	}
-	let transactionStatus=response.data;
-	let findData = {
-		potId:data.potId,
-		walletAddress:data.walletAddress,
-		userId:data.req.auth.id
-    }
-
-	let updateData={
-        rewardClaimed:transactionStatus.status=="COMPLETED"?true :false
-
-    }
-
-	userPotDetails.findOneAndUpdate(findData,updateData).exec((err,res)=>{
-		if(err){
-			console.log("err",err);
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					"Error in updating",
-					"updateTransactionDetails",
-					null,
-					data.req.signature
-				)
-			);	
-		}
-		return cb(
-			null,
-			responseUtilities.responseStruct(
-				200,
-				"updated Successfully",
-				"updateTransactionDetails",
-				res,
-				data.req.signature
-			)
-		);
-	})
 
 
 }

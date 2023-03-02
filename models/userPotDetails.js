@@ -1,22 +1,32 @@
 let mongoose = require('./db');
 
 let Schema = mongoose.Schema;
-
-var userBalanceSchema = new Schema({
+// user pot
+var userPotDetailsSchema = new Schema({
+   
     potId: { type: mongoose.Schema.Types.ObjectId, ref: "rewardPot" },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     walletAddress:String,
     amount: Number,
-    lotteryNumbers:[],
+    lotteryWon:{type:Boolean,default:false},
     nftHolded:{type:Number,default:0},
     rewardedTokenAmount:{type:Number,default:0},
     rewardPointsPercentage:{type:Number,default:0},
     rewardPoints:{type:Number,default:0},
     rewardClaimed:{type:Boolean ,default:false},
 
+    signature :String,
+    nonce:String,
+    hash:String,
+    status:{
+        type: String,
+        enum: { values: process.env.TRANSACTION_STATUS.split(",") },
+        default: "PENDING",
+
+      }
 
 },{ timestamps: true });
 
-const userBalance = mongoose.model('userBalance', userBalanceSchema);
+const userPotDetails = mongoose.model('userPotDetails', userPotDetailsSchema);
 
-module.exports = userBalance;
+module.exports = userPotDetails;

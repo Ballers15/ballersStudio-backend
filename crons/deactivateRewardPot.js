@@ -3,7 +3,7 @@ require('../models/db');
 const async = require("async");
 const cron = require('node-cron');
 const RewardPot = require("../models/rewardPot");
-const UserBalance = require("../models/userBalance");
+const userPotDetails = require("../models/userPotDetails");
 const NftBalance = require('../helpers/web3Service');
 //      0 0 * * *                     10 sec
 let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid night
@@ -78,12 +78,12 @@ const getUserDetailsFromPotId = function (data, response, cb) {
         potId: { $in:rewardPotIds }
     }
 
-    UserBalance.find(findData).exec((err, res) => {
+    userPotDetails.find(findData).exec((err, res) => {
 		if (err) {
 			console.error(err);
         } else {
-            data.userBalanceDetails = res;
-            data.userBalanceIds = res.map((el) => el._id);
+            data.userPotDetailsDetails = res;
+            data.userPotDetailsIds = res.map((el) => el._id);
             return cb(null);
         }
         
@@ -112,7 +112,7 @@ const updateNftBalanceInUserSchema = async function (data, response, cb) {
 
     for(let i in balanceFetchedFromOpensea){
         let findData = {
-            _id:balanceFetchedFromOpensea[i].userBalanceId
+            _id:balanceFetchedFromOpensea[i].userPotDetailsId
         }
 
         let updateDate = {
@@ -120,7 +120,7 @@ const updateNftBalanceInUserSchema = async function (data, response, cb) {
             rewardPointsPercentage: balanceFetchedFromOpensea[i].rewardPointsPercentage,
         }
 
-        UserBalance.findOneAndUpdate(findData,updateDate).exec((err, res) => {
+        userPotDetails.findOneAndUpdate(findData,updateDate).exec((err, res) => {
             if (err) {
                 console.error(err);
                 
@@ -159,7 +159,7 @@ const getRewardTokenBalance =function(data,response,cb){
     }
     console.log("rewardPotIds",rewardPotIds);
 
-    UserBalance.find(findData).populate("potId").exec((err, res) => {
+    userPotDetails.find(findData).populate("potId").exec((err, res) => {
 		if (err) {
 			console.error(err);
         } else {
@@ -207,7 +207,7 @@ const updateRewardTokenBalance =async function(data,response,cb){
             rewardedTokenAmount: (((updatedUserDetails[i].rewardPointsPercentage)/100)*updatedUserDetails[i].potId.rewardTokenAmount)/tokenPrice,
         }
 console.log(updateDate,findData);
-        UserBalance.findOneAndUpdate(findData,updateDate).exec((err, res) => {
+        userPotDetails.findOneAndUpdate(findData,updateDate).exec((err, res) => {
             if (err) {
                 console.error(err);
                 

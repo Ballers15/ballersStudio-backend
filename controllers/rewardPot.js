@@ -33,13 +33,25 @@ const addRewardPot = function (data, response, cb) {
 		cb = response;
 	}
 
+	let assetDetails={
+		contractAddress: data.assetDetails.contractAddress,
+		assetName:data.assetDetails.assetName,
+	};
+
+
+	if(data.assetType=="NFT"){
+
+		assetDetails.tokenId =data.assetDetails.tokenId;
+
+	}
+	if(data.assetType=="TOKEN"){
+		assetDetails.ticker =data.assetDetails.ticker;
+
+	}
+	
 	let insertData = {
 		rewardTokenAmount: data.rewardTokenAmount,
-		assetDetails: {
-			contractAddress: data.assetDetails.contractAddress,
-			ticker: data.assetDetails.ticker,
-			assetName:data.assetDetails.assetName
-		},
+		assetDetails:assetDetails,
 		startDate: data.startDate,
 		endDate: data.endDate,
 		claimExpiryDate:data.claimExpiryDate,
@@ -67,7 +79,7 @@ const addRewardPot = function (data, response, cb) {
 		data.insertActionLogData = {
 			potId: res._id,
 			addedBy: data.req.auth.id,
-			message: "Added new config details"   // in case of edit "Edit the config details"
+			action: "Added new config details"   // in case of edit "Edit the config details"
 		};
 		
 		return cb(
@@ -182,8 +194,8 @@ const updatePotStatus = function (data, response, cb) {
 
 		data.insertActionLogData = {
 			potId: res._id,
-			editedBy: data.req.auth.id,
-			message: "Pot Status Change"
+			addedBy: data.req.auth.id,
+			action: "Pot Status Change"
 		};
 
 		return cb(
@@ -218,24 +230,87 @@ const updateRewardPot = function (data, response, cb) {
 	}
 
 	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(checkIfPotIsActive,data));
 	waterFallFunctions.push(async.apply(updatePot, data));
 	waterFallFunctions.push(async.apply(potActionLogs, data));
 	async.waterfall(waterFallFunctions, cb);
 }
 exports.updateRewardPot = updateRewardPot;
 
+
+
+
+const checkIfPotIsActive =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	let findData={
+		_id:data.potId,
+	}
+	RewardPot.findOne(findData, (err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"updatePot",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+		if(res.isActive){
+			return cb(
+				responseUtilities.responseStruct(
+					400,
+					"Active pot cant be updated",
+					"updatePot",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Pot updated succesfully",
+				"checkIfPotIsActive",
+				null,
+				data.req.signature
+			)
+		);
+
+	});
+}
 const updatePot = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
 	}
+	let assetDetails={
+		contractAddress: data.assetDetails.contractAddress,
+		assetName:data.assetDetails.assetName,
+	};
+
+
+	if(data.assetType=="NFT"){
+
+		assetDetails.tokenId =data.assetDetails.tokenId;
+
+	}
+	if(data.assetType=="TOKEN"){
+		assetDetails.ticker =data.assetDetails.ticker;
+
+	}
+
 
 	let updateData = {
 		rewardTokenAmount: data.rewardTokenAmount,
-		assetDetails: {
-			contractAddress: data.assetDetails.contractAddress,
-			ticker: data.assetDetails.ticker,
-			assetName:data.assetDetails.assetName
-		},
+		assetDetails: assetDetails,
 		startDate: data.startDate,
 		endDate: data.endDate,
 		assetType: data.assetType,
@@ -264,8 +339,8 @@ const updatePot = function (data, response, cb) {
 
 		data.insertActionLogData = {
 			potId: res._id,
-			editedBy: data.req.auth.id,
-			message: "Edit the config details"   
+			addedBy: data.req.auth.id,
+			action: "Edit the config details"   
 		};
 
 		return cb(

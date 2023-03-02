@@ -58,14 +58,14 @@ app.set('trust proxy', true);
 const auth = require('./routes/auth');
 const cryptoWallet = require('./routes/cryptoWallet')
 const rewardPot = require('./routes/rewardPot')
-const userBalance=require('./routes/userBalance')
+const userPotDetails=require('./routes/userPotDetails')
 const withdrawls = require('./routes/withdrawls')
 const users = require('./routes/user')
 
 app.use('/auth', auth);
 app.use('/crypto/wallet', cryptoWallet);
 app.use('/pot', rewardPot);
-app.use('/user', userBalance);
+app.use('/user', userPotDetails);
 app.use('/withdrawls', withdrawls);
 app.use('/users', users);
 

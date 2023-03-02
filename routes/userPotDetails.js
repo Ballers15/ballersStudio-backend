@@ -13,14 +13,14 @@ const data = {};
 const authenticator = require('../middlewares/authenticator')(clients, data);
 const authenticateRole = require('../middlewares/authenticateRole');
 
-const userBalance = require("../controllers/userBalance");
+const userPotDetails = require("../controllers/userPotDetails");
 
 
 router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
-    userBalance.addUserBalance(data, function (err, response) {
+    userPotDetails.adduserPotDetails(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -32,11 +32,33 @@ router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
   }
 );
 
+
+router.post( "/v1/add/lottery/pot/balance",[authenticator, authenticateRole(["USER"])],
+  function (req, res, next) {
+      let data = req.body;
+    data.req = req.data;
+    userPotDetails.addLotteryPotBalance(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
+
+
+// Not in use
 router.post( "/v1/update/lotterynumber",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
-    userBalance.updateLotterNumber(data, function (err, response) {
+    userPotDetails.updateLotterNumber(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -53,7 +75,7 @@ router.get( "/v1/balance/all",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
-    userBalance.getAllUserBalances(data, function (err, response) {
+    userPotDetails.getAlluserPotDetails(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -70,7 +92,7 @@ router.get( "/v1/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
-    userBalance.getUserBalanceById(data, function (err, response) {
+    userPotDetails.getuserPotDetailsById(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;
@@ -81,6 +103,46 @@ router.get( "/v1/balance",[authenticator, authenticateRole(["USER"])],
     });
   }
 );
+
+
+
+router.post("/v1/create/claim/withdrawl",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  userPotDetails.createClaimWithdrawl(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+
+router.post("/v1/update/withdrawl",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  userPotDetails.updateWithdrawl(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+
+
 
 
 module.exports = router;

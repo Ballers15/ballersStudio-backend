@@ -23,7 +23,7 @@
 
 * `controllers/user.js` Function description with all core logics used in `routes/user.js`, and all the query and data integration used is on the basis of schema defined in `models/users.js` 
 
-* `controllers/userBalance.js` Function description with all core logics used in `routes/userBalance.js`, and all the query and data integration used is on the basis of schema defined in `models/userBalance.js` 
+* `controllers/userPotDetails.js` Function description with all core logics used in `routes/userPotDetails.js`, and all the query and data integration used is on the basis of schema defined in `models/userPotDetails.js` 
 
 * `controllers/withdrawls.js` Function description with all core logics used in `routes/withdrawls.js`, and all the query and data integration used is on the basis of schema defined in `models/withdrawls.js` 
 

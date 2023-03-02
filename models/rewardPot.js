@@ -4,14 +4,16 @@ let Schema = mongoose.Schema;
 
 var rewardPotSchema = new Schema({
     rewardTokenAmount : Number,
-    assetDetails: {
-      ticker: String,
-      contractAddress: String,
-      assetName:String,
-    },
+    // ticker: String,
+    //   contractAddress: String,
+    //   assetName:String,
+    //   tokenId:String,
+    assetDetails: { type: Object },
     startDate: Date,
     endDate: Date,
     claimExpiryDate: Date,
+    potAmountCollected:Number,
+    claimPot:{ type: Boolean, default: true },
     assetType:{
       type: String,
       enum: { values: process.env.ASSEST_TYPE.split(",") },
@@ -21,7 +23,8 @@ var rewardPotSchema = new Schema({
         enum: { values: process.env.REWARD_POT.split(",") },
       },
     isActive: { type: Boolean, default: true },
-    createdBy:{ type: mongoose.Schema.Types.ObjectId,ref: 'users'}
+    createdBy:{ type: mongoose.Schema.Types.ObjectId,ref: 'users'},
+    
 },{ timestamps: true });
 
 const rewardPot = mongoose.model('rewardPot', rewardPotSchema);

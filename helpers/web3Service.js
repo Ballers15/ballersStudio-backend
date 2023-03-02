@@ -21,8 +21,8 @@ console.log("data",data);
 
 
 
-let walletLength=data.userBalanceDetails.length;
-let userNftDetails=data.userBalanceDetails;
+let walletLength=data.userPotDetailsDetails.length;
+let userNftDetails=data.userPotDetailsDetails;
 let finalArray=[];
 let totalNftHeldInPoolPoints=0;
 let totalInGameCashInPool=0
@@ -34,7 +34,7 @@ console.log("tokenIds",tokenIds,typeof tokenIds);
 for(let i= 0;i<tokenIds.length;i++){
 
     console.log("tokenIdDetails",tokenIds[i]);
-    let extractWallets=data.userBalanceDetails.map((el)=>{
+    let extractWallets=data.userPotDetailsDetails.map((el)=>{
         return web3.utils.toChecksumAddress(el.walletAddress)
     })
     let tokenIdDetails= Array(extractWallets.length).fill(tokenIds[i]);
@@ -87,7 +87,7 @@ console.log("totalNftHeldInPool",totalNftHeldInPoolPoints,totalInGameCashInPool)
 console.log("finalArray",userNftDetails);
     let dataToReturn = userNftDetails.map((el) => {
         return ({
-            userBalanceId: el._id,
+            userPotDetailsId: el._id,
             nftHolded: el.nftHolded,
             rewardPointsPercentage: el.rewardPointsPercentage,
     })
@@ -233,11 +233,12 @@ if(!cb){
     
         let walletDetail= Array(tokenIds.length).fill(walletAddress);
         let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
+        console.log("balanceOfBatch",balanceOfbatch);
         let exist=false;
         balanceOfbatch.filter((el)=>{
             let value=parseFloat(el);
             console.log("value",value);
-            if(value==1){
+            if(value>0){
                 exist=true; 
             }
         })
@@ -288,7 +289,7 @@ if(!cb){
 
 // getuserNftBalance(
 //     {
-//     "userBalanceDetails":[
+//     "userPotDetailsDetails":[
 //     {
 //         "_id" : "63ad81340ad3d036518d172c",
 //         "potId" : "63ad8073c2a633330e60b69f",

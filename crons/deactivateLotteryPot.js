@@ -30,15 +30,18 @@ let deactivateRewardPots = async (cb) => {
             rewardPotDetails:res
         };
         console.log("res",res);
-        data.rewardPotIds = res.map((el) => el._id);
-
-            let waterFallFunctions = [];
-            waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
-            waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
-            waterFallFunctions.push(async.apply(selectLotteryWinner, data));
-            waterFallFunctions.push(async.apply(updateUserDetails, data));
-
-            async.waterfall(waterFallFunctions, cb);
+        if(res.length){
+            data.rewardPotIds = res.map((el) => el._id);
+                let waterFallFunctions = [];
+                waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
+                waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
+                waterFallFunctions.push(async.apply(selectLotteryWinner, data));
+                waterFallFunctions.push(async.apply(updateUserDetails, data));
+    
+                async.waterfall(waterFallFunctions, cb);
+        }else{
+            console.log("No running pot found");
+        }
 	});
 }
 
@@ -83,11 +86,55 @@ const getUserDetailsFromPotId = function (data, response, cb) {
 		if (err) {
 			console.error(err);
         } else {
-            data.userPotDetailsDetails = res;
+            data.userPotDetails = res;
             data.userPotDetailsIds = res.map((el) => el._id);
             return cb(null);
         }
-        
-       
 	});
 };
+
+const selectLotteryWinner =function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+    let winner;
+    const cumulativeWeights = [];
+    console.log("data.userPotDetails",data.userPotDetails);
+    for (let i = 0; i < data.userPotDetails.length; i += 1) {
+        cumulativeWeights[i] = data.userPotDetails[i].amount + (cumulativeWeights[i - 1] || 0);
+    }
+    const maxCumulativeWeight = cumulativeWeights[cumulativeWeights.length - 1];
+    const randomNumber = maxCumulativeWeight * Math.random();
+    for (let itemIndex = 0; itemIndex < data.userPotDetails.length; itemIndex += 1) {
+        if (cumulativeWeights[itemIndex] >= randomNumber) {
+            winner=data.userPotDetails[itemIndex];
+              break;
+        }
+      }
+      data.winner=winner;
+      console.log(winner);
+      return cb(null);
+
+}
+
+const updateUserDetails = function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+    let findData={
+        potId:data.winner.potId,
+        userId:data.winner.userId,
+        walletAddress:data.winner.walletAddress
+    }
+    let updateData={
+        lotteryWon:true
+    }
+    userPotDetails.findOneAndUpdate(findData,updateData).exec((err, res) => {
+		if (err) {
+			console.error(err);
+        } else {
+          console.log("updated the winner");
+            return cb(null);
+        }
+	});
+}

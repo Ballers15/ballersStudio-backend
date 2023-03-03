@@ -27,17 +27,20 @@ let activateRewardPots = async (cb) => {
             rewardPotDetails:res
         };
         console.log("res",res);
-        data.rewardPotIds = res.map((el) => el._id);
+        if(res.length){
 
-            let waterFallFunctions = [];
-            waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
-            waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
-            waterFallFunctions.push(async.apply(fetchBalanceFromOpensea, data));
-            waterFallFunctions.push(async.apply(updateNftBalanceInUserSchema, data));
-            waterFallFunctions.push(async.apply(getRewardTokenBalance, data));
-            waterFallFunctions.push(async.apply(updateRewardTokenBalance, data));
-
-            async.waterfall(waterFallFunctions, cb);
+            data.rewardPotIds = res.map((el) => el._id);
+                let waterFallFunctions = [];
+                waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
+                waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
+                waterFallFunctions.push(async.apply(fetchBalanceFromOpensea, data));
+                waterFallFunctions.push(async.apply(updateNftBalanceInUserSchema, data));
+                waterFallFunctions.push(async.apply(getRewardTokenBalance, data));
+                waterFallFunctions.push(async.apply(updateRewardTokenBalance, data));    
+                async.waterfall(waterFallFunctions, cb);
+        }else{
+            console.log("No Active reward pot found");
+        }
 	});
 }
 

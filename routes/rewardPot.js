@@ -86,7 +86,9 @@ router.patch( "/v1/admin/delete/reward/pot",
   }
 );
 
-
+/**
+ * Gives active reward pots
+ */
 
 router.get( "/v1/admin/getall/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
@@ -104,6 +106,54 @@ router.get( "/v1/admin/getall/reward/pot",
     });
   }
 );
+
+
+
+/**
+ * Gives upcoming reward pots
+ */
+
+router.get( "/v1/admin/upcoming/reward/pot",
+  [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getUpcomingRewardPots(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+/**
+ * Gives archives reward pots
+ */
+
+router.get( "/v1/admin/archive/reward/pot",
+  [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getArchivePots(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
 
 router.get( "/v1/admin/getbyid/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],

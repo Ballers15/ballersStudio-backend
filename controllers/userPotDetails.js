@@ -26,6 +26,7 @@ const adduserPotDetails = function (data, response, cb) {
 
 	waterFallFunctions.push(async.apply(getPotDetails, data));
 	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+	waterFallFunctions.push(async.apply(checkWalletAssociatedToOther, data));
 	waterFallFunctions.push(async.apply(checkPremiumPot, data));
 	// waterFallFunctions.push(async.apply(getUserGameBalance, data));	
 	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	
@@ -98,6 +99,55 @@ const getPotDetails = function (data, response, cb) {
 
 };
 
+
+const checkWalletAssociatedToOther = function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	console.log("data.req.auth.id",data.req.auth.id);
+	let findData={
+		potId:data.potId,
+		walletAddress:data.walletAddress
+	};
+	userPotDetails.findOne(findData, (err, res) => {
+		if (err) {
+			console.log("checkWalletAssociatedToOther Error : ", err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in  checkWalletAssociatedToOther",
+					"addBalanceForUser",
+					null,
+					data.req.signature
+				)
+			);
+        }
+		if(res){
+			if(!(res.userId).equals(data.req.auth.id)){
+				
+				return cb(
+					responseUtilities.responseStruct(
+					  400,
+					  "Wallet associated to other user for this pot",
+					  "checkWalletAssociatedToOther",
+					  null,
+					  data.req.signature
+					)
+				);
+			}
+		}
+        return cb(
+		  null,
+		  responseUtilities.responseStruct(
+		    200,
+		    "No association found",
+		    "checkWalletAssociatedToOther",
+		    res,
+		    data.req.signature
+		  )
+		);
+    });
+}
 
 
 const checkPremiumPot =function(data,response,cb){
@@ -438,6 +488,8 @@ const addLotteryPotBalance = function(data,response,cb){
     let waterFallFunctions = [];
 	waterFallFunctions.push(async.apply(getPotDetails, data));
 	waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
+
+	waterFallFunctions.push(async.apply(checkWalletAssociatedToOther, data));
     // waterFallFunctions.push(async.apply(getUserGameBalance, data));
 	//add data.amount from here	
 	// waterFallFunctions.push(async.apply(updateUserGameBalance, data));	

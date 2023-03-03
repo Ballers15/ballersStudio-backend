@@ -27,10 +27,10 @@ let insertUser = [
   //   isActive:true
   // },
   {
-    _id:"601e3c6ef5eb242d4408dcd8",
+    _id:"601e3c6ef5eb242d4408dcd9",
     name:"user",
-    email:"manav@ith.tech",
-    accountId: "87654329",
+    email:"manav21@ith.tech",
+    accountId: "87654320",
     provider: "email",
     role: 'USER',
     userName: 'user_seed',

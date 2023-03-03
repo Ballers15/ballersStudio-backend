@@ -414,13 +414,61 @@ const getAllRewardPots = function (data, response, cb) {
 		cb = response;
 	}
 	
-	// let findData = {
-	// 	isActive: true
-	// };
+	let findData = {
+		isActive: true
+	};
+
+	let limit = parseInt(process.env.pageLimit);
+	let skip = 0;
+	if (data.currentPage) {
+	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
+	}
+
+	// Users.find(findData,projection) .skip(skip).limit(limit).sort({ createdAt: -1 }).exec((err, res) => {
+	// 	if (err) {
+	// 		console.error(err);
+	// 		return cb(
+	// 			responseUtilities.responseStruct(
+	// 				500,
+	// 				null,
+	// 				"getAllUsers",
+	// 				null,
+	// 				data.req.signature
+	// 			)
+	// 		);
+	// 	}
+	// 	Users.countDocuments(findData, (err, count) => {
+	// 		if (err) {
+	// 		  console.error(err);
+	// 		  return cb(
+	// 			responseUtilities.responseStruct(
+	// 			  500,
+	// 			  null,
+	// 			  "getAllUsers",
+	// 			  null,
+	// 			  null
+	// 			)
+	// 		  );
+	// 		}
+	// 		return cb(
+	// 		  null,
+	// 		  responseUtilities.responseStruct(
+	// 			200,
+	// 			"Users fetched successfuly",
+	// 			"getAllUsers",
+	// 			{ Users:res,count: count,pageLimit:limit},
+	// 			null
+	// 		  )
+	// 		);
+	// 	  });
+	// });
+
+
 
 	// RewardPot.find(findData)
-	RewardPot.find()
-		.populate("createdBy" )
+
+
+	RewardPot.find(findData).skip(skip).limit(limit).sort({createdAt:-1})
 		.exec((err, res) => {
 		if (err) {
 			console.error(err);
@@ -438,13 +486,40 @@ const getAllRewardPots = function (data, response, cb) {
 		return cb(
 			null,
 			responseUtilities.responseStruct(
-				200,
-				"Reward Pot fetched Successfully",
-				"getAllRewardPots",
-				res,
-				data.req.signature
+			  200,
+			  "Pots fetched Successfuly",
+			  "getAllRewardPots",
+			  res,
+			  null
 			)
-		);
+		  );
+		  
+		RewardPot.countDocuments(findData, (err, count) => {
+			if (err) {
+			  console.error(err);
+			  return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "getAllRewardPots",
+				  null,
+				  null
+				)
+			  );
+			}
+
+			return cb(
+			  null,
+			  responseUtilities.responseStruct(
+				200,
+				"Pots fetched Successfuly",
+				"getAllRewardPots",
+				{ res:res,count: count,pageLimit:limit},
+				null
+			  )
+			);
+
+		  });
 	});
 }
 exports.getAllRewardPots = getAllRewardPots;
@@ -499,3 +574,101 @@ const getRewardPotsById = function (data, response, cb) {
 
 }
 exports.getRewardPotsById = getRewardPotsById;
+
+
+
+const getArchivePots =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+
+	let findData = {
+		isActive: false
+	};
+
+	// RewardPot.find(findData)
+	RewardPot.find(findData)
+		.populate("createdBy")
+		.exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getAllRewardPots",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Reward Pot fetched Successfully",
+				"getAllRewardPots",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+}
+exports.getArchivePots=getArchivePots;
+
+
+
+
+const getUpcomingRewardPots =function(data,response,cb){
+
+	if(!cb){
+		cb=response;
+	}
+	let currentTime = new Date();
+
+
+	// createdAt : {$gte: data.startDate, $lt:data.endDate}}
+	
+	let findData = {
+		startDate: {$gte: currentTime}
+	};
+
+
+
+
+
+	RewardPot.find(findData)
+		.populate("createdBy")
+		.exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getAllRewardPots",
+					null,
+					data.req.signature
+				)
+			);
+		}
+
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Reward Pot fetched Successfully",
+				"getAllRewardPots",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+
+
+}
+exports.getUpcomingRewardPots=getUpcomingRewardPots;

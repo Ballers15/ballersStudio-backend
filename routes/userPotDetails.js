@@ -53,6 +53,10 @@ router.post( "/v1/add/lottery/pot/balance",[authenticator, authenticateRole(["US
 
 
 
+
+
+
+
 // Not in use
 router.post( "/v1/update/lotterynumber",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
@@ -142,6 +146,37 @@ function(req, res, next) {
 
 
 
+router.post( "/v1/create/lottery/claim",[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  userPotDetails.createLotteryClaim(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+})
+
+
+router.post("/v1/update/lottery/withdrawl",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data =req.body;
+  data.req=req.data;
+  userPotDetails.updateLotteryWithdrawl(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
 
 
 

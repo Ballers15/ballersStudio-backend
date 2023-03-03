@@ -154,6 +154,60 @@ const createUserSignature =async function(data,response,cb){
 
 
 
+const createLotterySignature =async function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+
+    if(data.signatureExist){
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Withdrawls fetched Successfully",
+				"getAllWithdrawls",
+				response.data,
+				data.req.signature
+			)
+		);
+	}
+
+
+
+    let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
+
+//   TODO  //change logic for this
+    let amount="1";
+    let nonce=data.nonce;
+    let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;
+    let privateKey=process.env.SIGNER_KEY;
+    let callerAddress=data.walletAddress;
+
+    let txn = {tokenAddress,amount,callerAddress,nonce,contractAddress};
+    console.log(txn);
+    let messages = ethers.utils.solidityKeccak256(
+        ['address','uint256','address','uint256','address'],
+        [txn.tokenAddress,txn.amount,txn.callerAddress,txn.nonce,txn.contractAddress]
+    );   
+
+    let messageBytes = ethers.utils.arrayify(messages);
+    let signer = new ethers.Wallet(privateKey);
+    let signature = await signer.signMessage(messageBytes);
+    console.log("signature$$$$$$----",signature);
+    let userSignature={
+        signature
+    }
+
+    return cb(
+        null,
+        responseUtilities.responseStruct(
+            200,
+            "Withdrawls fetched Successfully",
+            "getAllWithdrawls",
+            userSignature,
+            data.req.signature
+));}
+
 
 
 
@@ -337,5 +391,6 @@ module.exports ={
     getuserNftBalance,
     createUserSignature,
     getTransactionStatus,
-    checkUserHoldsNft
+    checkUserHoldsNft,
+    createLotterySignature
 }

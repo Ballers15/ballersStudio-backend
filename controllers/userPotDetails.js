@@ -9,7 +9,7 @@ const adduserPotDetails = function (data, response, cb) {
     if (!cb) {
 		cb = response;
     }
-
+// TODO://remove data.amount from here
     if (!data.walletAddress || !data.amount ||!data.potId) {
 		return cb(
 			responseUtilities.responseStruct(
@@ -504,6 +504,21 @@ const checkClaimExpired = function (data, response, cb) {
 	console.log(currentDate)
 	console.log(data.potDetails.startDate)
 	console.log(data.potDetails.endDate)
+
+	if(!data.potDetails.claimPot){
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"Claim is stopped for this pool",
+				"checkClaimExpired",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+
+
 	if (data.potDetails.endDate < currentDate && currentDate <= data.potDetails.claimExpiryDate) {
 		return cb(
 			null,
@@ -626,7 +641,7 @@ const checkIfSignatureExist = function(data,response,cb){
 				)
 			);
 		}
-		console.log(res);
+		// console.log(res);	
 		data.signatureExist=false;
 		if(res){
 			if(res.signature){
@@ -747,11 +762,13 @@ if(data.signatureExist){
 		userId:data.req.auth.id,
 	};
 	console.log(data.nonce);
-	let updateData={
+
+	let  updateData={
 		"signature":signature,
 		"nonce":data.nonce,
-		"amount":data.amount
 	}
+
+
 	let options={
 		upsert:true,
 		new:true,
@@ -812,6 +829,7 @@ const updateWithdrawl =function(data,response,cb){
 
 
 	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(findIfTransactionExist, data));
 	waterFallFunctions.push(async.apply(web3Service.getTransactionStatus, data));
 	waterFallFunctions.push(async.apply(updateTransactionDetails, data));
 	async.waterfall(waterFallFunctions, cb);
@@ -820,18 +838,21 @@ const updateWithdrawl =function(data,response,cb){
 exports.updateWithdrawl = updateWithdrawl;
 
 
+
+
+
 const updateTransactionDetails =function(data,response,cb){
 	if(!cb){
 		cb=response;
 	}
 	let  transactionStatus=response.data;
 
-	console.log("transactionStatus",transactionStatus,data.txnHash);
+	console.log("transactionStatus",transactionStatus,data.txnHash,data.req.auth.id);
 
 	let findData = {
         _id:data.withdrawlId,
 		potId:data.potId,
-		walletAddress:data.wupdateDataalletAddress,
+		walletAddress:data.walletAddress,
 		userId:data.req.auth.id
 
     }
@@ -857,6 +878,7 @@ const updateTransactionDetails =function(data,response,cb){
 				)
 			);	
 		}
+		console.log("res",res);
 		return cb(
 			null,
 			responseUtilities.responseStruct(
@@ -869,9 +891,198 @@ const updateTransactionDetails =function(data,response,cb){
 		);
 	})
 
+}
 
 
 
+
+const createLotteryClaim =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	if (!data.potId || !data.walletAddress ) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"createLotteryClaim",
+				null,
+				data.req.signature
+			)
+		);
+    }
+    
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getPotDetails,data));
+	waterFallFunctions.push(async.apply(checkClaimExpired, data));
+	waterFallFunctions.push(async.apply(checkIfuserWonLottery, data));
+	waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
+	waterFallFunctions.push(async.apply(getLatestNonce, data));
+	waterFallFunctions.push(async.apply(web3Service.createLotterySignature, data));
+	waterFallFunctions.push(async.apply(initiateWithdrawl, data));
+	async.waterfall(waterFallFunctions, cb);
 
 
 }
+exports.createLotteryClaim = createLotteryClaim;
+
+
+
+const checkIfuserWonLottery = function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+
+
+	console.log(data.req.auth.id);
+	let findData={
+		potId:data.potId,
+		userId:data.req.auth.id,
+		walletAddress:data.walletAddress,
+		lotteryWon:true,
+		rewardClaimed:false
+	};
+	console.log("findData",findData);
+	userPotDetails.findOne(findData).exec((err,res)=>{
+
+		if(err){
+			console.log("checkIfuserWonLottery",err);
+
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in creating Withdrawl",
+					"checkIfuserWonLottery",
+					null,
+					data.req.signature
+				)
+			);
+
+		}
+		console.log("RES IS",res)
+		if(res){
+			return cb(
+				null,
+				responseUtilities.responseStruct(
+					200,
+					"Withdrawls fetched Successfully",
+					"checkIfuserWonLottery",
+					res,
+					data.req.signature
+				)
+			);
+	
+		}
+
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"The user has not won the lottery",
+				"checkIfuserPotDetailsExist",
+				null,
+				data.req.signature
+			)
+		);
+
+	
+		
+	
+
+	})
+
+
+}
+
+
+
+const updateLotteryWithdrawl =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	if (!data.potId || !data.walletAddress ||!data.txnHash ||!data.withdrawlId ) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				null,
+				"updateWithdrawl",
+				null,
+				data.req.signature
+			)
+		);
+    }
+
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(findIfTransactionExist, data));
+	waterFallFunctions.push(async.apply(web3Service.getTransactionStatus, data));
+	waterFallFunctions.push(async.apply(updateTransactionDetails, data));
+	async.waterfall(waterFallFunctions, cb);
+}
+exports.updateLotteryWithdrawl=updateLotteryWithdrawl
+
+const findIfTransactionExist =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	console.log("transactionStatus",data.txnHash,data.req.auth.id);
+
+	let findData = {
+        _id:data.withdrawlId,
+		potId:data.potId,
+		walletAddress:data.walletAddress,
+		userId:data.req.auth.id
+
+    }
+	console.log("finddata",findData);
+
+	userPotDetails.findOne(findData).exec((err,res)=>{
+		if(err){
+			console.log("err",err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					"Error in updating",
+					"updateTransactionDetails",
+					null,
+					data.req.signature
+				)
+			);	
+		}
+		console.log("res",res);
+		if(res){
+			return cb(
+				null,
+				responseUtilities.responseStruct(
+					200,
+					"updated Successfully",
+					"updateTransactionDetails",
+						null,
+					data.req.signature
+				)
+			);
+		}
+
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"Details mismatched",
+				"findIfTransactionExist",
+				null,
+				data.req.signature
+			)
+		);		
+	})
+}
+
+
+
+
+
+
+
+
+

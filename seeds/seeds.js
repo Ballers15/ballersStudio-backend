@@ -27,14 +27,14 @@ let insertUser = [
   //   isActive:true
   // },
   {
-    _id:"601e3c6ef5eb242d4408dcc8",
+    _id:"601e3c6ef5eb242d4408dcd8",
     name:"user",
-    email:"user1@ith.tech",
-    accountId: "87654321",
+    email:"manav@ith.tech",
+    accountId: "87654329",
     provider: "email",
     role: 'USER',
     userName: 'user_seed',
-    password: crypto.pbkdf2Sync('123456789', randomSalt, 10000, 64, 'sha1').toString('base64'),
+    password: crypto.pbkdf2Sync('11111111', randomSalt, 10000, 64, 'sha1').toString('base64'),
     salt: salt,
     emailVerified:true,
     isActive:true

@@ -15,6 +15,13 @@ const authenticateRole = require('../middlewares/authenticateRole');
 
 const rewardPot = require("../controllers/rewardPot");
 
+
+
+
+/******************************************************************ADMIN****************************************************************************************** */
+/**
+ * create pot
+ */
 router.post( "/v1/admin/create/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
@@ -33,6 +40,9 @@ router.post( "/v1/admin/create/reward/pot",
 );
 
 
+/**
+ * update pot
+ */
 router.patch( "/v1/admin/update/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
@@ -49,6 +59,9 @@ router.patch( "/v1/admin/update/reward/pot",
     });
   }
 );
+/**
+ * update pot status
+ */
 
 
 router.patch( "/v1/admin/reward/pot/status",
@@ -68,6 +81,9 @@ router.patch( "/v1/admin/reward/pot/status",
   }
 );
 
+/**
+ * soft delete pot
+ */
 
 router.patch( "/v1/admin/delete/reward/pot",
   [authenticator, authenticateRole(["ADMIN"])],
@@ -153,6 +169,7 @@ router.get( "/v1/admin/archive/reward/pot",
 );
 
 
+// NOT IN USE
 
 
 router.get( "/v1/admin/getbyid/reward/pot",

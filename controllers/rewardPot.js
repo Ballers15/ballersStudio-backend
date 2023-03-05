@@ -409,6 +409,59 @@ const deleteRewardPot = function (data, response, cb) {
 }
 exports.deleteRewardPot = deleteRewardPot;
 
+
+const getRewardPotsById = function (data, response, cb) {
+	if (!cb) {
+		cb = response;
+	}
+
+	if (!data.potId) {
+		return cb(
+			responseUtilities.responseStruct(
+				400,
+				"missing potId",
+				"getRewardPotsById",
+				null,
+				data.req.signature
+			)
+		);
+	}
+
+	let findData = {
+		_id: data.potId,
+	};
+
+	RewardPot.find(findData).populate("createdBy").exec((err, res) => {
+		if (err) {
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getRewardPotsById",
+					null,
+					data.req.signature
+				)
+			);
+		}
+		console.log("res", res);
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+				200,
+				"Reward Pot fetched successfuly",
+				"getRewardPotsById",
+				res,
+				data.req.signature
+			)
+		);
+	});
+
+
+}
+exports.getRewardPotsById = getRewardPotsById;
+
+
 const getAllRewardPots = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
@@ -423,50 +476,6 @@ const getAllRewardPots = function (data, response, cb) {
 	if (data.currentPage) {
 	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
 	}
-
-	// Users.find(findData,projection) .skip(skip).limit(limit).sort({ createdAt: -1 }).exec((err, res) => {
-	// 	if (err) {
-	// 		console.error(err);
-	// 		return cb(
-	// 			responseUtilities.responseStruct(
-	// 				500,
-	// 				null,
-	// 				"getAllUsers",
-	// 				null,
-	// 				data.req.signature
-	// 			)
-	// 		);
-	// 	}
-	// 	Users.countDocuments(findData, (err, count) => {
-	// 		if (err) {
-	// 		  console.error(err);
-	// 		  return cb(
-	// 			responseUtilities.responseStruct(
-	// 			  500,
-	// 			  null,
-	// 			  "getAllUsers",
-	// 			  null,
-	// 			  null
-	// 			)
-	// 		  );
-	// 		}
-	// 		return cb(
-	// 		  null,
-	// 		  responseUtilities.responseStruct(
-	// 			200,
-	// 			"Users fetched successfuly",
-	// 			"getAllUsers",
-	// 			{ Users:res,count: count,pageLimit:limit},
-	// 			null
-	// 		  )
-	// 		);
-	// 	  });
-	// });
-
-
-
-	// RewardPot.find(findData)
-
 
 	RewardPot.find(findData).skip(skip).limit(limit).sort({createdAt:-1})
 		.exec((err, res) => {
@@ -524,57 +533,6 @@ const getAllRewardPots = function (data, response, cb) {
 }
 exports.getAllRewardPots = getAllRewardPots;
 
-const getRewardPotsById = function (data, response, cb) {
-	if (!cb) {
-		cb = response;
-	}
-
-	if (!data.potId) {
-		return cb(
-			responseUtilities.responseStruct(
-				400,
-				"missing potId",
-				"getRewardPotsById",
-				null,
-				data.req.signature
-			)
-		);
-	}
-
-	let findData = {
-		_id: data.potId,
-	};
-
-	RewardPot.find(findData).populate("createdBy").exec((err, res) => {
-		if (err) {
-			console.error(err);
-			return cb(
-				responseUtilities.responseStruct(
-					500,
-					null,
-					"getRewardPotsById",
-					null,
-					data.req.signature
-				)
-			);
-		}
-		console.log("res", res);
-		return cb(
-			null,
-			responseUtilities.responseStruct(
-				200,
-				"Reward Pot fetched successfuly",
-				"getRewardPotsById",
-				res,
-				data.req.signature
-			)
-		);
-	});
-
-
-}
-exports.getRewardPotsById = getRewardPotsById;
-
 
 
 const getArchivePots =function(data,response,cb){
@@ -587,9 +545,14 @@ const getArchivePots =function(data,response,cb){
 		isActive: false
 	};
 
-	// RewardPot.find(findData)
-	RewardPot.find(findData)
-		.populate("createdBy")
+
+	let limit = parseInt(process.env.pageLimit);
+	let skip = 0;
+	if (data.currentPage) {
+	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
+	}
+
+	RewardPot.find(findData).skip(skip).limit(limit).sort({createdAt:-1})
 		.exec((err, res) => {
 		if (err) {
 			console.error(err);
@@ -603,17 +566,33 @@ const getArchivePots =function(data,response,cb){
 				)
 			);
 		}
+	  
+		RewardPot.countDocuments(findData, (err, count) => {
+			if (err) {
+			  console.error(err);
+			  return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "getAllRewardPots",
+				  null,
+				  null
+				)
+			  );
+			}
 
-		return cb(
-			null,
-			responseUtilities.responseStruct(
+			return cb(
+			  null,
+			  responseUtilities.responseStruct(
 				200,
-				"Reward Pot fetched Successfully",
+				"Pots fetched Successfuly",
 				"getAllRewardPots",
-				res,
-				data.req.signature
-			)
-		);
+				{ pots:res,count: count,pageLimit:limit},
+				null
+			  )
+			);
+
+		  });
 	});
 
 }
@@ -637,11 +616,16 @@ const getUpcomingRewardPots =function(data,response,cb){
 	};
 
 
+	let limit = parseInt(process.env.pageLimit);
+	let skip = 0;
+	if (data.currentPage) {
+	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
+	}
 
 
+	// RewardPot.find(findData)
 
-	RewardPot.find(findData)
-		.populate("createdBy")
+	RewardPot.find(findData).skip(skip).limit(limit).sort({createdAt:-1})
 		.exec((err, res) => {
 		if (err) {
 			console.error(err);
@@ -655,20 +639,34 @@ const getUpcomingRewardPots =function(data,response,cb){
 				)
 			);
 		}
+	  
+		RewardPot.countDocuments(findData, (err, count) => {
+			if (err) {
+			  console.error(err);
+			  return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "getAllRewardPots",
+				  null,
+				  null
+				)
+			  );
+			}
 
-		return cb(
-			null,
-			responseUtilities.responseStruct(
+			return cb(
+			  null,
+			  responseUtilities.responseStruct(
 				200,
-				"Reward Pot fetched Successfully",
+				"Pots fetched Successfuly",
 				"getAllRewardPots",
-				res,
-				data.req.signature
-			)
-		);
+				{ pots:res,count: count,pageLimit:limit},
+				null
+			  )
+			);
+
+		  });
 	});
-
-
 
 }
 exports.getUpcomingRewardPots=getUpcomingRewardPots;

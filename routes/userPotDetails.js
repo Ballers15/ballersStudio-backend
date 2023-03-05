@@ -15,6 +15,10 @@ const authenticateRole = require('../middlewares/authenticateRole');
 
 const userPotDetails = require("../controllers/userPotDetails");
 
+/**
+ * Add reward Pot balance 
+*/
+
 
 router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
@@ -32,7 +36,9 @@ router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
   }
 );
 
-
+/**
+ * Add Lottery  Pot balance 
+*/
 router.post( "/v1/add/lottery/pot/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.body;
@@ -108,7 +114,9 @@ router.get( "/v1/balance",[authenticator, authenticateRole(["USER"])],
   }
 );
 
-
+/**
+ * Create Claim  for reward pot
+*/
 
 router.post("/v1/create/claim/withdrawl",
 [authenticator, authenticateRole(["USER"])],
@@ -126,7 +134,9 @@ function(req, res, next) {
   })
 });
 
-
+/**
+ * Update Claim  for reward pot
+*/
 
 router.post("/v1/update/withdrawl",
 [authenticator, authenticateRole(["USER"])],
@@ -144,6 +154,9 @@ function(req, res, next) {
   })
 });
 
+/**
+ * Create Claim  for Lottery pot
+*/
 
 
 router.post( "/v1/create/lottery/claim",[authenticator, authenticateRole(["USER"])],
@@ -162,6 +175,11 @@ function(req, res, next) {
 })
 
 
+/**
+ * Update Claim  for Lottery pot
+*/
+
+
 router.post("/v1/update/lottery/withdrawl",
 [authenticator, authenticateRole(["USER"])],
 function(req, res, next) {
@@ -177,6 +195,40 @@ function(req, res, next) {
     return res.status(status).send(response);
   })
 });
+
+
+
+
+
+/********************************************************** ADMIN ********************************************************************* */
+
+/**
+ *  Get user for a particular pot
+ */
+
+router.get( "/v1/specific/pot/users",[authenticator, authenticateRole(["ADMIN"])
+],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    userPotDetails.getSpecificPotUsers(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
+
+
+
+
 
 
 

@@ -33,6 +33,8 @@ const adduserPotDetails = function (data, response, cb) {
 
   waterFallFunctions.push(async.apply(addBalanceForUser, data));
 
+  waterFallFunctions.push(async.apply(addBalanceInPot, data));
+
   async.waterfall(waterFallFunctions, cb);
 };
 exports.adduserPotDetails = adduserPotDetails;
@@ -276,6 +278,53 @@ const addBalanceForUser = function (data, response, cb) {
   });
 };
 
+
+const addBalanceInPot = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  let findData={
+    _id:data.potId
+  }
+
+  //data.amount of user entered
+  let updateData = {
+    $inc: { potAmountCollected: data.amount },
+  };
+
+  let options = {
+    upsert: true,
+    new: true,
+    setDefaultsOnInsert: true,
+  };
+  console.log(findData,updateData);
+  RewardPot.findOneAndUpdate(findData, updateData, options, (err, res) => {
+    if (err) {
+      console.log("RewardPot Error : ", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in updating balance",
+          "addBalanceInPot",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "User Balance Added in Reward pot Successfully",
+        "addBalanceInPot",
+        res,
+        data.req.signature
+      )
+    );
+  });
+}
+
 //not in use
 const updateLotterNumber = function (data, response, cb) {
   if (!cb) {
@@ -477,7 +526,7 @@ const addLotteryPotBalance = function (data, response, cb) {
   //add data.amount from here
   // waterFallFunctions.push(async.apply(updateUserGameBalance, data));
   waterFallFunctions.push(async.apply(addBalanceForUser, data));
-
+  waterFallFunctions.push(async.apply(addBalanceInPot,data));
   async.waterfall(waterFallFunctions, cb);
 };
 exports.addLotteryPotBalance = addLotteryPotBalance;

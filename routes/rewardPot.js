@@ -189,4 +189,33 @@ router.get( "/v1/admin/getbyid/reward/pot",
   }
 );
 
+
+
+
+
+
+
+
+
+
+/**
+ * stop claim of pot
+ */
+
+router.patch( "/v1/admin/stop/reward/pot/claim",
+  // [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.body;
+    data.req = req.data;
+    rewardPot.updateClaimOfRewardPot(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
 module.exports = router;

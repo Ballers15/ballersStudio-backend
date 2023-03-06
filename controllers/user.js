@@ -157,7 +157,6 @@ const userGameCashDetails =function(data,response,cb){
 	if(!cb){
 		cb=response;
 	}
-// mongoose.Types.ObjectId(data.potId)
 	let pipeline=[
 		{$match:{userId:mongoose.Types.ObjectId(data.userId)}},
 		{$group:{

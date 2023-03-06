@@ -404,6 +404,72 @@ const deleteRewardPot = function (data, response, cb) {
 };
 exports.deleteRewardPot = deleteRewardPot;
 
+
+
+
+const updateClaimOfRewardPot =function(data,response,cb){
+if(!cb){
+	cb=response;
+}
+if (!data.potId) {
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "potId is required",
+        "updateClaimOfRewardPot",
+        null,
+        data.req.signature
+      )
+    );
+  }
+
+  let updateData = {
+    claimPot: data.claim,
+  };
+
+  let findData = {
+    _id: data.potId,
+  };
+
+  RewardPot.findOneAndUpdate(findData, updateData, (err, res) => {
+    if (err) {
+      console.error(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          null,
+          "updateClaimOfRewardPot",
+          null,
+          data.req.signature
+        )
+      );
+    }
+
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Claim of pot updated ",
+        "updateClaimOfRewardPot",
+        res,
+        data.req.signature
+      )
+    );
+  });
+}
+
+exports.updateClaimOfRewardPot = updateClaimOfRewardPot;
+
+
+
+
+
+
+
+
+
+
+
 const getRewardPotsById = function (data, response, cb) {
   if (!cb) {
     cb = response;

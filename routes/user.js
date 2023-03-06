@@ -31,4 +31,25 @@ router.get( "/v1/all",[authenticator, authenticateRole(["ADMIN"])],
   }
 );
 
+router.get( "/v1/user/game/details",
+// [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    users.getUserGameDetails(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
+
+
 module.exports = router;

@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const Users = require("../models/users");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
-
+const RewardPot = require("../models/rewardPot");
+const userPotDetails = require("../models/userPotDetails");
 // ` Users.find({ createdAt : {$gte: data.startDate, $lt:data.endDate}})`
 
 
@@ -89,3 +90,108 @@ const getAllUsers = function (data, response, cb) {
 	
 }
 exports.getAllUsers = getAllUsers;
+
+
+const getUserGameDetails =function (data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	if(!data.userId){
+		return cb(
+			responseUtilities.responseStruct(
+			  400,
+			  null,
+			  "getUserGameDetails",
+			  null,
+			  null
+			)
+		)
+	}
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(userWalletAddressDetails, data));
+	waterFallFunctions.push(async.apply(userGameCashDetails, data));
+	async.waterfall(waterFallFunctions, cb);
+
+
+}
+exports.getUserGameDetails=getUserGameDetails;
+
+const userWalletAddressDetails =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	let findData={userId:data.userId};
+	let field="walletAddress"
+	userPotDetails.distinct(field,findData).exec((err,res)=>{
+		if(err){
+			console.log(err);
+			return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "userWalletAddressDetails",
+				  null,
+				  null
+				)
+			  );
+		}
+		console.log("res",res);
+		data.walletDetails=res;
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+			  200,
+			  "Users fetched successfuly",
+			  "userWalletAddressDetails",
+			  res,
+			  null
+			)
+		  );
+	})
+
+}
+
+const userGameCashDetails =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+// mongoose.Types.ObjectId(data.potId)
+	let pipeline=[
+		{$match:{userId:mongoose.Types.ObjectId(data.userId)}},
+		{$group:{
+			_id:"$userId",
+			totalSum:{$sum:"$amount"},
+			rewardTokenAmount:{$sum:"$rewardedTokenAmount"}
+			}
+			
+		}
+
+	]
+	userPotDetails.aggregate(pipeline).exec((err,res)=>{
+		if(err){
+			console.error(err);
+			return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "userGameCashDetails",
+				  null,
+				  null
+				)
+			  );
+		}
+		console.log("res",data.walletDetails);
+		let finalResponse={
+			walletDetails:data.walletDetails,
+			totalSum:res.length?res[0].totalSum:0,
+			rewardTokenAmount:res.length?res[0].rewardTokenAmount:0
+
+		}
+		console.log("finalResponse",finalResponse)
+		return cb(null,responseUtilities.responseStruct(200,null,"userGameCashDetails",finalResponse,null));
+	})
+
+
+}

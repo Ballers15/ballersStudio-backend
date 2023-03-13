@@ -292,14 +292,9 @@ const updatePot = function (data, response, cb) {
   let assetDetails = {
     contractAddress: data.assetDetails.contractAddress,
     assetName: data.assetDetails.assetName,
-  };
+    ticker:data.assetDetails.ticker
 
-  if (data.assetType == "NFT") {
-    assetDetails.tokenId = data.assetDetails.tokenId;
-  }
-  if (data.assetType == "TOKEN") {
-    assetDetails.ticker = data.assetDetails.ticker;
-  }
+  };
 
   let updateData = {
     rewardTokenAmount: data.rewardTokenAmount,

@@ -40,18 +40,15 @@ const addRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
   }
-
+  // TICKER is token id in nft and reward amount is quantity in nft
+  
   let assetDetails = {
     contractAddress: data.assetDetails.contractAddress,
     assetName: data.assetDetails.assetName,
+    ticker:data.assetDetails.ticker
   };
 
-  if (data.assetType == "NFT") {
-    assetDetails.tokenId = data.assetDetails.tokenId;
-  }
-  if (data.assetType == "TOKEN") {
-    assetDetails.ticker = data.assetDetails.ticker;
-  }
+ 
 
   let insertData = {
     rewardTokenAmount: data.rewardTokenAmount,
@@ -194,7 +191,7 @@ const updatePotStatus = function (data, response, cb) {
     data.insertActionLogData = {
       potId: res._id,
       addedBy: data.req.auth.id,
-      action: "Pot Status Change",
+      action: `Pot Status Change to ${data.isActive ?"Active":"Deactive"}`,
     };
 
     return cb(
@@ -423,6 +420,18 @@ if (!data.potId) {
     );
   }
 
+  let waterFallFunctions=[];
+  waterFallFunctions.push(async.apply(updateClaim, data));
+  waterFallFunctions.push(async.apply(potActionLogs, data));
+  async.waterfall(waterFallFunctions, cb);
+ 
+}
+exports.updateClaimOfRewardPot = updateClaimOfRewardPot;
+
+const updateClaim = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
   let updateData = {
     claimPot: data.claim,
   };
@@ -443,22 +452,26 @@ if (!data.potId) {
           data.req.signature
         )
       );
+
     }
+    data.insertActionLogData = {
+      potId: data.potId,
+      addedBy: data.req.auth.id,
+      action: "Admin stopped the claim of pot", 
+    };
 
     return cb(
       null,
       responseUtilities.responseStruct(
         200,
         "Claim of pot updated ",
-        "updateClaimOfRewardPot",
+        "updateClaim",
         res,
         data.req.signature
       )
     );
   });
 }
-
-exports.updateClaimOfRewardPot = updateClaimOfRewardPot;
 
 
 

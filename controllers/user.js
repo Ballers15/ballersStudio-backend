@@ -194,3 +194,62 @@ const userGameCashDetails =function(data,response,cb){
 
 
 }
+
+
+
+
+
+const updateUserStatus = function (data, response, cb) {
+	if (!cb) {
+	  cb = response;
+	}
+	if (!data.userId) {
+	  return cb(
+		responseUtilities.responseStruct(
+		  400,
+		  null,
+		  "updateUserStatus",
+		  null,
+		  data.req.signature
+		)
+	  );
+	}
+  
+	let findData = {
+	  _id: data.userId,
+	  role: "USER",
+	};
+  
+	let updateData = {
+	  isBlocked: data.isBlocked,
+	};
+  
+  
+	Users.findOneAndUpdate(findData, updateData).exec(function (err, res) {
+	  if (err) {
+		console.error(err);
+		return cb(
+		  responseUtilities.responseStruct(
+			500,
+			null,
+			"updateUserStatus",
+			null,
+			null
+		  )
+		);
+	  }
+	
+	  console.log("DATA", data.mailjetId);
+	  return cb(
+		null,
+		responseUtilities.responseStruct(
+		  200,
+		  "user Status Updated",
+		  "updateUserStatus",
+		  null,
+		  data.req.signature
+		)
+	  );
+	});
+  };
+exports.updateUserStatus=updateUserStatus;

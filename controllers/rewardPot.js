@@ -530,7 +530,7 @@ const getAllRewardPots = function (data, response, cb) {
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getRewardPots, data));
-  // waterFallFunctions.push(async.apply(getUserCountInPots, data));
+  waterFallFunctions.push(async.apply(getUserCountInPots, data));
   async.waterfall(waterFallFunctions, cb);
 };
 exports.getAllRewardPots = getAllRewardPots;
@@ -540,6 +540,10 @@ const getRewardPots = function (data, resonse, cb) {
     cb = resonse;
   }
   let findData = {};
+
+  if(data.potType){
+    findData.potType=data.potType;
+  }
   if (data.activeRewardPots) {
     findData = {
       isActive: true,
@@ -583,16 +587,16 @@ const getRewardPots = function (data, resonse, cb) {
         );
       }
 
-      return cb(
-        null,
-        responseUtilities.responseStruct(
-          200,
-          "Pots fetched Successfuly",
-          "getAllRewardPots",
-          res,
-          null
-        )
-      );
+      // return cb(
+      //   null,
+      //   responseUtilities.responseStruct(
+      //     200,
+      //     "Pots fetched Successfuly",
+      //     "getAllRewardPots",
+      //     res,
+      //     null
+      //   )
+      // );
 
       RewardPot.countDocuments(findData, (err, count) => {
         if (err) {

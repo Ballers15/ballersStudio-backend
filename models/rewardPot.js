@@ -12,7 +12,7 @@ var rewardPotSchema = new Schema({
     startDate: Date,
     endDate: Date,
     claimExpiryDate: Date,
-    potAmountCollected:Number,
+    potAmountCollected:{ type: Number, default: 0 },
     //CAN BE STOPPED BY ADMIN 
     claimPot:{ type: Boolean, default: true },
     assetType:{

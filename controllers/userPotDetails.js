@@ -1227,3 +1227,102 @@ const getSpecificPotUsers = function (data, response, cb) {
   });
 };
 exports.getSpecificPotUsers = getSpecificPotUsers;
+
+
+const getTotalClaimCount = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getNftCLaimCount, data));
+  waterFallFunctions.push(async.apply(getTokenClaimAmount, data));
+  async.waterfall(waterFallFunctions, cb);
+}
+exports.getTotalClaimCount = getTotalClaimCount;
+
+const getNftCLaimCount = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let findData={
+    rewardClaimed:true,
+    lotteryWon:true
+  }
+  userPotDetails.find(findData).exec((err,res)=>{
+    if(err){
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "getNftCLaimCount",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get Nft CLaim Count",
+        "getNftCLaimCount",
+        res,
+        data.req.signature
+      )
+    );
+
+  })
+}
+
+const getTokenClaimAmount =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+
+  let findData={
+    rewardClaimed:true,
+  }
+
+  let pipeline=[
+    {$match:findData},
+    {$group:{_id:null,count:{$sum:"$rewardedTokenAmount"}}}
+  ]
+  userPotDetails.aggregate(pipeline).exec((err,res)=>{
+    if(err){
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "getNftCLaimCount",
+          null,
+          data.req.signature
+        )
+      );
+    }
+
+    console.log(res);
+    let rewardAmountClaimed=res[0].count;
+    let nftClaimed=response.data.length;
+    let sendRes={
+      rewardAmountClaimed,
+      nftClaimed
+    }
+    
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get Nft CLaim Count",
+        "getNftCLaimCount",
+        sendRes,
+        data.req.signature
+      )
+    );
+
+  })
+
+
+}

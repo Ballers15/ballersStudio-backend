@@ -108,12 +108,13 @@ const getUserGameDetails =function (data,response,cb){
 			)
 		)
 	}
-
 	let waterFallFunctions = [];
 	waterFallFunctions.push(async.apply(userWalletAddressDetails, data));
 	waterFallFunctions.push(async.apply(userGameCashDetails, data));
 	async.waterfall(waterFallFunctions, cb);
 
+	
+	
 
 }
 exports.getUserGameDetails=getUserGameDetails;
@@ -253,3 +254,86 @@ const updateUserStatus = function (data, response, cb) {
 	});
   };
 exports.updateUserStatus=updateUserStatus;
+
+
+const getUserCount =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	let waterFallFunctions = [];
+	waterFallFunctions.push(async.apply(getTotalUserCount, data));
+	waterFallFunctions.push(async.apply(getUniqueWalletAddressCount, data));
+	async.waterfall(waterFallFunctions, cb);
+
+
+
+}
+exports.getUserCount=getUserCount;
+
+
+const getTotalUserCount =async function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	let totalUserCount =await Users.find();
+	let incompleteSignups =await Users.find({emailVerified:false});
+let sendRes={
+	totalUserCount:totalUserCount.length,
+	incompleteSignups:incompleteSignups.length
+}
+
+ return cb(
+		null,
+		responseUtilities.responseStruct(
+		  200,
+		  "Total User Count",
+		  "getTotalUserCount",
+		  sendRes,
+		  data.req.signature
+		)
+	  );
+}
+
+
+const getUniqueWalletAddressCount =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+
+	if(!cb){
+		cb=response;
+	}
+	let field="walletAddress"
+	userPotDetails.distinct(field).exec((err,res)=>{
+		if(err){
+			console.log(err);
+			return cb(
+				responseUtilities.responseStruct(
+				  500,
+				  null,
+				  "getUniqueWalletAddressCount",
+				  null,
+				  null
+				)
+			  );
+		}
+		console.log("response.data",response.data);
+		let sendRes =response.data;
+		console.log("res",res);
+		sendRes["uniqueWalletAddress"]=res.length
+		return cb(
+			null,
+			responseUtilities.responseStruct(
+			  200,
+			  "getUniqueWalletAddressCount",
+			  "getUniqueWalletAddressCount",
+			  sendRes,
+			  null
+			)
+		  );
+	})
+
+
+}

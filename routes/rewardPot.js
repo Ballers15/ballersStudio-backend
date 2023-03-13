@@ -203,7 +203,7 @@ router.get( "/v1/admin/getbyid/reward/pot",
  */
 
 router.patch( "/v1/admin/stop/reward/pot/claim",
-  // [authenticator, authenticateRole(["ADMIN"])],
+  [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
@@ -221,4 +221,24 @@ router.patch( "/v1/admin/stop/reward/pot/claim",
 module.exports = router;
 
 
+/**
+ * Count for active , archive and upcoming pots
+ */
 
+
+router.get( "/v1/admin/pot/counts",
+  [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getPotCounts(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);

@@ -70,6 +70,25 @@ router.patch(
 );
 
 
+router.get(
+	"/v1/admin/get/users/count",
+	[authenticator, authenticateRole(["ADMIN"])],
+	function (req, res, next) {
+		let data = req.query;
+		data.req = req.data;
+
+		users.getUserCount(data, function (err, response) {
+			let status = 0;
+			if (err) {
+				status = err.status;
+				return res.status(status).send(err);
+			}
+			status = response.status;
+			return res.status(status).send(response);
+		});
+	}
+);
+
 
 
 

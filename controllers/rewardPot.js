@@ -559,6 +559,7 @@ const getRewardPots = function (data, resonse, cb) {
     let currentTime = new Date();
 
     findData = {
+      isActive: false,
       startDate: { $gte: currentTime },
     };
   }
@@ -690,3 +691,43 @@ const getUpcomingRewardPots = function (data, response, cb) {
   async.waterfall(waterFallFunctions, cb);
 };
 exports.getUpcomingRewardPots = getUpcomingRewardPots;
+
+
+
+const getPotCounts = async function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+
+  
+  let activePots=await RewardPot.find({isActive:true});
+  console.log(activePots.length)
+  let currentTime = new Date();
+
+   
+  let upcomingPots=await RewardPot.find({isActive:false,startDate: { $gte: currentTime }});
+  console.log("AAAA",upcomingPots)
+
+  let archivePots=await RewardPot.find({isActive:false});
+
+
+  let sendRes={
+    activePots:activePots.length,
+    upcomingPots:upcomingPots.length,
+    archivePots:archivePots.length 
+  }
+   return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get pot counts",
+        "getPotCounts",
+        sendRes,
+        data.req.signature
+      )
+    );
+}
+
+
+exports.getPotCounts = getPotCounts;

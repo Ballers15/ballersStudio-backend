@@ -266,7 +266,7 @@ router.get("/v1/admin/get/user/piechart",
 );
 
 /**
- *  users of game in last pots 
+ *  users of game in last 10 pots 
  */
 
 router.get("/v1/admin/get/user/barchart",

@@ -4,16 +4,11 @@ let Schema = mongoose.Schema;
 
 var rewardPotSchema = new Schema({
     rewardTokenAmount : Number,
-    // ticker: String,
-    //   contractAddress: String,
-    //   assetName:String,
-    //   tokenId:String,
     assetDetails: { type: Object },
     startDate: Date,
     endDate: Date,
     claimExpiryDate: Date,
     potAmountCollected:{ type: Number, default: 0 },
-    //CAN BE STOPPED BY ADMIN 
     claimPot:{ type: Boolean, default: true },
     assetType:{
       type: String,

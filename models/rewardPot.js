@@ -22,7 +22,11 @@ var rewardPotSchema = new Schema({
     potType:{
         type: String,
         enum: { values: process.env.REWARD_POT.split(",") },
-      },
+    },
+    potStatus:{ 
+      type: String,
+      enum: { values: process.env.POT_STATUS.split(",") }
+    },  
     isActive: { type: Boolean, default: true },
     createdBy:{ type: mongoose.Schema.Types.ObjectId,ref: 'users'},
     

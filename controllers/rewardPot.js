@@ -59,6 +59,7 @@ const addRewardPot = function (data, response, cb) {
     isActive: data.isActive || false,
     assetType: data.assetType,
     potType: data.potType,
+    potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
     createdBy: data.req.auth.id,
   };
 
@@ -261,11 +262,11 @@ const checkIfPotIsActive = function (data, response, cb) {
       );
     }
 
-    if (res.isActive) {
+    if (res.potStatus==process.env.POT_STATUS.split(",")[1]) {
       return cb(
         responseUtilities.responseStruct(
           400,
-          "Active pot cant be updated",
+          "Ongoing pot cant be updated",
           "updatePot",
           null,
           data.req.signature
@@ -304,7 +305,8 @@ const updatePot = function (data, response, cb) {
     assetType: data.assetType,
     claimExpiryDate: data.claimExpiryDate,
     potType: data.potType,
-    isActive: data.isActive || false,
+    potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
+
   };
 
   let findData = {
@@ -427,12 +429,15 @@ const updateClaim = function(data,response,cb){
   if(!cb){
     cb=response;
   }
+
   let updateData = {
     claimPot: data.claim,
   };
 
   let findData = {
+
     _id: data.potId,
+  
   };
 
   RewardPot.findOneAndUpdate(findData, updateData, (err, res) => {
@@ -447,7 +452,6 @@ const updateClaim = function(data,response,cb){
           data.req.signature
         )
       );
-
     }
     data.insertActionLogData = {
       potId: data.potId,
@@ -552,23 +556,26 @@ const getRewardPots = function (data, resonse, cb) {
  
   if (data.activeRewardPots) {
     findData = {
-      isActive: true,
+      $or:[
+        {potStatus:process.env.POT_STATUS.split(",")[1]},
+        {potStatus:process.env.POT_STATUS.split(",")[2]}
+      ]
     };
   }
 
   if (data.archivedRewardPots) {
     findData = {
-      isActive: false,
+      potStatus:process.env.POT_STATUS.split(",")[3]
     };
   }
   if (data.upcomingPots) {
     let currentTime = new Date();
 
     findData = {
-      isActive: false,
-      startDate: { $gte: currentTime },
+      potStatus:process.env.POT_STATUS.split(",")[0]
     };
   }
+
   if(data.potType){
     findData.potType=data.potType;
   }
@@ -709,17 +716,31 @@ const getPotCounts = async function(data,response,cb){
     cb=response;
   }
 
-
+  let findDataActive = {
+    $or:[
+      {potStatus:process.env.POT_STATUS.split(",")[1]},
+      {potStatus:process.env.POT_STATUS.split(",")[2]}
+    ]
+  };
   
-  let activePots=await RewardPot.find({isActive:true});
+  let activePots=await RewardPot.find(findDataActive);
   console.log(activePots.length)
   let currentTime = new Date();
 
+
+ let findDataUpcoming = {
+    potStatus:process.env.POT_STATUS.split(",")[0]
+  };
    
-  let upcomingPots=await RewardPot.find({isActive:false,startDate: { $gte: currentTime }});
+  let upcomingPots=await RewardPot.find(findDataUpcoming);
   console.log("AAAA",upcomingPots)
 
-  let archivePots=await RewardPot.find({isActive:false});
+
+  let findDataArchive = {
+    potStatus:process.env.POT_STATUS.split(",")[3]
+  };
+
+  let archivePots=await RewardPot.find(findDataArchive);
 
 
   let sendRes={

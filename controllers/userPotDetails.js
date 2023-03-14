@@ -25,6 +25,7 @@ const adduserPotDetails = function (data, response, cb) {
   let waterFallFunctions = [];
 
   waterFallFunctions.push(async.apply(getPotDetails, data));
+  waterFallFunctions.push(async.apply(checkPotOngoing, data));
   waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
   waterFallFunctions.push(async.apply(checkWalletAssociatedToOther, data));
   waterFallFunctions.push(async.apply(checkPremiumPot, data));
@@ -170,6 +171,49 @@ const checkPremiumPot = function (data, response, cb) {
     );
   }
 };
+
+
+const checkPotOngoing =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  if (!data.potDetails) {
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "missing potDetails",
+        "checkBalanceSubmissionDate",
+        null,
+        data.req.signature
+      )
+    );
+  }
+  if(data.potDetails.potStatus==process.env.POT_STATUS.split(",")[1]){
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "User will able to add",
+        "checkPotOngoing",
+        null,
+        data.req.signature
+      )
+    );
+  }else{
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "Submission for  pot is not allowed for this moment",
+        "checkBalanceSubmissionDate",
+        null,
+        data.req.signature
+      )
+    );
+  }
+  
+}
+
 const checkBalanceSubmissionDate = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -192,18 +236,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
   console.log(data.potDetails.endDate);
   //check for is pot active or closed
 
-  if (!data.potDetails.isActive) {
-    return cb(
-      responseUtilities.responseStruct(
-        400,
-        "Submission for  pot is not allowed for this moment pot is closed",
-        "checkBalanceSubmissionDate",
-        null,
-        data.req.signature
-      )
-    );
-  }
-
+  
   if (
     data.potDetails.startDate < currentDate &&
     currentDate <= data.potDetails.endDate

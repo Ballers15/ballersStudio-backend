@@ -169,6 +169,7 @@ const userGameCashDetails =function(data,response,cb){
 		}
 
 	]
+	
 	userPotDetails.aggregate(pipeline).exec((err,res)=>{
 		if(err){
 			console.error(err);

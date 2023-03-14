@@ -60,7 +60,7 @@ router.patch( "/v1/admin/update/reward/pot",
   }
 );
 /**
- * update pot status
+ * update pot status soft delete this means pot will not be shown to user in any case
  */
 
 
@@ -82,7 +82,7 @@ router.patch( "/v1/admin/reward/pot/status",
 );
 
 /**
- * soft delete pot
+ * soft delete pot not in use
  */
 
 router.patch( "/v1/admin/delete/reward/pot",

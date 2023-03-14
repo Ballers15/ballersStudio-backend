@@ -269,12 +269,12 @@ router.get("/v1/admin/get/user/piechart",
  *  users of game in last pots 
  */
 
-router.get("/v1/admin/get/user/piechart",
+router.get("/v1/admin/get/user/barchart",
 [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
-    userPotDetails.getUsersPieChart(data, function (err, response) {
+    userPotDetails.getUsersBarChart(data, function (err, response) {
       let status = 0;
       if (err) {
         status = err.status;

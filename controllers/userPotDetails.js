@@ -1496,6 +1496,7 @@ const getLatestTenPots =function(data,response,cb){
  let findData={
   potType:data.potType
  }
+ let limit =10;
 
   rewardPot.find(findData).limit(limit).sort({ createdAt: -1 }).exec((err,res)=>{
     if(err){
@@ -1510,7 +1511,7 @@ const getLatestTenPots =function(data,response,cb){
         )
       );
     }
-    console.log(res);
+ 
     let potIds=res.map((el)=>{return el._id});
     return cb(
       null,
@@ -1529,7 +1530,38 @@ const getUserChart = function(data,response,cb){
     cb=response;
   }
 
-  userPotDetails.aggregate().exec((err,res)=>{
+  let potIds=response.data;
+  console.log(potIds);
+   let pipeline=[
+
+    {$match:{"potId":{$in:potIds}}},
+    {$lookup:{
+      "from":"rewardpots",
+      "localField":"potId",
+      "foreignField":"_id",
+      "as":"pots"
+      }
+  },
+  
+  {$unwind:"$pots"},
+  {$match:{"pots.potStatus":"ARCHIVED"}},
+  {$group:{
+    _id:"$potId",
+    users:{$sum:1},
+    gameCashBurned:{$sum:"$amount"}
+    }    
+  },
+  {
+    $lookup:{
+      from:"rewardpots",
+      localField:"_id",
+      foreignField:"_id",
+      as:"potDetails"
+    }
+  }
+
+   ]
+  userPotDetails.aggregate(pipeline).exec((err,res)=>{
     if(err){
       console.log(err);
       return cb(
@@ -1542,5 +1574,17 @@ const getUserChart = function(data,response,cb){
         )
       );
     }
+    console.log("RES",res);
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get User Chart",
+        "getUserChart",
+        res,
+        data.req.signature
+      )
+    );
+
   })
 }

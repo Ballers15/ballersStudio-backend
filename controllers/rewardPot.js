@@ -549,9 +549,7 @@ const getRewardPots = function (data, resonse, cb) {
   }
   let findData = {};
 
-  if(data.potType){
-    findData.potType=data.potType;
-  }
+ 
   if (data.activeRewardPots) {
     findData = {
       isActive: true,
@@ -571,12 +569,16 @@ const getRewardPots = function (data, resonse, cb) {
       startDate: { $gte: currentTime },
     };
   }
+  if(data.potType){
+    findData.potType=data.potType;
+  }
 
   let limit = parseInt(process.env.pageLimit);
   let skip = 0;
   if (data.currentPage) {
     skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
   }
+  console.log('find',findData);
 
   RewardPot.find(findData)
     .skip(skip)

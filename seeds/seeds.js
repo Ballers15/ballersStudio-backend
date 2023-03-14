@@ -13,19 +13,19 @@ const { Kinesis } = require('aws-sdk');
 
 let insertUser = [
 
-  // {
-  //   _id:"601e3c6ef5eb242d4408dcc6",
-  //   name:"admin",
-  //   email:"admin@ith.tech",
-  //   accountId: "11223344",
-  //   provider: "email",
-  //   role: 'ADMIN',
-  //   userName: 'admin_seed',
-  //   password: crypto.pbkdf2Sync('123456789', randomSalt, 10000, 64, 'sha1').toString('base64'),
-  //   salt: salt,
-  //   emailVerified:true,
-  //   isActive:true
-  // },
+   {
+     _id:"601e3c6ef5eb242d4408dcc6",
+     name:"admin",
+     email:"admin@ith.tech",
+    accountId: "11223344",
+     provider: "email",
+     role: 'ADMIN',
+     userName: 'admin_seed',
+     password: crypto.pbkdf2Sync('123456789', randomSalt, 10000, 64, 'sha1').toString('base64'),
+     salt: salt,
+     emailVerified:true,
+     isActive:true
+   },
   {
     _id:"601e3c6ef5eb242d4408dcd9",
     name:"user",
@@ -101,5 +101,5 @@ let seedCountry = function(){
   
 }
 
-// seedCountry()
+ seedCountry()
 seedUsers()

@@ -1326,3 +1326,59 @@ const getTokenClaimAmount =function(data,response,cb){
 
 
 }
+
+const getUsersPieChart =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let pipeline=[
+    {
+      $lookup:{
+      from:"rewardpots",
+      localField:"potId",
+      foreignField:"_id",
+      as:"potTypes"
+      }
+      },{
+          $unwind:"$potTypes"
+          
+       },
+       {$group:{
+           
+           _id:"$potTypes.potType",
+           userCount:{$sum:1},
+           gameCashBurned:{$sum:"$amount"}
+           } 
+      }  
+  ]
+  
+  userPotDetails.aggregate(pipeline).exec((err,res)=>{
+    if(err){
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "getUsersPieChart",
+          null,
+          data.req.signature
+        )
+      );
+    }
+
+    console.log(res);
+  
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get Users Pie Chart",
+        "getUsersPieChart",
+        res,
+        data.req.signature
+      )
+    );
+
+  })
+}
+
+exports.getUsersPieChart = getUsersPieChart;

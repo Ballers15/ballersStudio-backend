@@ -552,6 +552,8 @@ const addLotteryPotBalance = function (data, response, cb) {
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
+  waterFallFunctions.push(async.apply(checkPotOngoing, data));
+
   waterFallFunctions.push(async.apply(checkBalanceSubmissionDate, data));
 
   waterFallFunctions.push(async.apply(checkWalletAssociatedToOther, data));
@@ -583,6 +585,7 @@ const createClaimWithdrawl = function (data, response, cb) {
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
+  waterFallFunctions.push(async.apply(checkClaimStage, data));
   waterFallFunctions.push(async.apply(checkClaimExpired, data));
   waterFallFunctions.push(async.apply(checkIfuserPotDetailsExist, data));
   waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
@@ -594,6 +597,46 @@ const createClaimWithdrawl = function (data, response, cb) {
 
 exports.createClaimWithdrawl = createClaimWithdrawl;
 
+const checkClaimStage =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if (!data.potDetails) {
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "missing potDetails",
+        "checkClaimStage",
+        null,
+        data.req.signature
+      )
+    );
+  }
+  if(data.potDetails.potStatus==process.env.POT_STATUS.split(",")[2]){
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "User will able to add",
+        "checkClaimStage",
+        null,
+        data.req.signature
+      )
+    );
+  }else{
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "Submission for  pot is not allowed for this moment",
+        "checkClaimStage",
+        null,
+        data.req.signature
+      )
+    );
+  }
+
+
+}
 const checkClaimExpired = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -989,8 +1032,11 @@ const createLotteryClaim = function (data, response, cb) {
     );
   }
 
+    
+
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
+  waterFallFunctions.push(async.apply(checkClaimStage, data));
   waterFallFunctions.push(async.apply(checkClaimExpired, data));
   waterFallFunctions.push(async.apply(checkIfuserWonLottery, data));
   waterFallFunctions.push(async.apply(checkIfSignatureExist, data));

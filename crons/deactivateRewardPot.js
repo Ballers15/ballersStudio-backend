@@ -14,7 +14,8 @@ let activateRewardPots = async (cb) => {
     var currentTime = new Date();
         console.log("currentTime",currentTime);
     let findData = {
-        isActive: true,
+        isActive:true,
+        "potStatus": "ONGOING",
         endDate: { $lte: currentTime },
         potType:"REWARDPOT"
     }
@@ -56,8 +57,9 @@ const UpdateRewardPotStatus = function (data, response, cb) {
     let options = {
         multi:true
     }
+
     let updateDate = {
-        isActive:false
+        potStatus:"CLAIM"
     }
 
     RewardPot.updateMany(findData,updateDate,options).exec((err, res) => {

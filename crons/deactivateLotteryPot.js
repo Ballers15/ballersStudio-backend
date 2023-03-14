@@ -18,6 +18,7 @@ let deactivateRewardPots = async (cb) => {
         console.log("currentTime",currentTime);
     let findData = {
         isActive: true,
+        "potStatus": "ONGOING",
         endDate: { $lte: currentTime },
         potType:"LOTTERYPOT"
     }
@@ -57,8 +58,9 @@ const UpdateRewardPotStatus = function (data, response, cb) {
     let options = {
         multi:true
     }
+   
     let updateDate = {
-        isActive:false
+        potStatus:"CLAIM"
     }
 
     RewardPot.updateMany(findData,updateDate,options).exec((err, res) => {

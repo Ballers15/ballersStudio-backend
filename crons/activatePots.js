@@ -3,23 +3,24 @@ require('../models/db');
 const cron = require('node-cron');
 const RewardPot = require("../models/rewardPot");
 // '*/10 * * * * *'                      10 sec
-let taskJob = cron.schedule('0 0 * * *', () => { // runs at 12:00 mid night
+let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
     activateRewardPots()
 });
 
 let activateRewardPots = async () => {
     var currentTime = new Date();
     let findDate = {
-        isActive: false,
-        startDate: {$lte:currentTime},endDate:{$lt:currentTime}
+        isActive:true,
+        potStatus:"UPCOMING",
+        startDate: {$lte:currentTime},
+        endDate:{$gte:currentTime}
     }
     let  options   = {
         multi:true
     }
-    let updateData = { "$set": { "isActive": true } };
-
+    let updateData = { "$set": { "potStatus": "ONGOING" } };
+    console.log("findData",findDate);
     let rewardPot = await RewardPot.updateMany(findDate, updateData, options);
-    let rewardPotdata = await RewardPot.find({})
     console.log(rewardPot,'-------------------------------->>>>>>>>>>>>-------------->>>>>>>>>>>>>>>>>>>>>>>>>>')
-    console.log(rewardPotdata,'-------------------------------->>>>>>>>>>>>-------------->>>>>>>>>>>>>>>>>>>>>>>>>>')
+    // console.log(rewardPotdata,'-------------------------------->>>>>>>>>>>>-------------->>>>>>>>>>>>>>>>>>>>>>>>>>')
 }

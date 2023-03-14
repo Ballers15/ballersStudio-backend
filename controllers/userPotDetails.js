@@ -4,6 +4,7 @@ const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
+const rewardPot = require("../models/rewardPot");
 
 const adduserPotDetails = function (data, response, cb) {
   if (!cb) {
@@ -1461,3 +1462,85 @@ const getUsersPieChart =function(data,response,cb){
 }
 
 exports.getUsersPieChart = getUsersPieChart;
+
+
+const getUsersBarChart =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(!data.potType){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "get Users Bar Chart",
+        "getUsersBarChart",
+        res,
+        data.req.signature
+      )
+    );
+  }
+  let waterFallFunctions=[];
+  waterFallFunctions.push(async.apply(getLatestTenPots, data));
+  waterFallFunctions.push(async.apply(getUserChart, data));
+  async.waterfall(waterFallFunctions, cb);
+
+}
+exports.getUsersBarChart=getUsersBarChart;
+
+const getLatestTenPots =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+
+ let findData={
+  potType:data.potType
+ }
+
+  rewardPot.find(findData).limit(limit).sort({ createdAt: -1 }).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "getLatestPots",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    console.log(res);
+    let potIds=res.map((el)=>{return el._id});
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "get Nft CLaim Count",
+        "getNftCLaimCount",
+        potIds,
+        data.req.signature
+      )
+    );
+  })
+}
+const getUserChart = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  userPotDetails.aggregate().exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "getUserChart",
+          null,
+          data.req.signature
+        )
+      );
+    }
+  })
+}

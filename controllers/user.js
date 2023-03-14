@@ -24,6 +24,7 @@ const getAllUsers = function (data, response, cb) {
 		provider: 1,
 		emailVerified: 1,
 		isActive: 1,
+		isBlocked:1,
 		createdAt: 1,
 		userName: 1,
 		accountId: 1,

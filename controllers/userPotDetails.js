@@ -1498,6 +1498,7 @@ const getLatestTenPots =function(data,response,cb){
  }
  let limit =10;
 
+
   rewardPot.find(findData).limit(limit).sort({ createdAt: -1 }).exec((err,res)=>{
     if(err){
       console.log(err);

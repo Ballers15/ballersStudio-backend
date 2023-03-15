@@ -37,15 +37,29 @@ const getAllUsers = function (data, response, cb) {
 	if (data.currentPage) {
 	  skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
 	}
-	if (data.startDate) {
-		createdAt["$gte"] = new Date(data.startDate);
-  }
-	if (data.endDate) {
-		createdAt["$lte"] = new Date(data.endDate);
-	}
-	if (data.startDate || data.endDate) {
-		findData.createdAt = createdAt;
-	}
+
+
+	if (data.startDate && data.endDate) {
+		findData.createdAt = {
+		  $gte: new Date(new Date(data.startDate).setHours(0, 0, 0, 0)),
+		  $lte: new Date(new Date(data.endDate).setHours(23, 59, 59, 999)),
+		};
+	  }
+
+	  if (data.startDate && !data.endDate) {
+		findData.createdAt = {
+		  $gte: new Date(new Date(data.startDate).setHours(0, 0, 0, 0)),
+		};
+	  }
+	
+	  if (data.endDate && !data.startDate) {
+		findData.createdAt = {
+		  $lte: new Date(new Date(data.endDate).setHours(23, 59, 59, 999)),
+		};
+	  }
+
+
+
 
 	if(data.email){
 		findData.email=data.email

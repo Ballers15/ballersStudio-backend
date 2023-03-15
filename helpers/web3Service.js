@@ -331,6 +331,91 @@ if(!cb){
         );
 
     }
+}
+
+
+
+
+
+
+const checkNFTBalance =async function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+    try{
+       console.log("ass",response.data);
+       let users=response.data.transactions;
+       
+        let count=response.data.count;
+        let pageLimit=response.data.pageLimit;
+        // let walletAddress= walletAddresses
+        let walletAddresses=[];
+         walletAddresses=users.map((el)=>{
+            return web3.utils.toChecksumAddress(el.walletAddress)
+        })
+        // for(let i in users){
+        //     if(users[i].walletAddress){
+        //         let wallet = web3.utils.toChecksumAddress(users[i].walletAddress);
+        //         walletAddresses.push(users[i].walletAddress)
+
+        //     }
+        // }
+        console.log("walletAddresses--",walletAddresses);
+        let finalMap=[];
+        for(let i in tokenIds){
+           let tokenIdDetails= Array(walletAddresses.length).fill(tokenIds[i]);
+console.log("tokenIds",tokenIdDetails);
+        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletAddresses,tokenIdDetails).call();
+            console.log("balance of batch",balanceOfbatch,walletAddresses);
+            finalMap.push(balanceOfbatch);        
+        }
+
+        for(let i in users){
+            let count=0;
+            
+                for(let j in finalMap){
+                    let nftCount=parseFloat(finalMap[j][i]);
+                    if(nftCount>0){
+                        count+=1;
+                    }
+                }
+                users[i].nftHolded=count;
+            
+                
+            }
+            
+    
+        // console.log("users",users);
+        // return;
+    
+        let sendRes = {
+            transactions: users,
+            count: count,
+            pageLimit: pageLimit,
+          };
+        return cb(
+            null,
+            responseUtilities.responseStruct(
+                200,
+                "check User Holds Nft",
+                "checkUserHoldsNft",
+                sendRes,
+                data.req.signature
+        ));
+    }
+    catch(err){
+
+        return cb(
+            responseUtilities.responseStruct(
+                400,
+                `${err}`,
+                "checkUserHoldsNft",
+                null,
+                data.req.signature
+            )
+        );
+
+    }
 
 }
 
@@ -392,5 +477,6 @@ module.exports ={
     createUserSignature,
     getTransactionStatus,
     checkUserHoldsNft,
-    createLotterySignature
+    createLotterySignature,
+    checkNFTBalance
 }

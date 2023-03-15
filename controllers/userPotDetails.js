@@ -1190,6 +1190,24 @@ const getSpecificPotUsers = function (data, response, cb) {
   if (!cb) {
     cb = response;
   }
+
+  let waterFallFunctions=[];
+  waterFallFunctions.push(async.apply(getPotUsers, data));
+  waterFallFunctions.push(async.apply(web3Service.checkNFTBalance, data));
+
+  // waterFallFunctions.push(async.apply(getNftCount, data));
+  async.waterfall(waterFallFunctions, cb);
+
+  
+
+};
+exports.getSpecificPotUsers = getSpecificPotUsers;
+
+
+const getPotUsers =function(data,response,cb){
+  if (!cb) {
+    cb = response;
+  }
   if (!data.potId) {
     return cb(
       responseUtilities.responseStruct(
@@ -1229,6 +1247,7 @@ const getSpecificPotUsers = function (data, response, cb) {
 
   let sort = { createdAt: -1 };
 
+  console.log("findData",findData);
   let pipeline = [
     {
       $match: findData,
@@ -1305,8 +1324,16 @@ const getSpecificPotUsers = function (data, response, cb) {
       )
     );
   });
-};
-exports.getSpecificPotUsers = getSpecificPotUsers;
+}
+
+const getNftCount =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  console.log("respons",response.data);
+
+}
 
 
 const getTotalClaimCount = function(data,response,cb){
@@ -1499,7 +1526,7 @@ const getLatestTenPots =function(data,response,cb){
  let limit =10;
 
 
-  rewardPot.find(findData).limit(limit).sort({ createdAt: -1 }).exec((err,res)=>{
+  rewardPot.find(findData).sort({ createdAt: -1 }).exec((err,res)=>{
     if(err){
       console.log(err);
       return cb(
@@ -1559,7 +1586,10 @@ const getUserChart = function(data,response,cb){
       foreignField:"_id",
       as:"potDetails"
     }
-  }
+  },
+  {$unwind:"$potDetails"},
+  { $sort: { "potDetails.createdAt": -1 } }
+
 
    ]
   userPotDetails.aggregate(pipeline).exec((err,res)=>{
@@ -1576,6 +1606,7 @@ const getUserChart = function(data,response,cb){
       );
     }
     console.log("RES",res);
+    // add 10 here 
     return cb(
       null,
       responseUtilities.responseStruct(

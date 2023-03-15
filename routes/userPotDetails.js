@@ -206,8 +206,8 @@ function(req, res, next) {
  *  Get user for a particular pot
  */
 
-router.get( "/v1/specific/pot/users",[authenticator, authenticateRole(["ADMIN"])
-],
+router.get( "/v1/specific/pot/users",
+[authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
@@ -270,7 +270,7 @@ router.get("/v1/admin/get/user/piechart",
  */
 
 router.get("/v1/admin/get/user/barchart",
-[authenticator, authenticateRole(["ADMIN"])],
+// [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;

@@ -47,6 +47,9 @@ const getAllUsers = function (data, response, cb) {
 		findData.createdAt = createdAt;
 	}
 
+	if(data.email){
+		findData.email=data.email
+	}
 	console.log(findData,'-----------------------find date')
 
 	Users.find(findData,projection) .skip(skip).limit(limit).sort({ createdAt: -1 }).exec((err, res) => {

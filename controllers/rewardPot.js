@@ -56,7 +56,6 @@ const addRewardPot = function (data, response, cb) {
     startDate: data.startDate,
     endDate: data.endDate,
     claimExpiryDate: data.claimExpiryDate,
-    isActive: data.isActive || false,
     assetType: data.assetType,
     potType: data.potType,
     potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
@@ -234,7 +233,7 @@ const updateRewardPot = function (data, response, cb) {
   }
 
   let waterFallFunctions = [];
-  waterFallFunctions.push(async.apply(checkIfPotIsActive, data));
+  // waterFallFunctions.push(async.apply(checkIfPotIsActive, data));
   waterFallFunctions.push(async.apply(updatePot, data));
   waterFallFunctions.push(async.apply(potActionLogs, data));
   async.waterfall(waterFallFunctions, cb);
@@ -308,6 +307,7 @@ const updatePot = function (data, response, cb) {
     potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
 
   };
+  console.log("updateData",updateData);
 
   let findData = {
     _id: data.potId,

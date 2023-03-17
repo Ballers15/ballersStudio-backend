@@ -16,6 +16,28 @@ const authenticateRole = require('../middlewares/authenticateRole');
 const rewardPot = require("../controllers/rewardPot");
 
 
+/**
+ * gives active reward Pot
+ * Non Authenticated
+ */
+router.get( "/v1/user/get/active/pot",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getActivePot(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
 
 
 /******************************************************************ADMIN****************************************************************************************** */

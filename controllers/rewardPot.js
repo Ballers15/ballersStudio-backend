@@ -4,6 +4,69 @@ const PotActionLogs = require("../models/potActionLogs");
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
+
+
+const getActivePot = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(!data.potType){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        null,
+        "getActivePot",
+        null,
+        data.req.signature
+      )
+    );
+
+  }
+  let findData={
+    potStatus:process.env.POT_STATUS.split(",")[1],
+    isActive:true,
+    potType:data.potType
+  };
+  let projection={
+    "startDate":1,
+    "endDate":1,
+    "claimExpiryDate":1,
+    "assetType":1,
+    "potStatus":1,
+    "potType":1,
+  }
+  RewardPot.find(findData,projection).exec((err,res)=>{
+    if(err){
+      console.log("RewardPot Error : ", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting RewardPot",
+          "getActivePot",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    console.log("res",res);
+
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getActivePot",
+        res,
+        data.req.signature
+      )
+    );
+  })
+
+
+}
+
+exports.getActivePot=getActivePot;
+
 const createRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -62,6 +125,7 @@ const addRewardPot = function (data, response, cb) {
     createdBy: data.req.auth.id,
   };
 
+  console.log("inserD",insertData);
   RewardPot.create(insertData, (err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
@@ -88,7 +152,7 @@ const addRewardPot = function (data, response, cb) {
         200,
         "Pot added succesfully",
         "addRewardPot",
-        null,
+        res,
         data.req.signature
       )
     );
@@ -629,6 +693,7 @@ const getRewardPots = function (data, resonse, cb) {
             )
           );
         }
+        console.log("count is",count);
 
         return cb(
           null,

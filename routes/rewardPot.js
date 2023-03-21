@@ -36,7 +36,10 @@ router.get( "/v1/user/get/active/pot",
     });
   }
 );
-
+/**
+ * gives  reward Pot Leaderboard
+ * Non Authenticated
+ */
 
 router.get( "/v1/user/get/reward/pot/leaderboard",
   function (req, res, next) {
@@ -54,6 +57,10 @@ router.get( "/v1/user/get/reward/pot/leaderboard",
   }
 );
 
+/**
+ * gives  Lottery Pot Leaderboard
+ * Non Authenticated
+ */
 
 router.get( "/v1/user/get/lottery/pot/leaderboard",
   function (req, res, next) {

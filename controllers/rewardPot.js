@@ -199,6 +199,11 @@ const getLotteryleaderBoard = function (data, response, cb) {
           )
         );
       }
+        res.map((el)=>{
+        if(!el.userId){
+          res.splice(el,1);
+        }
+      })
       console.log("res", res);
       return cb(
         null,

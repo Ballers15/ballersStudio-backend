@@ -5,12 +5,219 @@ const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 
-
-const getActivePot = function(data,response,cb){
-  if(!cb){
-    cb=response;
+const getRewardPotLeaderBoard = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
   }
-  if(!data.potType){
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getActiveRewardPot, data));
+  waterFallFunctions.push(async.apply(getRewardLeaderBoard, data));
+  async.waterfall(waterFallFunctions, cb);
+};
+exports.getRewardPotLeaderBoard = getRewardPotLeaderBoard;
+
+const getActiveRewardPot = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+  let findData = {
+    $and: [
+      {
+        $or: [
+          { potStatus: process.env.POT_STATUS.split(",")[1] },
+          { potStatus: process.env.POT_STATUS.split(",")[2] },
+        ],
+      },
+      { isActive: true, potType: process.env.REWARD_POT.split(",")[0] },
+    ],
+  };
+  RewardPot.findOne(findData).exec((err, res) => {
+    if (err) {
+      console.log("getRewardPotLeaderBoard Error : ", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting Leaderboard",
+          "getRewardPotLeaderBoard",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getRewardPotLeaderBoard",
+        res,
+        data.req.signature
+      )
+    );
+  });
+};
+
+const getRewardLeaderBoard = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+
+  console.log(response.data);
+  let potId = response.data._id;
+  let findData = { potId: potId };
+  userPotDetails
+    .find(findData)
+    .populate({
+      path: "userId",
+      model: "users",
+      select: "_id name",
+    })
+    .sort({ amount: -1 })
+    .exec((err, res) => {
+      if (err) {
+        console.log(err);
+        console.log("RewardPot Error : ", err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting RewardPot",
+            "getRewardLeaderBoard",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      console.log("res", res);
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Active Pot Fetched Successfuly",
+          "getRewardPotLeaderBoard",
+          res,
+          data.req.signature
+        )
+      );
+    });
+};
+
+const getLotteryPotLeaderBoard = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getActiveLotteryPot, data));
+  waterFallFunctions.push(async.apply(getLotteryleaderBoard, data));
+  async.waterfall(waterFallFunctions, cb);
+};
+exports.getLotteryPotLeaderBoard = getLotteryPotLeaderBoard;
+
+const getActiveLotteryPot = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+  let findData = {
+    $and: [
+      {
+        $or: [
+          { potStatus: process.env.POT_STATUS.split(",")[1] },
+          { potStatus: process.env.POT_STATUS.split(",")[2] },
+        ],
+      },
+      { isActive: true, potType: process.env.REWARD_POT.split(",")[1] },
+    ],
+  };
+  RewardPot.findOne(findData).exec((err, res) => {
+    if (err) {
+      console.log("getRewardPotLeaderBoard Error : ", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting Leaderboard",
+          "getRewardPotLeaderBoard",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getRewardPotLeaderBoard",
+        res,
+        data.req.signature
+      )
+    );
+  });
+};
+
+const getLotteryleaderBoard = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+  console.log(response.data);
+  let potId = response.data._id;
+  let findData = { 
+    potId: potId ,
+    lotteryWon:true
+  
+  };
+  let searchQuery;
+  if (data.search) {
+    searchQuery = {
+      "name": data.search,
+    };
+  }
+
+  
+ 
+  userPotDetails
+    .find(findData)
+    .populate({
+      path: "userId",
+      model: "users",
+      match: searchQuery,
+      select: "_id name",
+      
+    })
+    .sort({ amount: -1 })
+    .exec((err, res) => {
+      if (err) {
+        console.log(err);
+        console.log("RewardPot Error : ", err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting RewardPot",
+            "getRewardLeaderBoard",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      console.log("res", res);
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Active Pot Fetched Successfuly",
+          "getRewardPotLeaderBoard",
+          res,
+          data.req.signature
+        )
+      );
+    });
+};
+
+const getActivePot = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+  if (!data.potType) {
     return cb(
       responseUtilities.responseStruct(
         400,
@@ -20,23 +227,29 @@ const getActivePot = function(data,response,cb){
         data.req.signature
       )
     );
+  }
 
-  }
-  let findData={
-    potStatus:process.env.POT_STATUS.split(",")[1],
-    isActive:true,
-    potType:data.potType
+  let findData = {
+    $and: [
+      {
+        $or: [
+          { potStatus: process.env.POT_STATUS.split(",")[1] },
+          { potStatus: process.env.POT_STATUS.split(",")[2] },
+        ],
+      },
+      { isActive: true, potType: data.potType },
+    ],
   };
-  let projection={
-    "startDate":1,
-    "endDate":1,
-    "claimExpiryDate":1,
-    "assetType":1,
-    "potStatus":1,
-    "potType":1,
-  }
-  RewardPot.find(findData,projection).exec((err,res)=>{
-    if(err){
+  let projection = {
+    startDate: 1,
+    endDate: 1,
+    claimExpiryDate: 1,
+    assetType: 1,
+    potStatus: 1,
+    potType: 1,
+  };
+  RewardPot.find(findData, projection).exec((err, res) => {
+    if (err) {
       console.log("RewardPot Error : ", err);
       return cb(
         responseUtilities.responseStruct(
@@ -48,7 +261,7 @@ const getActivePot = function(data,response,cb){
         )
       );
     }
-    console.log("res",res);
+    console.log("res", res);
 
     return cb(
       null,
@@ -60,12 +273,10 @@ const getActivePot = function(data,response,cb){
         data.req.signature
       )
     );
-  })
+  });
+};
 
-
-}
-
-exports.getActivePot=getActivePot;
+exports.getActivePot = getActivePot;
 
 const createRewardPot = function (data, response, cb) {
   if (!cb) {
@@ -104,14 +315,12 @@ const addRewardPot = function (data, response, cb) {
     cb = response;
   }
   // TICKER is token id in nft and reward amount is quantity in nft
-  
+
   let assetDetails = {
     contractAddress: data.assetDetails.contractAddress,
     assetName: data.assetDetails.assetName,
-    ticker:data.assetDetails.ticker
+    ticker: data.assetDetails.ticker,
   };
-
- 
 
   let insertData = {
     rewardTokenAmount: data.rewardTokenAmount,
@@ -121,11 +330,13 @@ const addRewardPot = function (data, response, cb) {
     claimExpiryDate: data.claimExpiryDate,
     assetType: data.assetType,
     potType: data.potType,
-    potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
+    potStatus: data.isActive
+      ? process.env.POT_STATUS.split(",")[1]
+      : process.env.POT_STATUS.split(",")[0],
     createdBy: data.req.auth.id,
   };
 
-  console.log("inserD",insertData);
+  console.log("inserD", insertData);
   RewardPot.create(insertData, (err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
@@ -255,7 +466,7 @@ const updatePotStatus = function (data, response, cb) {
     data.insertActionLogData = {
       potId: res._id,
       addedBy: data.req.auth.id,
-      action: `Pot Status Change to ${data.isActive ?"Active":"Deactive"}`,
+      action: `Pot Status Change to ${data.isActive ? "Active" : "Deactive"}`,
     };
 
     return cb(
@@ -325,7 +536,7 @@ const checkIfPotIsActive = function (data, response, cb) {
       );
     }
 
-    if (res.potStatus==process.env.POT_STATUS.split(",")[1]) {
+    if (res.potStatus == process.env.POT_STATUS.split(",")[1]) {
       return cb(
         responseUtilities.responseStruct(
           400,
@@ -356,8 +567,7 @@ const updatePot = function (data, response, cb) {
   let assetDetails = {
     contractAddress: data.assetDetails.contractAddress,
     assetName: data.assetDetails.assetName,
-    ticker:data.assetDetails.ticker
-
+    ticker: data.assetDetails.ticker,
   };
 
   let updateData = {
@@ -368,10 +578,11 @@ const updatePot = function (data, response, cb) {
     assetType: data.assetType,
     claimExpiryDate: data.claimExpiryDate,
     potType: data.potType,
-    potStatus:data.isActive ? process.env.POT_STATUS.split(",")[1] :process.env.POT_STATUS.split(",")[0],
-
+    potStatus: data.isActive
+      ? process.env.POT_STATUS.split(",")[1]
+      : process.env.POT_STATUS.split(",")[0],
   };
-  console.log("updateData",updateData);
+  console.log("updateData", updateData);
 
   let findData = {
     _id: data.potId,
@@ -462,14 +673,11 @@ const deleteRewardPot = function (data, response, cb) {
 };
 exports.deleteRewardPot = deleteRewardPot;
 
-
-
-
-const updateClaimOfRewardPot =function(data,response,cb){
-if(!cb){
-	cb=response;
-}
-if (!data.potId) {
+const updateClaimOfRewardPot = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
+  }
+  if (!data.potId) {
     return cb(
       responseUtilities.responseStruct(
         400,
@@ -481,17 +689,16 @@ if (!data.potId) {
     );
   }
 
-  let waterFallFunctions=[];
+  let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(updateClaim, data));
   waterFallFunctions.push(async.apply(potActionLogs, data));
   async.waterfall(waterFallFunctions, cb);
- 
-}
+};
 exports.updateClaimOfRewardPot = updateClaimOfRewardPot;
 
-const updateClaim = function(data,response,cb){
-  if(!cb){
-    cb=response;
+const updateClaim = function (data, response, cb) {
+  if (!cb) {
+    cb = response;
   }
 
   let updateData = {
@@ -499,9 +706,7 @@ const updateClaim = function(data,response,cb){
   };
 
   let findData = {
-
     _id: data.potId,
-  
   };
 
   RewardPot.findOneAndUpdate(findData, updateData, (err, res) => {
@@ -520,7 +725,7 @@ const updateClaim = function(data,response,cb){
     data.insertActionLogData = {
       potId: data.potId,
       addedBy: data.req.auth.id,
-      action: "Admin stopped the claim of pot", 
+      action: "Admin stopped the claim of pot",
     };
 
     return cb(
@@ -534,17 +739,7 @@ const updateClaim = function(data,response,cb){
       )
     );
   });
-}
-
-
-
-
-
-
-
-
-
-
+};
 
 const getRewardPotsById = function (data, response, cb) {
   if (!cb) {
@@ -617,31 +812,30 @@ const getRewardPots = function (data, resonse, cb) {
   }
   let findData = {};
 
- 
   if (data.activeRewardPots) {
     findData = {
-      $or:[
-        {potStatus:process.env.POT_STATUS.split(",")[1]},
-        {potStatus:process.env.POT_STATUS.split(",")[2]}
-      ]
+      $or: [
+        { potStatus: process.env.POT_STATUS.split(",")[1] },
+        { potStatus: process.env.POT_STATUS.split(",")[2] },
+      ],
     };
   }
 
   if (data.archivedRewardPots) {
     findData = {
-      potStatus:process.env.POT_STATUS.split(",")[3]
+      potStatus: process.env.POT_STATUS.split(",")[3],
     };
   }
   if (data.upcomingPots) {
     let currentTime = new Date();
 
     findData = {
-      potStatus:process.env.POT_STATUS.split(",")[0]
+      potStatus: process.env.POT_STATUS.split(",")[0],
     };
   }
 
-  if(data.potType){
-    findData.potType=data.potType;
+  if (data.potType) {
+    findData.potType = data.potType;
   }
 
   let limit = parseInt(process.env.pageLimit);
@@ -649,7 +843,7 @@ const getRewardPots = function (data, resonse, cb) {
   if (data.currentPage) {
     skip = data.currentPage > 0 ? (data.currentPage - 1) * limit : 0;
   }
-  console.log('find',findData);
+  console.log("find", findData);
 
   RewardPot.find(findData)
     .skip(skip)
@@ -693,7 +887,7 @@ const getRewardPots = function (data, resonse, cb) {
             )
           );
         }
-        console.log("count is",count);
+        console.log("count is", count);
 
         return cb(
           null,
@@ -774,56 +968,50 @@ const getUpcomingRewardPots = function (data, response, cb) {
 };
 exports.getUpcomingRewardPots = getUpcomingRewardPots;
 
-
-
-const getPotCounts = async function(data,response,cb){
-  if(!cb){
-    cb=response;
+const getPotCounts = async function (data, response, cb) {
+  if (!cb) {
+    cb = response;
   }
 
   let findDataActive = {
-    $or:[
-      {potStatus:process.env.POT_STATUS.split(",")[1]},
-      {potStatus:process.env.POT_STATUS.split(",")[2]}
-    ]
+    $or: [
+      { potStatus: process.env.POT_STATUS.split(",")[1] },
+      { potStatus: process.env.POT_STATUS.split(",")[2] },
+    ],
   };
-  
-  let activePots=await RewardPot.find(findDataActive);
-  console.log(activePots.length)
+
+  let activePots = await RewardPot.find(findDataActive);
+  console.log(activePots.length);
   let currentTime = new Date();
 
-
- let findDataUpcoming = {
-    potStatus:process.env.POT_STATUS.split(",")[0]
+  let findDataUpcoming = {
+    potStatus: process.env.POT_STATUS.split(",")[0],
   };
-   
-  let upcomingPots=await RewardPot.find(findDataUpcoming);
-  console.log("AAAA",upcomingPots)
 
+  let upcomingPots = await RewardPot.find(findDataUpcoming);
+  console.log("AAAA", upcomingPots);
 
   let findDataArchive = {
-    potStatus:process.env.POT_STATUS.split(",")[3]
+    potStatus: process.env.POT_STATUS.split(",")[3],
   };
 
-  let archivePots=await RewardPot.find(findDataArchive);
+  let archivePots = await RewardPot.find(findDataArchive);
 
-
-  let sendRes={
-    activePots:activePots.length,
-    upcomingPots:upcomingPots.length,
-    archivePots:archivePots.length 
-  }
-   return cb(
-      null,
-      responseUtilities.responseStruct(
-        200,
-        "get pot counts",
-        "getPotCounts",
-        sendRes,
-        data.req.signature
-      )
-    );
-}
-
+  let sendRes = {
+    activePots: activePots.length,
+    upcomingPots: upcomingPots.length,
+    archivePots: archivePots.length,
+  };
+  return cb(
+    null,
+    responseUtilities.responseStruct(
+      200,
+      "get pot counts",
+      "getPotCounts",
+      sendRes,
+      data.req.signature
+    )
+  );
+};
 
 exports.getPotCounts = getPotCounts;

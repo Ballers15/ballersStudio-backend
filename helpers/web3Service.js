@@ -283,12 +283,9 @@ if(!cb){
 }
     try{
 
-        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);
-    
-        let walletDetail= Array(tokenIds.length).fill(walletAddress);
-        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
+        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);        let walletDetail= Array(tokenIds.length).fill(walletAddress);        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
         console.log("balanceOfBatch",balanceOfbatch);
-        let exist=true;
+        let exist=false;
         balanceOfbatch.filter((el)=>{
             let value=parseFloat(el);
             console.log("value",value);

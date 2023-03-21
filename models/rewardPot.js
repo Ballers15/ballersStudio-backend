@@ -8,7 +8,7 @@ var rewardPotSchema = new Schema({
     startDate: Date,
     endDate: Date,
     claimExpiryDate: Date,
-    potAmountCollected:{ type: Number, default: 0 },
+    potAmountCollected:{ type: mongoose.Schema.Types.Decimal128, default: 0 },
     claimPot:{ type: Boolean, default: true },
     assetType:{
       type: String,

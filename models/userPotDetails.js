@@ -7,7 +7,7 @@ var userPotDetailsSchema = new Schema({
     potId: { type: mongoose.Schema.Types.ObjectId, ref: "rewardPot" },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     walletAddress:String,
-    amount: Number,
+    amount:{ type: mongoose.Schema.Types.Decimal128, default: 0 },
     lotteryWon:{type:Boolean,default:false},
     nftHolded:{type:Number,default:0},
     rewardedTokenAmount:{type:Number,default:0},

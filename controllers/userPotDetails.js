@@ -1411,7 +1411,7 @@ const getTokenClaimAmount =function(data,response,cb){
     }
 
     console.log(res);
-    let rewardAmountClaimed=res[0].count;
+    let rewardAmountClaimed=res.length?res[0].count:0;
     let nftClaimed=response.data.length;
     let sendRes={
       rewardAmountClaimed,
@@ -1473,7 +1473,7 @@ const getUsersPieChart =function(data,response,cb){
     }
 
     console.log(res);
-  
+    console.log(res[0].gameCashBurned.toString())
     return cb(
       null,
       responseUtilities.responseStruct(

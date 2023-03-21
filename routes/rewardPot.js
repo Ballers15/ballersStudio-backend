@@ -24,6 +24,7 @@ router.get( "/v1/user/get/active/pot",
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;
+
     rewardPot.getActivePot(data, function (err, response) {
       let status = 0;
       if (err) {
@@ -36,6 +37,39 @@ router.get( "/v1/user/get/active/pot",
   }
 );
 
+
+router.get( "/v1/user/get/reward/pot/leaderboard",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getRewardPotLeaderBoard(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+router.get( "/v1/user/get/lottery/pot/leaderboard",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getLotteryPotLeaderBoard(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
 
 
 

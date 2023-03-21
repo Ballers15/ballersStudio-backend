@@ -20,7 +20,7 @@ const userPotDetails = require("../controllers/userPotDetails");
 */
 
 
-router.post( "/v1/add/balance",[authenticator, authenticateRole(["USER"])],
+router.post( "/v1/add/reward/pot/balance",[authenticator, authenticateRole(["USER"])],
   function (req, res, next) {
       let data = req.body;
     data.req = req.data;
@@ -270,7 +270,7 @@ router.get("/v1/admin/get/user/piechart",
  */
 
 router.get("/v1/admin/get/user/barchart",
-// [authenticator, authenticateRole(["ADMIN"])],
+[authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;

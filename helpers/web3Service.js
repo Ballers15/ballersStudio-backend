@@ -174,21 +174,24 @@ const createLotterySignature =async function(data,response,cb){
 
 
 
-    let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
+
+    
 
 //   TODO  //change logic for this
-    let amount="1";
+    let quantity=data.potDetails.rewardTokenAmount;
     let nonce=data.nonce;
-    let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;
-    let privateKey=process.env.SIGNER_KEY;
+    let contractAddress=process.env.NFT_CLAIM_CONTRACT_ADDRESS;
+    let privateKey=process.env.NFT_SIGNER_KEY;
     let callerAddress=data.walletAddress;
+    let tokenId=data.potDetails.assetDetails.ticker;
+    let txn = {tokenId,quantity,callerAddress,nonce,contractAddress};
 
-    let txn = {tokenAddress,amount,callerAddress,nonce,contractAddress};
-    console.log(txn);
     let messages = ethers.utils.solidityKeccak256(
-        ['address','uint256','address','uint256','address'],
-        [txn.tokenAddress,txn.amount,txn.callerAddress,txn.nonce,txn.contractAddress]
+        ['uint256','uint256','address','uint256','address'],
+        [txn.tokenId,txn.quantity,txn.callerAddress,txn.nonce,txn.contractAddress]
     );   
+
+  
 
     let messageBytes = ethers.utils.arrayify(messages);
     let signer = new ethers.Wallet(privateKey);

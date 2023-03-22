@@ -784,12 +784,18 @@ const checkIfSignatureExist = function (data, response, cb) {
         )
       );
     }
+    let finalRes;
     // console.log(res);
     data.signatureExist = false;
     if (res) {
       if (res.signature) {
         data.signatureExist = true;
       }
+       finalRes={
+        potDetails:data.potDetails,
+        transactionDetails:res
+      };
+
     }
     return cb(
       null,
@@ -797,7 +803,7 @@ const checkIfSignatureExist = function (data, response, cb) {
         200,
         "Withdrawls fetched Successfully",
         "getAllWithdrawls",
-        res,
+        finalRes,
         data.req.signature
       )
     );
@@ -918,13 +924,17 @@ const initiateWithdrawl = function (data, response, cb) {
         );
       }
 
+      let finalRes={
+        potDetails:data.potDetails,
+        transactionDetails:res
+      };
       return cb(
         null,
         responseUtilities.responseStruct(
           200,
           "Withdrawls fetched Successfully",
           "getAllWithdrawls",
-          res,
+          finalRes,
           data.req.signature
         )
       );
@@ -1103,6 +1113,41 @@ const checkIfuserWonLottery = function (data, response, cb) {
     );
   });
 };
+
+
+const getGameCash =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(!data.walletAddress){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "The user Game Cash",
+        "getGameCash",
+        null,
+        data.req.signature
+      )
+    );
+  }
+  let sendRes={
+    walletAddress:data.walletAddress,
+    amount:    Math.floor(Math.random() * 1000000)
+
+
+  };
+  return cb(
+    null,
+    responseUtilities.responseStruct(
+      200,
+      "Game Cash fetched Successfully",
+      "getGameCash",
+      sendRes,
+      data.req.signature
+    )
+  );
+}
+exports.getGameCash=getGameCash;
 
 const updateLotteryWithdrawl = function (data, response, cb) {
   if (!cb) {
@@ -1620,3 +1665,69 @@ const getUserChart = function(data,response,cb){
 
   })
 }
+
+
+
+const checkUserWonLottery = function(data,response,cb){
+  
+  if(!cb){
+    cb=response;
+  }
+  if(!data.potId || !data.walletAddress){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        null,
+        "checkUserWonLottery",
+        null,
+        data.req.signature
+      )
+    )
+   
+  }
+  console.log("hi");
+  let findData={
+    userId:data.req.auth.id,
+    lotteryWon:true,
+    potId:data.potId,
+    walletAddress:data.walletAddress
+  }
+  console.log("findData",findData);
+  userPotDetails.findOne(findData).exec((err,res)=>{
+    if(err){
+      console.error(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "checkUserWonLottery",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    let sendRes={lotteryWon:false};
+    console.log("res",res,sendRes);
+    if(res){
+      console.log(res);
+      sendRes={
+        lotteryWon:true
+      };
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "check if user won ",
+        "checkUserWonLottery",
+        sendRes,
+        data.req.signature
+      )
+    );
+
+  })
+
+
+
+}
+exports.checkUserWonLottery=checkUserWonLottery;

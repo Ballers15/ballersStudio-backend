@@ -197,6 +197,49 @@ function(req, res, next) {
 });
 
 
+/**
+ * api to get  game cash
+*/
+
+router.get("/v1/get/game/cash",
+function(req, res, next) {
+  let data = req.query;
+  data.req = req.data;
+  userPotDetails.getGameCash(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+router.get("/v1/check/user/won/lottery",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data = req.query;
+  data.req = req.data;
+  userPotDetails.checkUserWonLottery(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
+
+
+
+
+
+
+
 
 
 

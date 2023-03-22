@@ -114,6 +114,103 @@ const getLotteryPotLeaderBoard = function (data, response, cb) {
 };
 exports.getLotteryPotLeaderBoard = getLotteryPotLeaderBoard;
 
+
+
+const getLotteryPotBoardPreviousRounds = function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let pipeline=[
+    {
+      $match:{potType:"LOTTERYPOT"}
+  
+  },
+    {
+      $lookup:{
+        from:"userpotdetails",
+        let:{"potId":"$_id"},
+        pipeline:[{
+            $match:{
+                "$expr":{"$eq":["$potId","$$potId"]},"lotteryWon":true,
+                
+                }
+            
+            }],
+        as :"potUserDetails"
+    }
+    },
+    {$lookup:{
+        from:"users",
+        localField:"potUserDetails.userId",
+        foreignField:"_id",
+        as:"userDetails",
+    }},
+    { $sort:{"createdAt":-1} },
+    
+    {
+        $project:{
+          "createdAt":1,
+          "startDate":1,
+          "endDate":1,
+          "claimExpiryDate":1,
+            "potUserDetails.potId":1,
+            "potUserDetails.userId":1,
+            "potUserDetails.walletAddress":1,
+            "userDetails.name":1
+            }
+    },
+    
+    {$unwind:{path:"$userDetails",preserveNullAndEmptyArrays:true}
+      },
+      {$unwind:{path:"$potUserDetails",preserveNullAndEmptyArrays:true}
+      }     
+       
+    ]
+    RewardPot.aggregate(pipeline).exec((err,res)=>{
+      if(err) {
+        console.error(err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting Leaderboard",
+            "getRewardPotLeaderBoard",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Previous Round Fetched Successfuly",
+          "getLotteryPotBoardPreviousRounds",
+          res,
+          data.req.signature
+        )
+      );
+    })
+
+}
+
+exports.getLotteryPotBoardPreviousRounds = getLotteryPotBoardPreviousRounds;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const getActiveLotteryPot = function (data, response, cb) {
   if (!cb) {
     cb = response;

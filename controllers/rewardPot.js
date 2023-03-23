@@ -272,6 +272,18 @@ const getLotteryleaderBoard = function (data, response, cb) {
     cb = response;
   }
   console.log(response.data);
+  if(!response.data?._id){
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getRewardPotLeaderBoard",
+        [],
+        data.req.signature
+      )
+    );
+  }
   let potId = response.data._id;
   let findData = { 
     potId: potId ,

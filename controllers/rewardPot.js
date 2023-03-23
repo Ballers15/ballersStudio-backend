@@ -460,9 +460,9 @@ const addRewardPot = function (data, response, cb) {
   let insertData = {
     rewardTokenAmount: data.rewardTokenAmount,
     assetDetails: assetDetails,
-    startDate: data.startDate,
-    endDate: data.endDate,
-    claimExpiryDate: data.claimExpiryDate,
+    startDate: new Date(data.startDate),
+    endDate: new Date(data.endDate),
+    claimExpiryDate: new Date(data.claimExpiryDate),
     assetType: data.assetType,
     potType: data.potType,
     potStatus: data.isActive
@@ -708,10 +708,10 @@ const updatePot = function (data, response, cb) {
   let updateData = {
     rewardTokenAmount: data.rewardTokenAmount,
     assetDetails: assetDetails,
-    startDate: data.startDate,
-    endDate: data.endDate,
+    startDate: new Date(data.startDate),
+    endDate: new Date(data.endDate),
     assetType: data.assetType,
-    claimExpiryDate: data.claimExpiryDate,
+    claimExpiryDate: new Date(data.claimExpiryDate),
     potType: data.potType,
     potStatus: data.isActive
       ? process.env.POT_STATUS.split(",")[1]

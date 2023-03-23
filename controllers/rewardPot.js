@@ -122,9 +122,24 @@ const getLotteryPotBoardPreviousRounds = function(data,response,cb){
   }
   let pipeline=[
     {
-      $match:{potType:"LOTTERYPOT"}
+      $match:{
+
+        $and: [
+          {
+            $or: [
+              { potStatus: "CLAIM"},
+              { potStatus: "ARCHIVED" },
+            ],
+          },
+          { isActive: true, potType: process.env.REWARD_POT.split(",")[1] },
+        ],
+
+
+
+
+    }
   
-  },
+   },
     {
       $lookup:{
         from:"userpotdetails",
@@ -179,6 +194,7 @@ const getLotteryPotBoardPreviousRounds = function(data,response,cb){
           )
         );
       }
+      console.log("res$$$$$$$$$$$$$$$$$$$$",res);
       return cb(
         null,
         responseUtilities.responseStruct(
@@ -220,7 +236,6 @@ const getActiveLotteryPot = function (data, response, cb) {
       {
         $or: [
           { potStatus: process.env.POT_STATUS.split(",")[1] },
-          { potStatus: process.env.POT_STATUS.split(",")[2] },
         ],
       },
       { isActive: true, potType: process.env.REWARD_POT.split(",")[1] },
@@ -260,7 +275,6 @@ const getLotteryleaderBoard = function (data, response, cb) {
   let potId = response.data._id;
   let findData = { 
     potId: potId ,
-    lotteryWon:true
   
   };
   let searchQuery;
@@ -302,6 +316,7 @@ const getLotteryleaderBoard = function (data, response, cb) {
         }
       })
       console.log("res", res);
+      let sendRes=[];
       return cb(
         null,
         responseUtilities.responseStruct(
@@ -336,7 +351,6 @@ const getActivePot = function (data, response, cb) {
       {
         $or: [
           { potStatus: process.env.POT_STATUS.split(",")[1] },
-          { potStatus: process.env.POT_STATUS.split(",")[2] },
         ],
       },
       { isActive: true, potType: data.potType },

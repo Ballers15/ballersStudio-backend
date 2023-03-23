@@ -58,7 +58,7 @@ router.get( "/v1/user/get/reward/pot/leaderboard",
 );
 
 /**
- * gives  Lottery Pot Leaderboard
+ * gives  Lottery Pot Leaderboard for current pot
  * Non Authenticated
  */
 

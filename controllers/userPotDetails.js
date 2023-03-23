@@ -23,6 +23,7 @@ const adduserPotDetails = function (data, response, cb) {
     );
   }
 
+  data.walletAddress=(data.walletAddress).toLowerCase();
   let waterFallFunctions = [];
 
   waterFallFunctions.push(async.apply(getPotDetails, data));
@@ -550,6 +551,8 @@ const addLotteryPotBalance = function (data, response, cb) {
       )
     );
   }
+  data.walletAddress=(data.walletAddress).toLowerCase();
+
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
@@ -583,6 +586,8 @@ const createClaimWithdrawl = function (data, response, cb) {
       )
     );
   }
+  data.walletAddress=(data.walletAddress).toLowerCase();
+
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
@@ -613,6 +618,7 @@ const checkClaimStage =function(data,response,cb){
       )
     );
   }
+  console.log("data.potDEtails",data.potDetails);
   if(data.potDetails.potStatus==process.env.POT_STATUS.split(",")[2]){
     return cb(
       null,
@@ -845,7 +851,7 @@ const getLatestNonce = function (data, response, cb) {
       }
       console.log(res);
       let nonceResponse = res;
-      let latest = 0;
+      let latest = 11;
 
       nonceResponse.filter((el) => {
         if (el.nonce > latest) {
@@ -964,6 +970,8 @@ const updateWithdrawl = function (data, response, cb) {
       )
     );
   }
+  data.walletAddress=(data.walletAddress).toLowerCase();
+
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(findIfTransactionExist, data));
@@ -1044,6 +1052,7 @@ const createLotteryClaim = function (data, response, cb) {
   }
 
     
+  data.walletAddress=(data.walletAddress).toLowerCase();
 
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(getPotDetails, data));
@@ -1066,6 +1075,7 @@ const checkIfuserWonLottery = function (data, response, cb) {
   }
 
   console.log(data.req.auth.id);
+
   let findData = {
     potId: data.potId,
     userId: data.req.auth.id,
@@ -1073,6 +1083,7 @@ const checkIfuserWonLottery = function (data, response, cb) {
     lotteryWon: true,
     rewardClaimed: false,
   };
+
   console.log("findData", findData);
   userPotDetails.findOne(findData).exec((err, res) => {
     if (err) {
@@ -1169,7 +1180,7 @@ const updateLotteryWithdrawl = function (data, response, cb) {
       )
     );
   }
-
+data.walletAddress=(data.walletAddress).toLowerCase();
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(findIfTransactionExist, data));
   waterFallFunctions.push(async.apply(web3Service.getTransactionStatus, data));
@@ -1685,10 +1696,10 @@ const checkUserWonLottery = function(data,response,cb){
     )
    
   }
+  data.walletAddress=(data.walletAddress).toLowerCase();
   console.log("hi");
   let findData={
     userId:data.req.auth.id,
-    lotteryWon:true,
     potId:data.potId,
     walletAddress:data.walletAddress
   }
@@ -1706,14 +1717,26 @@ const checkUserWonLottery = function(data,response,cb){
         )
       );
     }
-    let sendRes={lotteryWon:false};
+    let sendRes={lotteryWon:false,participated:false};
     console.log("res",res,sendRes);
     if(res){
       console.log(res);
       sendRes={
-        lotteryWon:true
+        participated:true,
+        lotteryWon:res?.lotteryWon,
+
       };
+      if(res.status=="COMPLETED"){
+        sendRes={
+          participated:true,
+          lotteryWon:true,
+          claimed:true
+  
+        };
+      }
+
     }
+    console.log("sendRes");
     return cb(
       null,
       responseUtilities.responseStruct(

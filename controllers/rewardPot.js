@@ -279,8 +279,9 @@ const getLotteryleaderBoard = function (data, response, cb) {
   };
   let searchQuery;
   if (data.search) {
+
     searchQuery = {
-      "name": data.search,
+      "name": { $regex: data.search, $options: "i" },
     };
   }
 
@@ -310,20 +311,26 @@ const getLotteryleaderBoard = function (data, response, cb) {
           )
         );
       }
-        res.map((el)=>{
-        if(!el.userId){
-          res.splice(el,1);
-        }
-      })
-      console.log("res", res);
+      let finalRes=JSON.parse(JSON.stringify(res));
       let sendRes=[];
+
+      finalRes.map((el)=>{
+        console.log("el",el);
+        if(el.userId==null){
+          console.log("ap",el);
+          finalRes.splice(el,1);
+        }else{
+          sendRes.push(el);
+                }
+      })
+      console.log("res", sendRes);
       return cb(
         null,
         responseUtilities.responseStruct(
           200,
           "Active Pot Fetched Successfuly",
           "getRewardPotLeaderBoard",
-          res,
+          sendRes,
           data.req.signature
         )
       );

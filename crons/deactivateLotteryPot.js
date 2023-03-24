@@ -14,8 +14,9 @@ let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid nig
 
 
 let deactivateRewardPots = async (cb) => {
-    var currentTime = new Date().toISOString();
-        console.log("currentTime",currentTime);
+    var currentDate=new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    var currentTime = moment(currentDate).format('YYYY-MM-DD HH:mm:ss')
+        console.log("currentTime",currentTime,currentDate);
     let findData = {
         isActive: true,
         "potStatus": "ONGOING",

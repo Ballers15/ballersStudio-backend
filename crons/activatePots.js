@@ -9,11 +9,20 @@ let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
 
 let activateRewardPots = async () => {
     var currentTime = new Date();
+    let currentDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    console.log("currentDate", currentDate,currentTime);
+  
+    
+    // if (
+    //   new Date( data.potDetails.startDate).getTime() < currentTime &&
+    //   currentTime <= new Date (data.potDetails.endDate).getTime()
+    // ) {
+
     let findDate = {
         isActive:true,
         potStatus:"UPCOMING",
-        startDate: {$lte:currentTime},
-        endDate:{$gte:currentTime}
+        startDate: {$lte:currentDate},
+        endDate:{$gte:currentDate}
     }
     let  options   = {
         multi:true

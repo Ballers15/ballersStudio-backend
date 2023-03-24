@@ -16,15 +16,14 @@ let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid nig
 
 let deactivateRewardPots = async (cb) => {
     var currentDate=new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-    var currentTime = moment(currentDate).format('YYYY-MM-DD HH:mm:ss')
-        console.log("currentTime",currentTime,currentDate);
+    var currentTime = moment(currentDate).format('YYYY-MM-DDTHH:mm:ssZZ')
+        console.log("currentTime",currentTime,"sss",currentDate);
     let findData = {
         isActive: true,
         "potStatus": "ONGOING",
         endDate: { $lte: currentTime },
         potType:"LOTTERYPOT"
     }
-
     RewardPot.find(findData).exec((err, res) => {
 		if (err) {
 			console.error(err);
@@ -33,6 +32,7 @@ let deactivateRewardPots = async (cb) => {
             rewardPotDetails:res
         };
         console.log("res",res);
+        return;
         if(res.length){
             data.rewardPotIds = res.map((el) => el._id);
                 let waterFallFunctions = [];

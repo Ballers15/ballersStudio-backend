@@ -1,6 +1,7 @@
 require('../config/index');
 require('../models/db');
 const cron = require('node-cron');
+const moment = require('moment');
 const RewardPot = require("../models/rewardPot");
 // '*/10 * * * * *'                      10 sec
 let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
@@ -8,10 +9,10 @@ let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
 });
 
 let activateRewardPots = async () => {
-    var currentTime = new Date();
-    let currentDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-    console.log("currentDate", currentDate,currentTime);
   
+    var currentDate=new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    var currentTime = moment(currentDate).format('YYYY-MM-DDTHH:mm:ssZZ')
+        console.log("currentTime",currentTime,"sss",currentDate);
     
     // if (
     //   new Date( data.potDetails.startDate).getTime() < currentTime &&

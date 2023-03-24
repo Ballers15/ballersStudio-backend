@@ -5,14 +5,19 @@ const cron = require('node-cron');
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const NftBalance = require('../helpers/web3Service');
+const moment = require('moment');
+
 //      0 0 * * *                     10 sec
 let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid night
     activateRewardPots()
 });
 
 let activateRewardPots = async (cb) => {
-    var currentTime = new Date();
-        console.log("currentTime",currentTime);
+
+    var currentDate=new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    var currentTime = moment(currentDate).format('YYYY-MM-DDTHH:mm:ssZZ')
+        console.log("currentTime",currentTime,"sss",currentDate);
+
     let findData = {
         isActive:true,
         "potStatus": "ONGOING",

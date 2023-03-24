@@ -5,6 +5,7 @@ const cron = require('node-cron');
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 
+const moment = require('moment');
 
 
 let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid night

@@ -11,7 +11,7 @@ let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid nig
 });
 
 let activateRewardPots = async (cb) => {
-    var currentTime = new Date();
+    var currentTime = new Date().toISOString();
         console.log("currentTime",currentTime);
     let findData = {
         isActive:true,

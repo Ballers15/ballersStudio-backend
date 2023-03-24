@@ -232,7 +232,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
     );
   }
 
-  let currentDate = new Date();
+  let currentDate = new Date().toISOString();
   console.log("currentDate", currentDate);
   console.log(data.potDetails.startDate);
   console.log(data.potDetails.endDate);
@@ -660,7 +660,7 @@ const checkClaimExpired = function (data, response, cb) {
     );
   }
 
-  let currentDate = new Date();
+  let currentDate = new Date().toISOString();
   console.log(currentDate);
   console.log(data.potDetails.startDate);
   console.log(data.potDetails.endDate);

@@ -9,7 +9,7 @@ let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
 });
 
 let deactivateClaims = async () => {
-    var currentTime = new Date();
+    var currentTime = new Date().toISOString();
     let findDate = {
         isActive:true,
         claimExpiryDate: {$lte:currentTime}

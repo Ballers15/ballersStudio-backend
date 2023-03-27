@@ -855,7 +855,7 @@ const getLatestNonce = function (data, response, cb) {
       }
       console.log(res);
       let nonceResponse = res;
-      let latest = 11;
+      let latest = 134;
 
       nonceResponse.filter((el) => {
         if (el.nonce > latest) {

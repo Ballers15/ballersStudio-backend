@@ -32,7 +32,6 @@ let deactivateRewardPots = async (cb) => {
             rewardPotDetails:res
         };
         console.log("res",res);
-        return;
         if(res.length){
             data.rewardPotIds = res.map((el) => el._id);
                 let waterFallFunctions = [];

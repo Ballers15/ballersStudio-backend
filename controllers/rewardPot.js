@@ -268,6 +268,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
       }
 
       let sendResponse=JSON.parse(JSON.stringify(finalRes));
+      console.log("sendResponse",sendResponse)
       sendResponse[0].userRes=sendRes;
       return cb(
         null,

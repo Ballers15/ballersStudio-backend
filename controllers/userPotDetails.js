@@ -216,6 +216,8 @@ const checkPotOngoing =function(data,response,cb){
   
 }
 
+
+
 const checkBalanceSubmissionDate = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -232,17 +234,16 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
     );
   }
 
-  let currentDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-  let currentTime=new Date(currentDate).getTime();
-  console.log("currentDate", currentDate,currentTime);
+  let currentDate = new Date();
+  console.log("currentDate", currentDate);
   console.log(data.potDetails.startDate);
   console.log(data.potDetails.endDate);
   //check for is pot active or closed
 
   
   if (
-    new Date( data.potDetails.startDate).getTime() < currentTime &&
-    currentTime <= new Date (data.potDetails.endDate).getTime()
+    data.potDetails.startDate < currentDate &&
+    currentDate <= data.potDetails.endDate
   ) {
     return cb(
       null,
@@ -266,6 +267,7 @@ const checkBalanceSubmissionDate = function (data, response, cb) {
     );
   }
 };
+
 
 const addBalanceForUser = function (data, response, cb) {
   if (!cb) {
@@ -661,7 +663,10 @@ const checkClaimExpired = function (data, response, cb) {
     );
   }
 
-
+  let currentDate = new Date();
+  console.log(currentDate);
+  console.log(data.potDetails.startDate);
+  console.log(data.potDetails.endDate);
 
   if (!data.potDetails.claimPot) {
     return cb(
@@ -675,15 +680,9 @@ const checkClaimExpired = function (data, response, cb) {
     );
   }
 
-
-  let currentDate = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
-  let currentTime=new Date(currentDate).getTime();
-  console.log("currentDate", currentDate,currentTime);
-
-  
   if (
-    new Date( data.potDetails.startDate).getTime() < currentTime &&
-    currentTime <= new Date (data.potDetails.endDate).getTime()
+    data.potDetails.endDate < currentDate &&
+    currentDate <= data.potDetails.claimExpiryDate
   ) {
     return cb(
       null,

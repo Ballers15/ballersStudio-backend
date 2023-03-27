@@ -98,6 +98,43 @@ router.get( "/v1/user/get/lottery/pot/previous/rounds",
 );
 
 
+/**
+ * gives  Reward Pot last rounds details
+ * Non Authenticated
+*/
+
+router.get("/v1/user/get/reward/pot/previous/rounds",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.getRewardPotBoardPreviousRounds(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

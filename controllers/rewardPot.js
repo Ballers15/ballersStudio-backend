@@ -120,6 +120,23 @@ const getLotteryPotBoardPreviousRounds = function(data,response,cb){
   if(!cb){
     cb=response;
   }
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getPreviousRounds, data));
+  waterFallFunctions.push(async.apply(getLotteryPotWalletAddress, data));
+  async.waterfall(waterFallFunctions, cb);
+
+
+}
+
+exports.getLotteryPotBoardPreviousRounds = getLotteryPotBoardPreviousRounds;
+
+
+
+const getPreviousRounds =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
   let pipeline=[
     {
       $match:{
@@ -206,21 +223,143 @@ const getLotteryPotBoardPreviousRounds = function(data,response,cb){
         )
       );
     })
+}
+
+const getLotteryPotWalletAddress =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(data.walletAddress){
+    // let userI=data.req.auth.id
+  let finalRes=response.data;
+
+    let potId=finalRes.potUserDetails?.potId;
+    let walletAddress=data.walletAddress;
+    let findData={
+      potId:potId,
+      // userId:userId,
+      walletAddress:walletAddress
+    }
+    userPotDetails.find(findData).exec((err,res)=>{
+      if(err){
+        console.log(err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting pot details",
+            "getLotteryPotWalletAddress",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      let sendRes={};
+      if(res){
+        sendRes={
+          participated:true,
+          lotteryWon:res.lotteryWon?true:false
+        }
+      
+      }else{
+        sendRes={
+          participated:false,
+          lotteryWon:false
+        }
+      }
+
+      let sendResponse=JSON.parse(JSON.stringify(finalRes));
+      sendResponse[0].userRes=sendRes;
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Active Pot Fetched Successfuly",
+          "getLotteryPotWalletAddress",
+          sendResponse,
+          data.req.signature
+        )
+      ); 
+
+    })
+
+
+  }
+  else{
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getLotteryPotWalletAddress",
+        response.data,
+        data.req.signature
+      )
+    ); 
+  
+  }
+
+
 
 }
 
-exports.getLotteryPotBoardPreviousRounds = getLotteryPotBoardPreviousRounds;
+
+
+
+const getRewardPotBoardPreviousRounds = function(data,response,cb) {
+  if(!cb){
+    cb=response;
+  }
+  let pipeline=[
+    {
+      $match:{
+
+        $and: [
+          {
+            $or: [
+              { potStatus: "CLAIM"},
+              { potStatus: "ARCHIVED" },
+            ],
+          },
+          { isActive: true, potType: process.env.REWARD_POT.split(",")[0] },
+        ],
+
+    }
+  
+   },
+       
+    ]
+   
+    RewardPot.aggregate(pipeline).exec((err,res)=>{
+      if(err) {
+        console.error(err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting Leaderboard",
+            "getRewardPotBoardPreviousRounds",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      console.log("res$$$$$$$$$$$$$$$$$$$$",res);
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Previous Round Fetched Successfuly",
+          "getRewardPotBoardPreviousRounds",
+          res,
+          data.req.signature
+        )
+      );
+    })
+}
 
 
 
 
-
-
-
-
-
-
-
+exports.getRewardPotBoardPreviousRounds = getRewardPotBoardPreviousRounds;
 
 
 

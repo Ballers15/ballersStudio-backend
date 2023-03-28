@@ -78,9 +78,11 @@ const UpdateRewardPotStatus = function (data, response, cb) {
 }
 
 const getUserDetailsFromPotId = function (data, response, cb) {
+    
     if (!cb) {
 		cb = response;
     }
+
     let rewardPotIds = data.rewardPotIds;
 
     let findData = {
@@ -205,7 +207,7 @@ const updateRewardTokenBalance =async function(data,response,cb){
     }
     let updatedUserDetails=data.updatedUserDetails;
     let tokenPrice= getTokenPrice();
-
+    console.log("updatedUserDetails",updatedUserDetails);
     for(let i in updatedUserDetails){
         let findData = {
             _id:updatedUserDetails[i]._id
@@ -221,10 +223,14 @@ console.log(updateDate,findData);
                 console.error(err);
                 
             } else {
-                // console.log('---------------all data updated--------------------------------------');
+                console.log('---------------all data updated--------------------------------------');
                 // return cb(null)
             }
         })
+
+        if(i==updatedUserDetails.length-1){
+            return cb(null);
+        }
         console.log("last waterfall executed",i);
         
     }
@@ -232,3 +238,39 @@ console.log(updateDate,findData);
 
 }
 
+
+
+
+
+
+const updateRewardPotDetails=function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+    let waterFallFunctions = [];
+
+    waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
+    waterFallFunctions.push(async.apply(fetchBalanceFromOpensea, data));
+    waterFallFunctions.push(async.apply(updateNftBalanceInUserSchema, data));
+    waterFallFunctions.push(async.apply(getRewardTokenBalance, data));
+    waterFallFunctions.push(async.apply(updateRewardTokenBalance, data));   
+    async.waterfall(waterFallFunctions, cb);
+
+}
+
+
+
+
+
+
+
+
+
+module.exports ={
+    updateRewardPotDetails,
+    getUserDetailsFromPotId,
+    fetchBalanceFromOpensea,
+    updateNftBalanceInUserSchema,
+    getRewardTokenBalance,
+    updateRewardTokenBalance,
+}

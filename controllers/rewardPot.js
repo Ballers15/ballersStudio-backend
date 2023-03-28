@@ -26,12 +26,13 @@ const getActiveRewardPot = function (data, response, cb) {
       {
         $or: [
           { potStatus: process.env.POT_STATUS.split(",")[1] },
-          { potStatus: process.env.POT_STATUS.split(",")[2] },
         ],
       },
-      { isActive: true, potType: process.env.REWARD_POT.split(",")[0] },
+      { isActive: true, 
+        potType: process.env.REWARD_POT.split(",")[0] },
     ],
   };
+ 
   RewardPot.findOne(findData).exec((err, res) => {
     if (err) {
       console.log("getRewardPotLeaderBoard Error : ", err);
@@ -45,6 +46,7 @@ const getActiveRewardPot = function (data, response, cb) {
         )
       );
     }
+    console.log("Reward pot",findData,res);
     return cb(
       null,
       responseUtilities.responseStruct(
@@ -63,15 +65,34 @@ const getRewardLeaderBoard = function (data, response, cb) {
     cb = response;
   }
 
-  console.log(response.data);
-  let potId = response.data._id;
+  // console.log(response.data);
+  let potId = response.data?._id;
+  console.log(potId);
   let findData = { potId: potId };
+  let projection={
+    userId:1,
+    walletAddress:1,
+    nftHolded:1,
+    rewardPoints:1,
+    amount:1,
+    rewardPointsPercentage:1
+  };
+  let searchQuery;
+
+  if (data.search) {
+
+    searchQuery = {
+      "name": { $regex: data.search, $options: "i" },
+    };
+  }
+
   userPotDetails
-    .find(findData)
+    .find(findData,projection)
     .populate({
       path: "userId",
       model: "users",
-      select: "_id name",
+      match:searchQuery,
+      select: "_id userName",
     })
     .sort({ amount: -1 })
     .exec((err, res) => {
@@ -88,14 +109,24 @@ const getRewardLeaderBoard = function (data, response, cb) {
           )
         );
       }
-      console.log("res", res);
+      let finalRes=JSON.parse(JSON.stringify(res));
+      let sendRes=[];
+      finalRes.map((el)=>{
+        console.log("el",el);
+        if(el.userId==null){
+          console.log("ap",el);
+          finalRes.splice(el,1);
+        }else{
+          sendRes.push(el);
+                }
+      })
       return cb(
         null,
         responseUtilities.responseStruct(
           200,
           "Active Pot Fetched Successfuly",
           "getRewardPotLeaderBoard",
-          res,
+          sendRes,
           data.req.signature
         )
       );
@@ -148,7 +179,8 @@ const getPreviousRounds =function(data,response,cb){
               { potStatus: "ARCHIVED" },
             ],
           },
-          { isActive: true, potType: process.env.REWARD_POT.split(",")[1] },
+          { isActive: true, 
+            potType: process.env.REWARD_POT.split(",")[0] },
         ],
 
 
@@ -188,8 +220,8 @@ const getPreviousRounds =function(data,response,cb){
             "potUserDetails.potId":1,
             "potUserDetails.userId":1,
             "potUserDetails.walletAddress":1,
-            "userDetails.name":1
-            }
+            "userDetails.name":1,
+                      }
     },
     
     {$unwind:{path:"$userDetails",preserveNullAndEmptyArrays:true}
@@ -403,7 +435,15 @@ const getRewardPreviousRounds =function(data,response,cb){
     {
       $project:{
           "potUserDetails.lotteryWon":0,
-          "potAmountCollected":0
+          "potAmountCollected":0,
+          "claimPot":0,
+          "isActive":0,
+          "rewardTokenAmount":0,
+          "assetDetails":0,
+          "createdBy":0,
+          "createdAt":0,
+          "updatedAt":0,
+          "potStatus":0
           }
         
         
@@ -604,7 +644,7 @@ const getLotteryleaderBoard = function (data, response, cb) {
   if (data.search) {
 
     searchQuery = {
-      "name": { $regex: data.search, $options: "i" },
+      "userName": { $regex: data.search, $options: "i" },
     };
   }
 
@@ -616,7 +656,7 @@ const getLotteryleaderBoard = function (data, response, cb) {
       path: "userId",
       model: "users",
       match: searchQuery,
-      select: "_id name",
+      select: "_id userName",
       
     })
     .sort({ amount: -1 })

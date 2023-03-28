@@ -5,7 +5,7 @@ const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 const rewardPot = require("../models/rewardPot");
-
+const nftService=require('../crons/deactivateRewardPot');
 const adduserPotDetails = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -24,6 +24,7 @@ const adduserPotDetails = function (data, response, cb) {
   }
 
   data.walletAddress=(data.walletAddress).toLowerCase();
+  data.rewardPotIds=[data.potId];
   let waterFallFunctions = [];
 
   waterFallFunctions.push(async.apply(getPotDetails, data));
@@ -36,11 +37,13 @@ const adduserPotDetails = function (data, response, cb) {
 
   waterFallFunctions.push(async.apply(addBalanceForUser, data));
 
+  waterFallFunctions.push(async.apply(nftService.updateRewardPotDetails, data));
+
   waterFallFunctions.push(async.apply(addBalanceInPot, data));
 
   async.waterfall(waterFallFunctions, cb);
 };
-exports.adduserPotDetails = adduserPotDetails;
+exports.adduserPotDetails = adduserPotDetails;  
 
 const getPotDetails = function (data, response, cb) {
   if (!cb) {
@@ -569,6 +572,7 @@ const addLotteryPotBalance = function (data, response, cb) {
   // waterFallFunctions.push(async.apply(updateUserGameBalance, data));
   waterFallFunctions.push(async.apply(addBalanceForUser, data));
   waterFallFunctions.push(async.apply(addBalanceInPot,data));
+  waterFallFunctions.push(async.apply(updateRewardPotDetails,data));
   async.waterfall(waterFallFunctions, cb);
 };
 exports.addLotteryPotBalance = addLotteryPotBalance;
@@ -1757,3 +1761,12 @@ const checkUserWonLottery = function(data,response,cb){
 
 }
 exports.checkUserWonLottery=checkUserWonLottery;
+
+
+
+
+
+
+
+
+

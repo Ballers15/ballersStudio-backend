@@ -232,15 +232,28 @@ const getLotteryPotWalletAddress =function(data,response,cb){
   if(data.walletAddress){
     // let userI=data.req.auth.id
   let finalRes=response.data;
+    if(!finalRes.length){
 
-    let potId=finalRes.potUserDetails?.potId;
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Active Pot Fetched Successfuly",
+          "getLotteryPotWalletAddress",
+          response.data,
+          data.req.signature
+        )
+      ); 
+    }
+
+    let potId=finalRes[0].potUserDetails?.potId;
     let walletAddress=data.walletAddress;
     let findData={
       potId:potId,
       // userId:userId,
       walletAddress:walletAddress
     }
-    userPotDetails.find(findData).exec((err,res)=>{
+    userPotDetails.findOne(findData).exec((err,res)=>{
       if(err){
         console.log(err);
         return cb(
@@ -257,7 +270,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
       if(res){
         sendRes={
           participated:true,
-          lotteryWon:res.lotteryWon?true:false
+          lotteryWon:res.lotteryWon
         }
       
       }else{
@@ -313,57 +326,212 @@ const getRewardPotBoardPreviousRounds = function(data,response,cb) {
   if(!cb){
     cb=response;
   }
+
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getRewardPreviousRounds, data));
+  waterFallFunctions.push(async.apply(getRewardPotWalletAddress, data));
+  async.waterfall(waterFallFunctions, cb);
+    
+}
+exports.getRewardPotBoardPreviousRounds = getRewardPotBoardPreviousRounds;
+
+const getRewardPreviousRounds =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
   let pipeline=[
-    {
-      $match:{
-
-        $and: [
-          {
-            $or: [
-              { potStatus: "CLAIM"},
-              { potStatus: "ARCHIVED" },
+    {$match:{
+            $and: [
+              {
+                $or: [
+                  { potStatus: "CLAIM"},
+                  { potStatus: "ARCHIVED" },
+                ],
+              },
+              { isActive: true, 
+                potType: "REWARDPOT" },
             ],
-          },
-          { isActive: true, potType: process.env.REWARD_POT.split(",")[0] },
-        ],
-
+    
     }
-  
-   },
-       
-    ]
-   
-    RewardPot.aggregate(pipeline).exec((err,res)=>{
-      if(err) {
-        console.error(err);
-        return cb(
-          responseUtilities.responseStruct(
-            500,
-            "Error in getting Leaderboard",
-            "getRewardPotBoardPreviousRounds",
-            null,
-            data.req.signature
-          )
-        );
-      }
-      console.log("res$$$$$$$$$$$$$$$$$$$$",res);
+    },
+    {$lookup:{
+        from:"userpotdetails",
+        let: { "potId": "$_id" },
+        pipeline:[
+        {
+        $match:{
+            "$expr":{"$eq":["$potId","$$potId"]}
+            
+            }
+        },
+        {
+              '$sort': {  'rewardPointsPercentage': -1 }
+         },
+         {
+              '$limit': 3
+            },
+           {
+               $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "user"
+                }
+              },
+              { $unwind: "$user" },
+              {$project:{
+                  "user.role":0,
+                  "user.accountId":0,
+                  "user.password":0,
+                  "user.salt":0,
+                  "user.provider":0,
+                  "user.emailVerified":0,
+                  "user.isBlocked":0,
+                  "user.isActive":0
+                  
+                  }}
+        
+        ],
+        
+        as: "potUserDetails"
+        
+        },
+        
+    },
+    {$sort:{"createdAt":-1}},
+    {
+      $project:{
+          "potUserDetails.lotteryWon":0,
+          "potAmountCollected":0
+          }
+        
+        
+    }
+]
+RewardPot.aggregate(pipeline).exec((err,res)=>{
+  if(err) {
+    console.error(err);
+    return cb(
+      responseUtilities.responseStruct(
+        500,
+        "Error in getting Leaderboard",
+        "getRewardPreviousRounds",
+        null,
+        data.req.signature
+      )
+    );
+  }
+  // console.log("res$$$$$$$$$$$$$$$$$$$$",res);
+  return cb(
+    null,
+    responseUtilities.responseStruct(
+      200,
+      "Previous Round Fetched Successfuly",
+      "getRewardPreviousRounds",
+      res,
+      data.req.signature
+    )
+  );
+})
+
+
+}
+const getRewardPotWalletAddress =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(data.walletAddress){
+  let finalRes=response.data;
+    if(!finalRes.length){
+
       return cb(
         null,
         responseUtilities.responseStruct(
           200,
           "Previous Round Fetched Successfuly",
-          "getRewardPotBoardPreviousRounds",
-          res,
+          "getRewardPotWalletAddress",
+          response.data,
           data.req.signature
         )
-      );
+      ); 
+    }
+
+    let potId=finalRes[0]?._id;
+    
+    let walletAddress=data.walletAddress;
+    let findData={
+      potId:potId,
+      walletAddress:walletAddress
+    }
+    userPotDetails.findOne(findData).exec((err,res)=>{
+      if(err){
+        console.log(err);
+        return cb(
+          responseUtilities.responseStruct(
+            500,
+            "Error in getting pot details",
+            "getRewardPreviousRounds",
+            null,
+            data.req.signature
+          )
+        );
+      }
+      let sendRes={};
+      console.log("getRewardPotWalletAddress::res",res,findData);
+      if(res){
+        sendRes={
+          participated:true,
+          claimed:(res.status=="COMPLETED")?true:false
+        }
+      
+      }else{
+        sendRes={
+          participated:false,
+          claimed:false
+        }
+      }
+
+      let sendResponse=JSON.parse(JSON.stringify(finalRes));
+      console.log("sendResponse",sendResponse)
+      if(sendResponse.length){
+        sendResponse[0].userRes=sendRes
+      }
+      
+      return cb(
+        null,
+        responseUtilities.responseStruct(
+          200,
+          "Active Pot Fetched Successfuly",
+          "getRewardPreviousRounds",
+          sendResponse,
+          data.req.signature
+        )
+      ); 
+
     })
+
+
+  }
+  else{
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getRewardPreviousRounds",
+        response.data,
+        data.req.signature
+      )
+    ); 
+  
+  }
+
 }
 
 
 
 
-exports.getRewardPotBoardPreviousRounds = getRewardPotBoardPreviousRounds;
 
 
 

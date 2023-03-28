@@ -31,6 +31,7 @@ exports.userRegistry = function (data, response, cb) {
         return cb(responseUtilities.responseStruct(400, null, "Email Missing", null, data.req.signature));    
     }
 
+    console.log("data",data.resend);
     Users.findOne({email:data.email},(err,res)=>{
         if (err) {
             console.error(err);
@@ -413,8 +414,8 @@ const validateSignupInput = function (data, response, cb) {
     }
 
     let functionsWaterfall = [];
-
-    if (!data.name || !data.firstName || !data.lastName || !data.email || !data.userName) {
+// !data.name || !data.firstName || !data.lastName || !data.email || 
+    if (!data.userName) {
 
         return cb(responseUtilities.responseStruct(400, "Missing or Invalid Params", "validateSignupInput", null, data.req.signature));
     }

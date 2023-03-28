@@ -6,11 +6,12 @@ const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const NftBalance = require('../helpers/web3Service');
 const moment = require('moment');
-
+const helper=require('../controllers/userPotDetails');
 //      0 0 * * *                     10 sec
 let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid night
     activateRewardPots()
 });
+
 
 let activateRewardPots = async (cb) => {
 
@@ -36,12 +37,12 @@ let activateRewardPots = async (cb) => {
 
             data.rewardPotIds = res.map((el) => el._id);
                 let waterFallFunctions = [];
-                waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
-                waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
-                waterFallFunctions.push(async.apply(fetchBalanceFromOpensea, data));
-                waterFallFunctions.push(async.apply(updateNftBalanceInUserSchema, data));
-                waterFallFunctions.push(async.apply(getRewardTokenBalance, data));
-                waterFallFunctions.push(async.apply(updateRewardTokenBalance, data));    
+                waterFallFunctions.push(async.apply(helper.UpdateRewardPotStatus, data));
+                waterFallFunctions.push(async.apply(helper.getUserDetailsFromPotId, data));
+                waterFallFunctions.push(async.apply(helper.fetchBalanceFromOpensea, data));
+                waterFallFunctions.push(async.apply(helper.updateNftBalanceInUserSchema, data));
+                waterFallFunctions.push(async.apply(helper.getRewardTokenBalance, data));
+                waterFallFunctions.push(async.apply(helper.updateRewardTokenBalance, data));    
                 async.waterfall(waterFallFunctions, cb);
         }else{
             console.log("No Active reward pot found");
@@ -261,16 +262,3 @@ const updateRewardPotDetails=function(data,response,cb){
 
 
 
-
-
-
-
-
-module.exports ={
-    updateRewardPotDetails,
-    getUserDetailsFromPotId,
-    fetchBalanceFromOpensea,
-    updateNftBalanceInUserSchema,
-    getRewardTokenBalance,
-    updateRewardTokenBalance,
-}

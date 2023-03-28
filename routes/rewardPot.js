@@ -17,7 +17,7 @@ const rewardPot = require("../controllers/rewardPot");
 
 
 /**
- * gives active reward Pot
+ * gives active Pot
  * Non Authenticated
  */
 router.get( "/v1/user/get/active/pot",
@@ -36,10 +36,11 @@ router.get( "/v1/user/get/active/pot",
     });
   }
 );
+
 /**
  * gives  reward Pot Leaderboard
  * Non Authenticated
- */
+*/
 
 router.get( "/v1/user/get/reward/pot/leaderboard",
   function (req, res, next) {

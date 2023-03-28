@@ -1763,6 +1763,81 @@ const checkUserWonLottery = function(data,response,cb){
 exports.checkUserWonLottery=checkUserWonLottery;
 
 
+const checkUserClaimedReward =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  if(!cb){
+    cb=response;
+  }
+  if(!data.potId || !data.walletAddress){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        null,
+        "checkUserClaimedReward",
+        null,
+        data.req.signature
+      )
+    )
+   
+  }
+  data.walletAddress=(data.walletAddress).toLowerCase();
+  let findData={
+    userId:data.req.auth.id,
+    potId:data.potId,
+    walletAddress:data.walletAddress
+  }
+  console.log("findData",findData);
+  userPotDetails.findOne(findData).exec((err,res)=>{
+    if(err){
+      console.error(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in get",
+          "checkUserClaimedReward",
+          null,
+          data.req.signature
+        )
+      );
+    }
+
+    let sendRes={};
+    if(res){
+      sendRes={
+        participated:true,
+        claimed:(res.status=="COMPLETED")?true:false
+      }
+    
+    }else{
+      sendRes={
+        participated:false,
+        claimed:false
+      }
+    }
+
+    
+    console.log("sendRes");
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "check if user won ",
+        "checkUserClaimedReward",
+        sendRes,
+        data.req.signature
+      )
+    );
+
+  })
+
+
+
+}
+exports.checkUserClaimedReward=checkUserClaimedReward;
+
 
 
 

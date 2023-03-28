@@ -234,8 +234,25 @@ function(req, res, next) {
 });
 
 
+/**
+ * Check If user claim or not
+*/
 
-
+router.get("/v1/check/user/claimed/reward",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data = req.query;
+  data.req = req.data;
+  userPotDetails.checkUserClaimedReward(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
 
 
 

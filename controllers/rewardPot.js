@@ -270,7 +270,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
         null,
         responseUtilities.responseStruct(
           200,
-          "Active Pot Fetched Successfuly",
+          "Previous Round Fetched Successfuly",
           "getLotteryPotWalletAddress",
           response.data,
           data.req.signature
@@ -291,7 +291,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
         return cb(
           responseUtilities.responseStruct(
             500,
-            "Error in getting pot details",
+            "Error in Fetching previous Rounds ",
             "getLotteryPotWalletAddress",
             null,
             data.req.signature
@@ -322,7 +322,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
         null,
         responseUtilities.responseStruct(
           200,
-          "Active Pot Fetched Successfuly",
+          "Previous Round Fetched Successfuly",
           "getLotteryPotWalletAddress",
           sendResponse,
           data.req.signature
@@ -338,7 +338,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
       null,
       responseUtilities.responseStruct(
         200,
-        "Active Pot Fetched Successfuly",
+        "Previous Round Fetched Successfuly",
         "getLotteryPotWalletAddress",
         response.data,
         data.req.signature

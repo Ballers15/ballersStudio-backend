@@ -43,7 +43,7 @@ exports.userRegistry = function (data, response, cb) {
                 emailVerified: res.emailVerified,
                 isActive: res.isActive
             }
-            return cb(responseUtilities.responseStruct(400, "Email ID Already Verify", "validateEmail", sendData, data.req.signature));  
+            return cb(responseUtilities.responseStruct(400, "Email ID Already Exist and Verified", "validateEmail", sendData, data.req.signature));  
         }
 
         let waterFallFunctions = [];
@@ -424,7 +424,7 @@ const validateSignupInput = function (data, response, cb) {
 
     functionsWaterfall.push(async.apply(checkEmailExists, data));
     functionsWaterfall.push(async.apply(validatePassword, data));
-    functionsWaterfall.push(async.apply(checkUserName, data));
+    // functionsWaterfall.push(async.apply(checkUserName, data));
 
 
     async.waterfall(functionsWaterfall, cb);
@@ -492,7 +492,7 @@ const checkUserName = function (data, response, cb) {
         cb = response;
     }
     console.log(data,'-------------------------------data response')
-    if (!data.userName || !data.email) {
+    if (!data.userName) {
         return cb(responseUtilities.responseStruct(400, null, "checkUserName", null, data.req.signature));
     }
 

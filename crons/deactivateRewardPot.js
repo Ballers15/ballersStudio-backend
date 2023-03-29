@@ -37,7 +37,7 @@ let activateRewardPots = async (cb) => {
 
             data.rewardPotIds = res.map((el) => el._id);
                 let waterFallFunctions = [];
-                waterFallFunctions.push(async.apply(helper.UpdateRewardPotStatus, data));
+                waterFallFunctions.push(async.apply(UpdateRewardPotStatus, data));
                 waterFallFunctions.push(async.apply(helper.getUserDetailsFromPotId, data));
                 waterFallFunctions.push(async.apply(helper.fetchBalanceFromOpensea, data));
                 waterFallFunctions.push(async.apply(helper.updateNftBalanceInUserSchema, data));

@@ -1912,6 +1912,8 @@ const getUserDetailsFromPotId = function (data, response, cb) {
      
 });
 };
+exports.getUserDetailsFromPotId=getUserDetailsFromPotId;
+
 
 const fetchBalanceFromOpensea = async function (data, response, cb) {
   if (!cb) {
@@ -1922,6 +1924,7 @@ const fetchBalanceFromOpensea = async function (data, response, cb) {
   data.balanceFetchedFromOpensea = balanceFetchedFromOpensea;
   return cb(null);
 };
+exports.fetchBalanceFromOpensea=fetchBalanceFromOpensea;
 
 
 const updateNftBalanceInUserSchema = async function (data, response, cb) {
@@ -1961,6 +1964,7 @@ const updateNftBalanceInUserSchema = async function (data, response, cb) {
 
   
 };
+exports.updateNftBalanceInUserSchema=updateNftBalanceInUserSchema;
 
 
 
@@ -2007,9 +2011,12 @@ const getRewardTokenBalance =function(data,response,cb){
 
 
 }
+exports.getRewardTokenBalance=getRewardTokenBalance;
+
 const getTokenPrice=()=>{
   return 1;
 }
+exports.getTokenPrice=getTokenPrice;
 
 const updateRewardTokenBalance =async function(data,response,cb){
 
@@ -2048,6 +2055,8 @@ console.log(updateDate,findData);
 
 
 }
+
+exports.updateRewardTokenBalance=updateRewardTokenBalance;
 
 
 

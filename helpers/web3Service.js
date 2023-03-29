@@ -12,9 +12,44 @@ let collectionAddress=process.env.NFT_COLLECTION_ADDRESS;
 let nftGamePoints=JSON.parse(process.env.NFT_POINTS);
 let tokenIds=JSON.parse(process.env.tokenIds);
 
+let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
 
 let web3=new Web3(new Web3.providers.HttpProvider(polygon));
 let nftContract = new web3.eth.Contract(abi.erc1155Abi,collectionAddress);
+
+
+let tokenContract =new web3.eth.Contract(abi.standardTokenAbi,tokenAddress);
+
+const getTokenBalance =async(data,response,cb)=>{
+
+    if(!cb){
+        cb=response;
+    }
+    try{
+
+        let walletAddress=data.walletAddress;
+        walletAddress=web3.utils.toChecksumAddress(walletAddress); 
+        let  balance =   await tokenContract.methods.balanceOf(walletAddress).call();
+        let tokenDecimal = await tokenContract.methods.decimals().call();
+        const tokenbits = new BigNumber(10).pow(tokenDecimal);
+        let tokenAmount = new BigNumber(balance).div(tokenbits);
+        tokenAmount = tokenAmount.toString();
+        return cb(null, tokenAmount);
+
+    }
+    catch(err){
+        console.log(err);
+        return cb(err);
+    }
+
+}
+
+
+
+
+
+
+
 
 const getuserNftBalance=async (data) => {
 console.log("data",data);
@@ -478,5 +513,6 @@ module.exports ={
     getTransactionStatus,
     checkUserHoldsNft,
     createLotterySignature,
-    checkNFTBalance
+    checkNFTBalance,
+    getTokenBalance
 }

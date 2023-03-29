@@ -7,6 +7,45 @@ const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 // ` Users.find({ createdAt : {$gte: data.startDate, $lt:data.endDate}})`
 
+const getTokenBalance =function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	if(!data.walletAddress){
+		return cb(
+			responseUtilities.responseStruct(
+			  400,
+			  null,
+			  "getTokenBalance",
+			  null,
+			  null
+			)
+		)
+
+	}
+	web3Service.getTokenBalance(data,(err,res)=>{
+		if(err){
+			return cb(
+				responseUtilities.responseStruct(
+					500,
+					null,
+					"getTokenBalance",
+					null,
+					data.req.signature
+				)
+			);
+
+		}
+		let sendRes=res;
+		return cb(null,responseUtilities.responseStruct(200,"Balance Fetched Successfuly","getTokenBalance",sendRes,null));
+
+		// return cb(null, sendResponse(200, "Balance Fetched Successfuly", "getTokenBalance", sendRes, data.req.signature));
+
+	})
+
+}
+
+exports.getTokenBalance=getTokenBalance;
 
 const getAllUsers = function (data, response, cb) {
 	if (!cb) {

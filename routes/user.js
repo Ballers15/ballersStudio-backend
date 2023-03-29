@@ -15,6 +15,25 @@ const users = require("../controllers/user");
 
 
 
+router.get( "/v1/token/balance",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    users.getTokenBalance(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
+
+
+
 router.get( "/v1/all",[authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;

@@ -422,7 +422,7 @@ const getPreviousRounds =function(data,response,cb){
             "potUserDetails.potId":1,
             "potUserDetails.userId":1,
             "potUserDetails.walletAddress":1,
-            "userDetails.name":1,
+            "userDetails.userName":1,
                       }
     },
     

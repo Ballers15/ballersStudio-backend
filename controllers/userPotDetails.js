@@ -940,7 +940,8 @@ const getLatestNonce = function (data, response, cb) {
 
       nonceResponse.filter((el) => {
         if(el?.nonce){
-          if (el.nonce > latest) {
+          let Nonce=parseFloat(el.nonce);
+          if (Nonce > latest) {
             latest = el.nonce;
           }
         }
@@ -1148,7 +1149,6 @@ const createLotteryClaim = function (data, response, cb) {
   waterFallFunctions.push(async.apply(checkClaimExpired, data));
   waterFallFunctions.push(async.apply(checkIfuserWonLottery, data));
   waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
-  waterFallFunctions.push(async.apply(getLatestLotteryNonce, data));
   waterFallFunctions.push(async.apply(findLotteryPools, data));
   waterFallFunctions.push(async.apply(getLatestNonce, data));
   waterFallFunctions.push(

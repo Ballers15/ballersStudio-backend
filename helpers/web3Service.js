@@ -249,6 +249,49 @@ const createLotterySignature =async function(data,response,cb){
 
 
 
+const getTransactionReceit=async function (data){
+    
+  
+
+    let web3 = new Web3(new Web3.providers.HttpProvider(polygon));
+    
+    try{
+        let hash = data.txnHash;
+        let receipt = await web3.eth.getTransactionReceipt(hash);
+        // console.log("receipt",receipt);
+        let statusResponse;
+        if (receipt) {
+            // console.log("RECEIPT", receipt)
+            if (receipt.status == true) {
+                statusResponse={
+                    status: "COMPLETED"
+                }
+
+            }
+            else if (receipt.status == false) {
+                statusResponse={
+                    status: "FAILED"
+                }
+
+            }
+        }
+        else {
+            statusResponse={
+                status: "PROCESSING"
+            }
+        }
+        return statusResponse;
+     
+    
+    }
+    catch(err){
+        console.log("errrr",err);
+     return err;
+    }
+
+        
+}
+
 
 
 
@@ -514,5 +557,6 @@ module.exports ={
     checkUserHoldsNft,
     createLotterySignature,
     checkNFTBalance,
-    getTokenBalance
+    getTokenBalance,
+    getTransactionReceit
 }

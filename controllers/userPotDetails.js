@@ -602,6 +602,7 @@ const createClaimWithdrawl = function (data, response, cb) {
   waterFallFunctions.push(async.apply(checkClaimExpired, data));
   waterFallFunctions.push(async.apply(checkIfuserPotDetailsExist, data));
   waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
+  waterFallFunctions.push(async.apply(findRewardPools, data));
   waterFallFunctions.push(async.apply(getLatestNonce, data));
   waterFallFunctions.push(async.apply(web3Service.createUserSignature, data));
   waterFallFunctions.push(async.apply(initiateWithdrawl, data));
@@ -823,6 +824,82 @@ const checkIfSignatureExist = function (data, response, cb) {
   });
 };
 
+const findRewardPools =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let findData={
+    potType:"REWARDPOT"
+  };
+  rewardPot.find(findData).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting reward pools",
+          "findRewardPools",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    let mapIds=res.map((el)=>{
+      return el._id;
+    })
+    data.potIds=mapIds;
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "reward pools fetched Successfully",
+        "findRewardPools",
+        response.data,
+        data.req.signature
+      )
+    ); 
+  })
+
+}
+const findLotteryPools =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let findData={
+    potType:"LOTTERYPOT"
+  };
+  rewardPot.find(findData).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting lottery pools",
+          "findLotteryPools",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    let mapIds=res.map((el)=>{
+      return el._id;
+    })
+    data.potIds=mapIds;
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Withdrawls fetched Successfully",
+        "getAllWithdrawls",
+        response.data,
+        data.req.signature
+      )
+    ); 
+  })
+
+
+
+}
 const getLatestNonce = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -840,30 +917,34 @@ const getLatestNonce = function (data, response, cb) {
       )
     );
   }
+  let potIds=data.potIds;
 
   userPotDetails
-    .find()
+    .find({potId:{$in:potIds}})
     .sort({ createdAt: -1 })
     .exec((err, res) => {
       if (err) {
         return cb(
           responseUtilities.responseStruct(
             500,
-            "Error in creating Withdrawl",
+            "Error in getting lottery nonce",
             "getLatestNonce",
             null,
             data.req.signature
           )
         );
       }
-      console.log(res);
+      console.log("response of pot details is",res);
       let nonceResponse = res;
       let latest = 134;
 
       nonceResponse.filter((el) => {
-        if (el.nonce > latest) {
-          latest = el.nonce;
+        if(el?.nonce){
+          if (el.nonce > latest) {
+            latest = el.nonce;
+          }
         }
+ 
       });
       latest = parseFloat(latest);
       console.log("nonce", latest + 1);
@@ -873,7 +954,7 @@ const getLatestNonce = function (data, response, cb) {
         responseUtilities.responseStruct(
           200,
           "Withdrawls fetched Successfully",
-          "getAllWithdrawls",
+          "getLatestNonce",
           res,
           data.req.signature
         )
@@ -1067,6 +1148,8 @@ const createLotteryClaim = function (data, response, cb) {
   waterFallFunctions.push(async.apply(checkClaimExpired, data));
   waterFallFunctions.push(async.apply(checkIfuserWonLottery, data));
   waterFallFunctions.push(async.apply(checkIfSignatureExist, data));
+  waterFallFunctions.push(async.apply(getLatestLotteryNonce, data));
+  waterFallFunctions.push(async.apply(findLotteryPools, data));
   waterFallFunctions.push(async.apply(getLatestNonce, data));
   waterFallFunctions.push(
     async.apply(web3Service.createLotterySignature, data)

@@ -386,7 +386,7 @@ const getPreviousRounds =function(data,response,cb){
             ],
           },
           { isActive: true, 
-            potType: process.env.REWARD_POT.split(",")[0] },
+            potType: process.env.REWARD_POT.split(",")[1] },
         ],
     }
   

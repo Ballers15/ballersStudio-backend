@@ -166,7 +166,7 @@ const createUserSignature =async function(data,response,cb){
     let privateKey=process.env.SIGNER_KEY;
     let callerAddress=data.walletAddress;
 
-    let txn = {tokenAddress,amount,callerAddress,nonce,contractAddress};
+    let txn = {tokenAddress,tokenAmount,callerAddress,nonce,contractAddress};
     console.log(txn);
     let messages = ethers.utils.solidityKeccak256(
         ['address','uint256','address','uint256','address'],

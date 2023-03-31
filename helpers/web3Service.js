@@ -157,17 +157,19 @@ const createUserSignature =async function(data,response,cb){
 
     let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
     let tokenDecimals=process.env.BALLERS_TOKEN_DECIMALS;
-    let amount=parseFloat(data.amount);
+    let amount=(data.amount).toString();
+    console.log("amount amounttt",amount);
     const tokenbits = new BigNumber(10).pow(tokenDecimals);
     let tokenAmount = new BigNumber(amount).times(tokenbits);
     tokenAmount=tokenAmount.toString();
+    console.log("after calculation amount is",tokenAmount);
     let nonce=data.nonce;
     let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;
     let privateKey=process.env.SIGNER_KEY;
     let callerAddress=data.walletAddress;
 
     let txn = {tokenAddress,tokenAmount,callerAddress,nonce,contractAddress};
-    console.log(txn);
+    console.log("TX",txn);
     let messages = ethers.utils.solidityKeccak256(
         ['address','uint256','address','uint256','address'],
         [txn.tokenAddress,txn.tokenAmount,txn.callerAddress,txn.nonce,txn.contractAddress]

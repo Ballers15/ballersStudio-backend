@@ -936,7 +936,7 @@ const getLatestNonce = function (data, response, cb) {
       }
       console.log("response of pot details is",res);
       let nonceResponse = res;
-      let latest = 134;
+      let latest = 0;
 
       nonceResponse.filter((el) => {
         if(el?.nonce){

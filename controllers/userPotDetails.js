@@ -995,6 +995,7 @@ const initiateWithdrawl = function (data, response, cb) {
   }
 
   let signature = response.data.signature;
+  let tokenAmount=response.data.tokenAmount;
   console.log("resonse", response.data);
 
   let findData = {

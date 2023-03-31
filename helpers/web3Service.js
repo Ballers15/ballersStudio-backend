@@ -156,7 +156,10 @@ const createUserSignature =async function(data,response,cb){
 
 
     let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
-    let amount=data.amount;
+    let tokenDecimals=process.env.BALLERS_TOKEN_DECIMALS;
+    let amount=parseFloat(data.amount);
+    let tokenAmount = new BigNumber(amount).times(tokenDecimals);
+    tokenAmount=tokenAmount.toString();
     let nonce=data.nonce;
     let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;
     let privateKey=process.env.SIGNER_KEY;
@@ -174,7 +177,8 @@ const createUserSignature =async function(data,response,cb){
     let signature = await signer.signMessage(messageBytes);
     console.log("signature$$$$$$----",signature);
     let userSignature={
-        signature
+        signature,
+        tokenAmount
     }
 
     return cb(

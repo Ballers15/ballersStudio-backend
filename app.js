@@ -23,14 +23,15 @@ const passport = require('passport');
 
 let app = express();
 
-// use passport session
-app.use(passport.initialize());
-app.use(passport.session());
+
 app.use(expressSession({
   secret: process.env.ENCRYPT_SALT_STATIC,
   resave: false,
   saveUninitialized: true
 }));
+// use passport session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Declaring Swagger and binding swagger doc
 require('swagger-node-express').setAppHandler(app);

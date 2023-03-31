@@ -10,7 +10,9 @@ passport.use(new GoogleStrategy({
 
     let data = {
       profile:profile,
-      accessToken:accessToken
+      accessToken:accessToken,
+      refreshToken: refreshToken
+
     }
 
     passport.serializeUser(function(data, done) {

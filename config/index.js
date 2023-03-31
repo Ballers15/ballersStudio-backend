@@ -11,6 +11,7 @@ const commonVariables = {
     SERVICE_REST_PORT: '8004',
     SERVICE_RPC_PORT: '8005',
     DB_ENV: 'development',
+    CLIENT_URL:'http://localhost:3000',
     pageLimit: 10,
     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],
     ASSEST_TYPE: ["TOKEN", "NFT"],

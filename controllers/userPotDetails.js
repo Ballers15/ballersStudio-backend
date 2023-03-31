@@ -748,7 +748,7 @@ const checkIfuserPotDetailsExist = function (data, response, cb) {
     if (res) {
       userBal = res.amount;
       nftCount = res.nftHolded;
-      data.amount = res.amount;
+      data.amount = res.rewardedTokenAmount;
     }
 
     if (userBal > 0 && nftCount > 0) {
@@ -809,6 +809,18 @@ const checkIfSignatureExist = function (data, response, cb) {
         potDetails:data.potDetails,
         transactionDetails:res
       };
+      if(res.status=='COMPLETED'){
+        return cb(
+          responseUtilities.responseStruct(
+            400,
+            "Already claimed the reward!!",
+            "checkIfSignatureExist",
+            null,
+            data.req.signature
+          )
+        );
+
+      }
 
     }
     return cb(
@@ -995,6 +1007,7 @@ const initiateWithdrawl = function (data, response, cb) {
   let updateData = {
     signature: signature,
     nonce: data.nonce,
+    rewardedTokenAmountDecimals:tokenAmount
   };
 
   let options = {

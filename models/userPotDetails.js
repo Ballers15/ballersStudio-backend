@@ -11,6 +11,7 @@ var userPotDetailsSchema = new Schema({
     lotteryWon:{type:Boolean,default:false},
     nftHolded:{type:Number,default:0},
     rewardedTokenAmount:{type:Number,default:0},
+    rewardedTokenAmountDecimals:{type:Number},
     rewardPointsPercentage:{type:Number,default:0},
     rewardPoints:{type:Number,default:0},
     rewardClaimed:{type:Boolean ,default:false},

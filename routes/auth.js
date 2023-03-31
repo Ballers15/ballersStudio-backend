@@ -204,35 +204,39 @@ router.post("/v1/user/register/mailjet", function (req, res, next) {
 
 
 // /**Social Connections */
+// clientid
+// 66109923821-8qajlcid64c3o8646l09r03tb18ncgft.apps.googleusercontent.com
 
-// router.get('/v1/google', function (req, res, next) {
+// clientsecre
+// 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
+router.get('/v1/google', function (req, res, next) {
 
-//     passport.authenticate('google', {
-//         scope: ['profile', 'email'],
-//         state: "webLogin"
-//     })(req, res, next)
-// });
+    passport.authenticate('google', {
+        scope: ['profile', 'email'],
+        state: "webLogin"
+    })(req, res, next)
+});
 
-// router.get('/v1/google/callback', passport.authenticate('google', { failureRedirect: '/signUp' }), function (req, res, next) {
+router.get('/v1/google/callback', passport.authenticate('google', { failureRedirect: '/signUp' }), function (req, res, next) {
 
-//         let data = req.user.profile;
-//         data.req = req.data;
-//         data.device = req.device.type;
-//         data.ip = req.ip;
-//         data.browser = parser(req.headers['user-agent']).browser.name;
-//         auth.socialLoginOrSignup(data, function (err, response) {
-//             let status = 0;
-//             if (err) {
-//                 console.log(err);
-//                 status = err.status;
-//                 return res.status(status).send(response);
-//                 // return res.redirect(`${process.env.CLIENT_URL}/auth/social/${btoa(JSON.stringify(err))}`);
-//             }
-//             status = response.status;
-//             return res.status(status).send(response);
-//             // return res.redirect(`${process.env.CLIENT_URL}/auth/social/${btoa(JSON.stringify(response))}`);
+        let data = req.user.profile;
+        data.req = req.data;
+        data.device = req.device.type;
+        data.ip = req.ip;
+        data.browser = parser(req.headers['user-agent']).browser.name;
+        auth.socialLoginOrSignup(data, function (err, response) {
+            let status = 0;
+            if (err) {
+                console.log(err);
+                status = err.status;
+                // return res.status(status).send(response);
+                return res.redirect(`${process.env.CLIENT_URL}/auth/social/${btoa(JSON.stringify(err))}`);
+            }
+            status = response.status;
+            // return res.status(status).send(response);
+            return res.redirect(`${process.env.CLIENT_URL}/auth/social/${btoa(JSON.stringify(response))}`);
             
-//         });
-// })
+        });
+})
 
 module.exports = router;

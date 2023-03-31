@@ -133,7 +133,7 @@ console.log("dataTo***************************Return",dataToReturn);
 }
 
 
-
+/**do this code in try catch */
 
 const createUserSignature =async function(data,response,cb){
     if(!cb){
@@ -158,7 +158,8 @@ const createUserSignature =async function(data,response,cb){
     let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
     let tokenDecimals=process.env.BALLERS_TOKEN_DECIMALS;
     let amount=parseFloat(data.amount);
-    let tokenAmount = new BigNumber(amount).times(tokenDecimals);
+    const tokenbits = new BigNumber(10).pow(tokenDecimals);
+    let tokenAmount = new BigNumber(amount).times(tokenbits);
     tokenAmount=tokenAmount.toString();
     let nonce=data.nonce;
     let contractAddress=process.env.CLAIM_CONTRACT_ADDRESS;

@@ -14,17 +14,12 @@ let taskJob = cron.schedule('*/10 * * * * *', () => { // runs at 12:00 mid night
 
 let verifyHashes = async () => {
   
-    var currentTime = new Date();
     
 
     let findData = {
         hash:{$exists: true},
         rewardClaimed:false,
     }
-    let  options   = {
-        multi:true
-    }
-    let updateData = { "$set": { "potStatus": "ONGOING" } };
     console.log("findData",findData);
     let rewardPot = await userPotDetails.find(findData);
 console.log("rewardPot",rewardPot);
@@ -46,15 +41,3 @@ console.log("rewardPot",rewardPot);
     }
 }
 
-// let findData = {
-//     _id: data.withdrawlId,
-//     potId: data.potId,
-//     walletAddress: data.walletAddress,
-//     userId: data.req.auth.id,
-//   };
-
-//   let updateData = {
-//     hash: data.txnHash,
-//     status: transactionStatus.status,
-//     rewardClaimed: transactionStatus.status == "COMPLETED" ? true : false,
-//   };

@@ -170,7 +170,7 @@ const createUserSignature =async function(data,response,cb){
     console.log(txn);
     let messages = ethers.utils.solidityKeccak256(
         ['address','uint256','address','uint256','address'],
-        [txn.tokenAddress,txn.amount,txn.callerAddress,txn.nonce,txn.contractAddress]
+        [txn.tokenAddress,txn.tokenAmount,txn.callerAddress,txn.nonce,txn.contractAddress]
     );   
 
     let messageBytes = ethers.utils.arrayify(messages);

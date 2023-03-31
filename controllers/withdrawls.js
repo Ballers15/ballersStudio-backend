@@ -563,6 +563,7 @@ if(data.signatureExist){
 
 
 	let signature = response.data.signature;
+	let updateAmount=response.data.tokenAmount
 	console.log("resonse",response.data);
 
 	let findData={
@@ -574,7 +575,7 @@ if(data.signatureExist){
 	let updateData={
 		"signature":signature,
 		"nonce":data.nonce,
-		"amount":data.amount
+		"amount":updateAmount
 	}
 	let options={
 		upsert:true,

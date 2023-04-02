@@ -1353,7 +1353,7 @@ const getSpecificPotUsers = function (data, response, cb) {
 
   let waterFallFunctions=[];
   waterFallFunctions.push(async.apply(getPotUsers, data));
-  waterFallFunctions.push(async.apply(web3Service.checkNFTBalance, data));
+  // waterFallFunctions.push(async.apply(web3Service.checkNFTBalance, data));
 
   // waterFallFunctions.push(async.apply(getNftCount, data));
   async.waterfall(waterFallFunctions, cb);
@@ -1392,7 +1392,7 @@ const getPotUsers =function(data,response,cb){
   };
 
   if (data.walletSearch) {
-    findData.walletAddress = data.walletSearch;
+    findData.walletAddress = (data.walletSearch);
   }
 
   let findUserQuery = {};

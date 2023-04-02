@@ -101,7 +101,7 @@ const getAllUsers = function (data, response, cb) {
 
 
 	if(data.email){
-		findData.email=data.email
+		findData.email= { $regex: data.email, $options: "i" }
 	}
 	console.log(findData,'-----------------------find date')
 

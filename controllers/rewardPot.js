@@ -163,7 +163,7 @@ const getRewardLeaderBoard = function (data, response, cb) {
   if (data.search) {
 
     searchQuery = {
-      "name": { $regex: data.search, $options: "i" },
+      "userName": { $regex: data.search, $options: "i" },
     };
   }
 
@@ -196,7 +196,7 @@ const getRewardLeaderBoard = function (data, response, cb) {
         console.log("el",el);
         if(el.userId==null){
           console.log("ap",el);
-          finalRes.splice(el,1);
+          //finalRes.splice(el,1);
         }else{
           sendRes.push(el);
                 }
@@ -331,7 +331,7 @@ const getLotteryleaderBoard = function (data, response, cb) {
         console.log("el",el);
         if(el.userId==null){
           console.log("ap",el);
-          finalRes.splice(el,1);
+          // finalRes.splice(el,1);
         }else{
           sendRes.push(el);
                 }

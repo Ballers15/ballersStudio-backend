@@ -166,10 +166,10 @@ const otpVerify = function (data, response, cb) {
     OtpLog.findOne(find_data, function (err, res) {
         if (err) {
             console.log(err);
-            return cb(responseUtilities.responseStruct(500, null, "otpVerify", null, data.req.signature));
+            return cb(responseUtilities.responseStruct(500, null, "Wrong OTP", null, data.req.signature));
         }
         if(!res) {
-            return cb(responseUtilities.responseStruct(400, "Wrong OTP/Email or OTP Already used!", "otpVerify", null, data.req.signature));
+            return cb(responseUtilities.responseStruct(400, "Wrong OTP", "otpVerify", null, data.req.signature));
         }
 
         if (new Date().getTime() > res.otpExpiration) {

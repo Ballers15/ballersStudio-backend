@@ -1397,8 +1397,10 @@ const getPotUsers =function(data,response,cb){
 
   let findUserQuery = {};
 
+  //       "name": { $regex: data.search, $options: "i" },
+
   if (data.email) {
-    findUserQuery["userDetails.email"] = data.email;
+    findUserQuery["userDetails.email"] =  { $regex: data.email, $options: "i" }
   }
 
   if (data.name) {

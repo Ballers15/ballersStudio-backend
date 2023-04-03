@@ -500,16 +500,21 @@ const getLotteryPotWalletAddress =function(data,response,cb){
         );
       }
       let sendRes={};
+
+      
+
       if(res){
         sendRes={
           participated:true,
-          lotteryWon:res.lotteryWon
+          lotteryWon:res.lotteryWon,
+          claimed:res.status=="COMPLETED"?true:false
         }
       
       }else{
         sendRes={
           participated:false,
-          lotteryWon:false
+          lotteryWon:false,
+
         }
       }
 

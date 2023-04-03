@@ -175,7 +175,7 @@ const getRewardLeaderBoard = function (data, response, cb) {
       match:searchQuery,
       select: "_id userName",
     })
-    .sort({ amount: -1 })
+    .sort({ rewardPointsPercentage: -1 })
     .exec((err, res) => {
       if (err) {
         console.log(err);

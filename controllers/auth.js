@@ -619,7 +619,6 @@ const userLoginAsync = function (data, response, cb) {
     if (!data.email || !data.password) {
         return cb(responseUtilities.responseStruct(400, "Email and Password are required", "user_login", null, data.req.signature));
     }
-
     data.role = response.data.role;
     data._id = response.data._id;
     data.provider = response.data.provider;
@@ -668,10 +667,12 @@ const encryptData = function (data, response, cb) {
         return cb(null, responseUtilities.responseStruct(200, "Successfully Logged In!", "encryptData", {
             user: {
                 email: data.email,
-                name: data.name,
+                userName: data.userName,
                 accountId: data.accountId,
                 provider:data.provider,
                 role:data.role,
+                userId:data._id
+
             },
             token: cipher
         }, data.req.signature));
@@ -743,6 +744,7 @@ const comparePassword = function (data, response, cb) {
             data._id = response.data._id
             data.accountId = response.data.accountId
             data.name = response.data.name
+            data.userName=response.data.userName
             data.role = response.data.role
             data.provider = response.data.provider
             data.twoFactorAuth = response.data.twoFactorAuth

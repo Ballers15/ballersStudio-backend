@@ -14,6 +14,7 @@ let deactivateClaims = async () => {
     var currentTime = new Date();
     let findDate = {
         isActive:true,
+        potStatus:"CLAIM",
         claimExpiryDate: {$lte:currentTime}
     }
 

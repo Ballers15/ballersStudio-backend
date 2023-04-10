@@ -217,6 +217,25 @@ function(req, res, next) {
 });
 
 
+/**Remove api from production */
+router.post("/v1/update/game/cash",
+function(req, res, next) {
+  
+  let data =req.body;
+  data.req=req.data;
+  userPotDetails.updateGameCash(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+  
+  
+});
+
 router.get("/v1/check/user/won/lottery",
 [authenticator, authenticateRole(["USER"])],
 function(req, res, next) {

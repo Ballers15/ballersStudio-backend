@@ -1,6 +1,8 @@
 const Web3 = require("web3");
 const abi = require("./abi.js");
 const BigNumber = require("bignumber.js");
+const cryptojs = require("crypto-js");
+const crypto = require('crypto');
 
 const { ethers}=require("ethers");
 const responseUtilities = require("./sendResponse");
@@ -19,6 +21,65 @@ let nftContract = new web3.eth.Contract(abi.erc1155Abi,collectionAddress);
 
 
 let tokenContract =new web3.eth.Contract(abi.standardTokenAbi,tokenAddress);
+
+
+
+const decrypt= (data) => {
+    
+    try{
+        let encryptedText=data.encryptedText;
+        let password=process.env.PASSWORD;
+        let salt=process.env.SALT;
+        let VIKey=process.env.VIKEY;
+        const cipherTextBytes = Buffer.from(encryptedText, 'base64');
+        const keyBytes = crypto.pbkdf2Sync(password, salt, 1000, 256 / 8, 'sha1');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', keyBytes, Buffer.from(VIKey, 'ascii'));
+        decipher.setAutoPadding(false);
+        let decryptedText = decipher.update(cipherTextBytes);
+        decryptedText = Buffer.concat([decryptedText, decipher.final()]);
+        let decrypt= decryptedText.toString('utf8').replace(/\0+$/, '');
+        console.log('decrypt',decrypt);
+        return decrypt;
+    
+    }
+    catch(err){
+        console.log(err);
+        return (err);
+    }
+   
+}
+
+
+
+const encrypt= (data) => {
+    try{
+        let plainText=data.plainText;
+        let password=process.env.PASSWORD;
+        let salt=process.env.SALT;
+        let VIKey=process.env.VIKEY;
+        const keyBytes = crypto.pbkdf2Sync(password, salt, 1000, 32, 'sha1');
+        const iv = Buffer.from(VIKey, 'hex');
+        console.log('HIFI2')
+        const cipher = crypto.createCipheriv('aes-256-cbc', keyBytes, VIKey);
+        console.log('HIFI3');
+    
+        let encrypted = cipher.update(plainText, 'utf8', 'base64');
+        encrypted += cipher.final('base64');
+        console.log("encrypteddddd",encrypted);
+        return encrypted;
+    }
+    catch(err){
+        console.log(err);
+        return err;
+    }
+   
+}
+
+
+
+
+
+
 
 const getTokenBalance =async(data,response,cb)=>{
 
@@ -565,5 +626,7 @@ module.exports ={
     createLotterySignature,
     checkNFTBalance,
     getTokenBalance,
-    getTransactionReceit
+    getTransactionReceit,
+    decrypt,
+    encrypt
 }

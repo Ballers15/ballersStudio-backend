@@ -5,7 +5,7 @@ const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 const rewardPot = require("../models/rewardPot");
-
+const  psqlService =require('../helpers/postgresSql');
 const adduserPotDetails = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1263,6 +1263,43 @@ const getGameCash =function(data,response,cb){
   );
 }
 exports.getGameCash=getGameCash;
+
+
+
+const updateGameCash = async function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  
+
+   psqlService.updateCash(data,(err,res)=>{
+    if(err){
+      console.log("err", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in updating",
+          "updateGameCash",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    console.log("res",res);
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "updated Successfully",
+        "updateGameCash",
+        res,
+        data.req.signature
+      )
+    );
+   })
+
+}
+exports.updateGameCash=updateGameCash;
 
 const updateLotteryWithdrawl = function (data, response, cb) {
   if (!cb) {

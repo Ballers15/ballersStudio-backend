@@ -378,7 +378,7 @@ router.get( "/v1/admin/pot/counts",
 
 
 router.get("/v1/check/nft/claim/contract",
-  // [authenticator, authenticateRole(["ADMIN"])],
+  [authenticator, authenticateRole(["ADMIN"])],
   function (req, res, next) {
       let data = req.query;
     data.req = req.data;

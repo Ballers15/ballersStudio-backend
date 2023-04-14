@@ -432,7 +432,9 @@ if(!cb){
 }
     try{
 
-        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);        let walletDetail= Array(tokenIds.length).fill(walletAddress);        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
+        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);      
+        let walletDetail= Array(tokenIds.length).fill(walletAddress);     
+        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetail,tokenIds).call();
         console.log("balanceOfBatch",balanceOfbatch);
         let exist=false;
         balanceOfbatch.filter((el)=>{
@@ -480,6 +482,54 @@ if(!cb){
 }
 
 
+const checkNftOnClaimContract =async function(data,response,cb){
+    if(!cb){
+        cb=response;
+    }
+    try{
+
+        let walletAddress= web3.utils.toChecksumAddress(process.env.NFT_CLAIM_CONTRACT_ADDRESS);      
+        let tokenId=data.tokenId;
+        let balance=await nftContract.methods.balanceOf(walletAddress,tokenId).call();
+        console.log("balance",balance,typeof balance);
+        if(!(parseFloat(balance) > 0)){
+            return cb(
+                null,
+                responseUtilities.responseStruct(
+                    200,
+                    "No NFT found",
+                    "checkNftOnClaimContract",
+                    {exists:false},
+                    data.req.signature
+                )
+            );
+        }
+    
+        return cb(
+            null,
+            responseUtilities.responseStruct(
+                200,
+                "check Nft On Claim Contract",
+                "checkNftOnClaimContract",
+                {exist:true},
+                data.req.signature
+        ));
+
+
+    }
+    catch(err){
+        return cb(
+            responseUtilities.responseStruct(
+                400,
+                `${err}`,
+                "checkNftOnClaimContract",
+                null,
+                data.req.signature
+            )
+        );
+
+    }
+}
 
 
 
@@ -628,5 +678,6 @@ module.exports ={
     getTokenBalance,
     getTransactionReceit,
     decrypt,
-    encrypt
+    encrypt,
+    checkNftOnClaimContract
 }

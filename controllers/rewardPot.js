@@ -4,6 +4,7 @@ const PotActionLogs = require("../models/potActionLogs");
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
+const web3Service = require("../helpers/web3Service");
 
 
 const getActivePot = function (data, response, cb) {
@@ -1520,3 +1521,28 @@ const getPotCounts = async function (data, response, cb) {
 };
 
 exports.getPotCounts = getPotCounts;
+
+const checkNftClaimContract =async function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(!data.tokenId){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "missing potId",
+        "checkNftClaimContract",
+        null,
+        data.req.signature
+      )
+    )
+  }
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(web3Service.checkNftOnClaimContract, data));
+  async.waterfall(waterFallFunctions, cb);
+
+
+
+
+}
+exports.checkNftClaimContract = checkNftClaimContract;

@@ -368,3 +368,28 @@ router.get( "/v1/admin/pot/counts",
     });
   }
 );
+
+
+
+
+/**
+ * Check if NFT is present in calim contract
+ */
+
+
+router.get("/v1/check/nft/claim/contract",
+  // [authenticator, authenticateRole(["ADMIN"])],
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    rewardPot.checkNftClaimContract(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);

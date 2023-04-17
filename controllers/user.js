@@ -27,8 +27,8 @@ const getTokenBalance =function(data,response,cb){
 		if(err){
 			return cb(
 				responseUtilities.responseStruct(
-					500,
-					null,
+					400,
+					err.message,
 					"getTokenBalance",
 					null,
 					data.req.signature
@@ -39,13 +39,56 @@ const getTokenBalance =function(data,response,cb){
 		let sendRes=res;
 		return cb(null,responseUtilities.responseStruct(200,"Balance Fetched Successfuly","getTokenBalance",sendRes,null));
 
-		// return cb(null, sendResponse(200, "Balance Fetched Successfuly", "getTokenBalance", sendRes, data.req.signature));
 
 	})
 
 }
 
 exports.getTokenBalance=getTokenBalance;
+
+
+const getNftsInWalletAddress = function(data,response,cb){
+	if(!cb){
+		cb=response;
+	}
+	if(!data.walletAddress){
+		return cb(
+			responseUtilities.responseStruct(
+			  400,
+			  null,
+			  "getNftsInWalletAddress",
+			  null,
+			  null
+			)
+		)
+
+	}
+
+	web3Service.getNftsInWalletAddress(data,(err,res)=>{
+		if(err){
+			console.log("HIIIIIIIIIIIIIIIIIII",err.message);
+			return cb(
+				responseUtilities.responseStruct(
+					400,
+					err.message,
+					"getNftsInWalletAddress",
+					null,
+					data.req.signature
+				)
+			);
+
+		}
+		let sendRes=res;
+		return cb(null,responseUtilities.responseStruct(200,"Balance Fetched Successfuly","getNftsInWalletAddress",sendRes,null));
+
+
+	})
+
+}
+exports.getNftsInWalletAddress=getNftsInWalletAddress;
+
+
+
 
 const getAllUsers = function (data, response, cb) {
 	if (!cb) {

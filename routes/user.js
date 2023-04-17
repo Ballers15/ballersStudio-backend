@@ -32,6 +32,22 @@ router.get( "/v1/token/balance",
 );
 
 
+router.get( "/v1/check/nfts",
+  function (req, res, next) {
+      let data = req.query;
+    data.req = req.data;
+    users.getNftsInWalletAddress(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
+
 
 
 router.get( "/v1/all",[authenticator, authenticateRole(["ADMIN"])],

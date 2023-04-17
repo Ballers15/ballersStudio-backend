@@ -13,7 +13,8 @@ let polygon = process.env.POLYGON_RPC_URL;
 let collectionAddress=process.env.NFT_COLLECTION_ADDRESS;
 let nftGamePoints=JSON.parse(process.env.NFT_POINTS);
 let tokenIds=JSON.parse(process.env.tokenIds);
-
+let tokenIdUrl=JSON.parse(process.env.tokenIdsUrl);
+let openSeaUrl=(process.env.OPENSEA_COLLECTION_URL);
 let tokenAddress=process.env.BALLERS_TOKEN_ADDRESS;
 
 let web3=new Web3(new Web3.providers.HttpProvider(polygon));
@@ -99,6 +100,73 @@ const getTokenBalance =async(data,response,cb)=>{
 
     }
     catch(err){
+        console.log(err);
+        return cb(err);
+    }
+
+}
+
+
+const getNftsInWalletAddress =async (data,response,cb)=>{
+    
+    if(!cb){
+        cb=response;
+    }
+    try{
+
+        let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);      
+        let sendData=[];
+        for(let i= 0;i<tokenIds.length;i++){
+
+            console.log("tokenIdDetails",tokenIds[i]);
+           
+            let balance=await nftContract.methods.balanceOf(walletAddress,tokenIds[i]).call();
+
+            console.log("balance of b",i+1,balance,tokenIds[i]);
+            let obj={
+                "tokenId":tokenIds[i],
+                "exists":parseFloat(balance)>0?true:false,
+                "marketUrl":openSeaUrl,
+                "tokenIdUrl":tokenIdUrl[0]
+            }
+            sendData.push(obj);
+        }
+
+
+        // let sendData={
+
+        // }
+        
+             return cb(
+                null,
+                responseUtilities.responseStruct(
+                    200,
+                    "Nfts In WalletAddress",
+                    "getNftsInWalletAddress",
+                    sendData,
+                    data.req.signature
+                )
+            );
+
+
+     
+        // if(!(parseFloat(balance) > 0)){
+        //     return cb(
+        //         null,
+        //         responseUtilities.responseStruct(
+        //             200,
+        //             "No NFT found",
+        //             "checkNftOnClaimContract",
+        //             {exists:false},
+        //             data.req.signature
+        //         )
+        //     );
+        // }
+    
+
+
+
+    }catch(err){
         console.log(err);
         return cb(err);
     }
@@ -668,7 +736,7 @@ console.log("tokenIds",tokenIdDetails);
 
 
 module.exports ={
-
+getNftsInWalletAddress,
     getuserNftBalance,
     createUserSignature,
     getTransactionStatus,

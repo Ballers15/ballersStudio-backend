@@ -1867,6 +1867,7 @@ const checkUserWonLottery = function(data,response,cb){
       sendRes={
         participated:true,
         lotteryWon:res?.lotteryWon,
+        claimed:false
         
 
       };

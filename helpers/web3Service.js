@@ -579,7 +579,7 @@ const checkNftOnClaimContract =async function(data,response,cb){
                 200,
                 "check Nft On Claim Contract",
                 "checkNftOnClaimContract",
-                {exist:true},
+                {exists:true},
                 data.req.signature
         ));
 

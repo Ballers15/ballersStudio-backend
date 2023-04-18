@@ -286,6 +286,7 @@ const addBalanceForUser = function (data, response, cb) {
 
   let updateData = {
     $inc: { amount: data.amount },
+    $inc:{gameAmount:data.amount}
   };
 
   let options = {
@@ -332,6 +333,7 @@ const addBalanceInPot = function(data,response,cb){
   //data.amount of user entered
   let updateData = {
     $inc: { potAmountCollected: data.amount },
+
   };
 
   let options = {
@@ -843,7 +845,7 @@ const findRewardPools =function(data,response,cb){
   let findData={
     potType:"REWARDPOT"
   };
-  rewardPot.find(findData).exec((err,res)=>{
+  RewardPot.find(findData).exec((err,res)=>{
     if(err){
       console.log(err);
       return cb(
@@ -880,7 +882,7 @@ const findLotteryPools =function(data,response,cb){
   let findData={
     potType:"LOTTERYPOT"
   };
-  rewardPot.find(findData).exec((err,res)=>{
+  RewardPot.find(findData).exec((err,res)=>{
     if(err){
       console.log(err);
       return cb(
@@ -1725,7 +1727,7 @@ const getLatestTenPots =function(data,response,cb){
  let limit =10;
 
 
-  rewardPot.find(findData).sort({ createdAt: -1 }).exec((err,res)=>{
+  RewardPot.find(findData).sort({ createdAt: -1 }).exec((err,res)=>{
     if(err){
       console.log(err);
       return cb(
@@ -2200,3 +2202,162 @@ exports.updateRewardTokenBalance=updateRewardTokenBalance;
 
 
 
+const getGameCashBurned =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  if (!data.walletAddress) {
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        null,
+        "getGameCashBurned",
+        null,
+        data.req.signature
+      )
+    );
+  }
+
+  let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getAllPots, data));
+  waterFallFunctions.push(async.apply(checkGameCash, data));
+  waterFallFunctions.push(async.apply(updateGameCashToZero, data));
+
+  async.waterfall(waterFallFunctions, cb);
+}
+const getAllPots =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let findData={
+    isActive:true,
+    potType:{$in:process.env.potType},
+    potStatus:process.env.POT_STATUS.split(",")[1]
+  };
+
+  RewardPot.find(findData).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          null,
+          "getAllPots",
+          null,
+          data.req.signature
+        ));
+    }
+    let activepots=res.map((el)=>{return el._id});
+    data.activepots=activepots;
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        null,
+        "getAllPots",
+        null,
+        data.req.signature
+      ));
+
+ 
+  })
+
+}
+const checkGameCash=function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  let walletAddress=(data.walletAddress).toLowerCase();
+  let findData={
+
+    walletAddress:walletAddress,
+    potId:{$in:data.activepots}
+  };
+  userPotDetails.find(findData).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          null,
+          "checkGameCash",
+          null,
+          data.req.signature
+        ));
+    }
+    let totalGameCash=0;
+    data.update=false;
+    res.filter((el)=>{
+      if(el?.gameAmount){
+        totalGameCash+=el.gameAmount;
+      }
+    })
+    if(parseFloat(totalGameCash)){
+      data.update=true;
+    }
+    let sendData={
+      totalGameCash
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        null,
+        "checkGameCash",
+        sendData,
+        data.req.signature
+      ));
+  })
+}
+const updateGameCashToZero =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  
+
+  if(!data.update){
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        null,
+        "updateGameCashToZero",
+        response.data,
+        data.req.signature
+    ));   
+  }
+ let findData={
+      potId:{$in:data.activepots}
+ };
+  let updateData={
+    gameAmount:0
+  };
+  userPotDetails.updateMany(findData,updateData).exec((err,res)=>{
+    if(err){
+      console.log(err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          null,
+          "updateGameCashToZero",
+          null,
+          data.req.signature
+        ));
+    }
+   
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        null,
+        "updateGameCashToZero",
+        response.data,
+        data.req.signature
+      ));
+  })
+
+}
+
+
+exports.getGameCashBurned=getGameCashBurned;

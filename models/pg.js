@@ -2,23 +2,23 @@ const { Client } = require('pg')
 
 
   // prod + staging
-  const client = new Client({
-    user: 'habrpguser',
-    host: '172.19.0.2',
-    password:'pgpwd4habr',
-    database: 'habrdb',
-    port: 5432,
-   ssl: false
+  // const client = new Client({
+  //   user: 'habrpguser',
+  //   host: '172.19.0.2',
+  //   password:'pgpwd4habr',
+  //   database: 'habrdb',
+  //   port: 5432,
+  //  ssl: false
 
-  })
+  // })
 
 // local
-  // const client = new Client({
-  //   user: 'postgres',
-  //   host: 'localhost',
-  //   database: 'template1',
-  //   port: 5432,
-  // })
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'template1',
+    port: 5432,
+  })
 
 
 

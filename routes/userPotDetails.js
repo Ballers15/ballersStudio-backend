@@ -12,7 +12,6 @@ const clients = {
 const data = {};
 const authenticator = require('../middlewares/authenticator')(clients, data);
 const authenticateRole = require('../middlewares/authenticateRole');
-
 const userPotDetails = require("../controllers/userPotDetails");
 
 /**
@@ -36,6 +35,7 @@ router.post( "/v1/add/reward/pot/balance",[authenticator, authenticateRole(["USE
   }
 );
 
+
 /**
  * Add Lottery  Pot balance 
 */
@@ -55,6 +55,25 @@ router.post( "/v1/add/lottery/pot/balance",[authenticator, authenticateRole(["US
   }
 );
 
+
+/**
+ * Get Game Cash burned 
+*/
+router.get( "/v1/get/game/cash/burned",[authenticator, authenticateRole(["USER"])],
+  function (req, res, next) {
+    let data = req.query;
+    data.req = req.data;
+    userPotDetails.getGameCashBurned(data, function (err, response) {
+      let status = 0;
+      if (err) {
+        status = err.status;
+        return res.status(status).send(err);
+      }
+      status = response.status;
+      return res.status(status).send(response);
+    });
+  }
+);
 
 
 
@@ -236,6 +255,9 @@ function(req, res, next) {
   
 });
 
+/**
+ * checks whether user won lottery
+*/
 router.get("/v1/check/user/won/lottery",
 [authenticator, authenticateRole(["USER"])],
 function(req, res, next) {
@@ -254,7 +276,7 @@ function(req, res, next) {
 
 
 /**
- * Check If user claim or not
+ * Check If user claimed reward (token)
 */
 
 router.get("/v1/check/user/claimed/reward",

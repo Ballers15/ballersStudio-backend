@@ -2230,12 +2230,15 @@ const getAllPots =function(data,response,cb){
   if(!cb){
     cb=response;
   }
+  let potTypes=process.env.REWARD_POT.split(",");
   let findData={
     isActive:true,
-    potType:{$in:process.env.potType},
+    potType:{$in:potTypes},
     potStatus:process.env.POT_STATUS.split(",")[1]
   };
 
+
+  console.log("findData:",findData);
   RewardPot.find(findData).exec((err,res)=>{
     if(err){
       console.log(err);
@@ -2289,8 +2292,9 @@ const checkGameCash=function(data,response,cb){
     let totalGameCash=0;
     data.update=false;
     res.filter((el)=>{
-      if(el?.gameAmount){
-        totalGameCash+=el.gameAmount;
+      if(parseFloat(el?.gameAmount)){
+        let addAmount=parseFloat(el?.gameAmount);
+        totalGameCash+=addAmount;
       }
     })
     if(parseFloat(totalGameCash)){
@@ -2299,6 +2303,7 @@ const checkGameCash=function(data,response,cb){
     let sendData={
       totalGameCash
     }
+    console.log("send",sendData);
     return cb(
       null,
       responseUtilities.responseStruct(

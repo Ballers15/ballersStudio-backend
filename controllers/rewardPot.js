@@ -1541,6 +1541,6 @@ const checkNftClaimContract =async function(data,response,cb){
   waterFallFunctions.push(async.apply(web3Service.checkNftOnClaimContract, data));
   async.waterfall(waterFallFunctions, cb);
 
-
 }
+
 exports.checkNftClaimContract = checkNftClaimContract;

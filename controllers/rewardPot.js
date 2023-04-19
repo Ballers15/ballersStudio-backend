@@ -1530,7 +1530,7 @@ const checkNftClaimContract =async function(data,response,cb){
     return cb(
       responseUtilities.responseStruct(
         400,
-        "missing potId",
+        "Provide tokenId of NFT",
         "checkNftClaimContract",
         null,
         data.req.signature
@@ -1540,8 +1540,6 @@ const checkNftClaimContract =async function(data,response,cb){
   let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(web3Service.checkNftOnClaimContract, data));
   async.waterfall(waterFallFunctions, cb);
-
-
 
 
 }

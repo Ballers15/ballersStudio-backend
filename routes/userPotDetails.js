@@ -59,7 +59,7 @@ router.post( "/v1/add/lottery/pot/balance",[authenticator, authenticateRole(["US
 /**
  * Get Game Cash burned 
 */
-router.get( "/v1/get/game/cash/burned",[authenticator, authenticateRole(["USER"])],
+router.get( "/v1/get/game/cash/burned",
   function (req, res, next) {
     let data = req.query;
     data.req = req.data;

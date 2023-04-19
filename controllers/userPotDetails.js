@@ -285,8 +285,7 @@ const addBalanceForUser = function (data, response, cb) {
   console.log("find", findData);
 
   let updateData = {
-    $inc: { amount: data.amount },
-    $inc:{gameAmount:data.amount}
+    $inc: { amount: data.amount ,gameAmount:data.amount},
   };
 
   let options = {

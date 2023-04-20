@@ -80,8 +80,13 @@ const encrypt= (data) => {
 
 
 
-
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns  token balance of user for game
+ */
 const getTokenBalance =async(data,response,cb)=>{
 
     if(!cb){
@@ -107,22 +112,26 @@ const getTokenBalance =async(data,response,cb)=>{
 }
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns nft for user in game
+ */
 const getNftsInWalletAddress =async (data,response,cb)=>{
     
     if(!cb){
         cb=response;
     }
     try{
-
         let walletAddress= web3.utils.toChecksumAddress(data.walletAddress);      
         let sendData=[];
-        for(let i= 0;i<tokenIds.length;i++){
-
-            console.log("tokenIdDetails",tokenIds[i]);
-           
-            let balance=await nftContract.methods.balanceOf(walletAddress,tokenIds[i]).call();
-
-            console.log("balance of b",i+1,balance,tokenIds[i]);
+        let walletDetails= Array(tokenIds.length).fill(walletAddress);
+        let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetails,tokenIds).call();
+        console.log('balanceOfBatch',balanceOfbatch);
+        for(let i in balanceOfbatch){
+            let balance=balanceOfbatch[i];
             let obj={
                 "tokenId":tokenIds[i],
                 "exists":parseFloat(balance)>0?true:false,
@@ -130,13 +139,9 @@ const getNftsInWalletAddress =async (data,response,cb)=>{
                 "tokenIdUrl":tokenIdUrl[0]
             }
             sendData.push(obj);
-        }
+      }
+      
 
-
-        // let sendData={
-
-        // }
-        
              return cb(
                 null,
                 responseUtilities.responseStruct(
@@ -148,24 +153,6 @@ const getNftsInWalletAddress =async (data,response,cb)=>{
                 )
             );
 
-
-     
-        // if(!(parseFloat(balance) > 0)){
-        //     return cb(
-        //         null,
-        //         responseUtilities.responseStruct(
-        //             200,
-        //             "No NFT found",
-        //             "checkNftOnClaimContract",
-        //             {exists:false},
-        //             data.req.signature
-        //         )
-        //     );
-        // }
-    
-
-
-
     }catch(err){
         console.log(err);
         return cb(err);
@@ -174,7 +161,11 @@ const getNftsInWalletAddress =async (data,response,cb)=>{
 }
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @returns user balance of nft with game points for crons
+ */
 
 const userBalanceOfOpensea=async(data)=>{
     console.log("data",data);
@@ -240,7 +231,11 @@ const userBalanceOfOpensea=async(data)=>{
         
 }
 
-
+/**
+ * 
+ * @param {*} data 
+ * @returns  get users nft balance  FOR ADD POT
+ */
 
 const getuserNftBalance=async (data) => {
 console.log("data",data);
@@ -326,6 +321,13 @@ console.log("dataTo***************************Return",dataToReturn);
 
 /**do this code in try catch */
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns  returns user signature for token claim
+ */
 const createUserSignature =async function(data,response,cb){
     if(!cb){
         cb=response;
@@ -386,7 +388,13 @@ const createUserSignature =async function(data,response,cb){
 ));}
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns  returns user signature for lottery claim
+ */
 const createLotterySignature =async function(data,response,cb){
     if(!cb){
         cb=response;
@@ -446,7 +454,11 @@ const createLotterySignature =async function(data,response,cb){
 
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @returns gives transaction confirmation details
+ */
 const getTransactionReceit=async function (data){
     
   
@@ -555,7 +567,13 @@ const getTransactionStatus=async function (data,response,cb){
 }
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns checks wether user holds nft's
+ */
 const checkUserHoldsNft=async function(data,response,cb){
 if(!cb){
     cb=response;
@@ -611,7 +629,13 @@ if(!cb){
     }
 }
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns check nfts on claim contract
+ */
 const checkNftOnClaimContract =async function(data,response,cb){
     if(!cb){
         cb=response;
@@ -664,6 +688,14 @@ const checkNftOnClaimContract =async function(data,response,cb){
 
 
 
+// NOT IN USE
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns  tells nft balance 
+ */
 const checkNFTBalance =async function(data,response,cb){
     if(!cb){
         cb=response;
@@ -679,13 +711,7 @@ const checkNFTBalance =async function(data,response,cb){
          walletAddresses=users.map((el)=>{
             return web3.utils.toChecksumAddress(el.walletAddress)
         })
-        // for(let i in users){
-        //     if(users[i].walletAddress){
-        //         let wallet = web3.utils.toChecksumAddress(users[i].walletAddress);
-        //         walletAddresses.push(users[i].walletAddress)
-
-        //     }
-        // }
+    
         console.log("walletAddresses--",walletAddresses);
         let finalMap=[];
         for(let i in tokenIds){
@@ -709,11 +735,6 @@ console.log("tokenIds",tokenIdDetails);
             
                 
             }
-            
-    
-        // console.log("users",users);
-        // return;
-    
         let sendRes = {
             transactions: users,
             count: count,

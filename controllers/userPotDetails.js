@@ -34,10 +34,9 @@ const adduserPotDetails = function (data, response, cb) {
   waterFallFunctions.push(async.apply(checkPremiumPot, data));
   // waterFallFunctions.push(async.apply(getUserGameBalance, data));
   // waterFallFunctions.push(async.apply(updateUserGameBalance, data));
-
-  waterFallFunctions.push(async.apply(addBalanceForUser, data));
-
-  waterFallFunctions.push(async.apply(updateRewardPotDetails, data));
+    waterFallFunctions.push(async.apply(addBalanceForUser, data));
+  // waterFallFunctions.push(async.apply(updateRewardPotDetails, data));
+  waterFallFunctions.push(async.apply(updateRewardPotNftDetails,data));
 
   waterFallFunctions.push(async.apply(addBalanceInPot, data));
 
@@ -1983,6 +1982,26 @@ exports.checkUserClaimedReward=checkUserClaimedReward;
 /****cron helpers */
 
 
+
+const updateRewardPotNftDetails=function(data,response,cb){
+  if(!cb){
+      cb=response;
+  }
+  let waterFallFunctions = [];
+
+  waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
+  waterFallFunctions.push(async.apply(userBalanceFromOpensea, data));
+  waterFallFunctions.push(async.apply(updateNftBalanceInUserSchema, data));
+  waterFallFunctions.push(async.apply(getRewardTokenBalance, data));
+  waterFallFunctions.push(async.apply(updateRewardTokenBalance, data));   
+  async.waterfall(waterFallFunctions, cb);
+
+}
+
+
+
+
+
 const updateRewardPotDetails=function(data,response,cb){
   if(!cb){
       cb=response;
@@ -2052,6 +2071,17 @@ const getUserDetailsFromPotId = function (data, response, cb) {
 });
 };
 exports.getUserDetailsFromPotId=getUserDetailsFromPotId;
+
+const userBalanceFromOpensea = async function (data, response, cb) {
+  if (!cb) {
+  cb = response;
+  }
+  let balanceFetchedFromOpensea = await web3Service.userBalanceOfOpensea(data);
+  console.log("ENDEDD");
+  data.balanceFetchedFromOpensea = balanceFetchedFromOpensea;
+  return cb(null);
+};
+exports.userBalanceFromOpensea=userBalanceFromOpensea;
 
 
 const fetchBalanceFromOpensea = async function (data, response, cb) {

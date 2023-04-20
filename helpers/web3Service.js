@@ -176,7 +176,69 @@ const getNftsInWalletAddress =async (data,response,cb)=>{
 
 
 
+const userBalanceOfOpensea=async(data)=>{
+    console.log("data",data);
+    let walletLength=data.userPotDetailsDetails.length;    
+    let userNftDetails=data.userPotDetailsDetails;
+    let finalArray=[];
+    let totalNftHeldInPoolPoints=0;
+    let totalInGameCashInPool=0
+    
+    console.log("walletLength",walletLength);
+    console.log("tokenIds",tokenIds,typeof tokenIds);
+    let walletDetails= Array(tokenIds.length).fill(data.walletAddress);
+    let balanceOfbatch=await nftContract.methods.balanceOfBatch(walletDetails,tokenIds).call();
+    let count=0;
+    for(let i in balanceOfbatch){
+        let nftCount=parseFloat(balanceOfbatch[i]);
+        if(nftCount>0){
+            count+=1;
+        }
+    }
 
+    for(let i in userNftDetails){
+        console.log("WWWWWWWWWWW*************************************************************",userNftDetails[i].walletAddress,data.walletAddress);
+        if(userNftDetails[i].walletAddress ==(data.walletAddress))
+        {
+                userNftDetails[i].nftHolded=count;
+                console.log("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII FIIIIIIIIIIIIIIIIIIIIIII",count);
+
+        }
+            console.log("nftGamePoints",nftGamePoints);
+            userNftDetails[i].nftPoints=nftGamePoints[userNftDetails[i].nftHolded];
+            totalNftHeldInPoolPoints+=nftGamePoints[userNftDetails[i].nftHolded];
+            totalInGameCashInPool=new BigNumber(userNftDetails[i].amount).plus(totalInGameCashInPool);
+          
+            console.log("Total in game cash",totalInGameCashInPool.toString());
+        }
+
+        for(let i in userNftDetails){
+            console.log("totalNftHeldInPoolPoints",totalNftHeldInPoolPoints,userNftDetails[i].nftHolded);
+             userNftDetails[i].nftPointsPercentage=(userNftDetails[i].nftPoints/totalNftHeldInPoolPoints)*100;
+             userNftDetails[i].gamePointsPercentage=new BigNumber(userNftDetails[i].amount).div(totalInGameCashInPool).times(100);
+             console.log("userNftDetails[i].amount",userNftDetails[i].gamePointsPercentage.toString());
+             userNftDetails[i].rewardPointsPercentage =0.75*( userNftDetails[i].nftPointsPercentage)+0.25*( userNftDetails[i].gamePointsPercentage)
+          
+        }
+        
+        
+        
+        
+        
+        console.log("totalNftHeldInPool",totalNftHeldInPoolPoints,totalInGameCashInPool);
+        
+        console.log("finalArray",userNftDetails);
+            let dataToReturn = userNftDetails.map((el) => {
+                return ({
+                    userPotDetailsId: el._id,
+                    nftHolded: el.nftHolded,
+                    rewardPointsPercentage: el.rewardPointsPercentage,
+            })
+            });
+        console.log("dataTo***************************Return",dataToReturn);
+            return dataToReturn;
+        
+}
 
 
 
@@ -747,5 +809,6 @@ getNftsInWalletAddress,
     getTransactionReceit,
     decrypt,
     encrypt,
+    userBalanceOfOpensea,
     checkNftOnClaimContract
 }

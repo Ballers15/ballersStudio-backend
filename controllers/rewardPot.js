@@ -6,7 +6,13 @@ const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives active pot
+ */
 const getActivePot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -71,6 +77,14 @@ const getActivePot = function (data, response, cb) {
 exports.getActivePot = getActivePot;
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives reward pot leaderboard
+
+ */
 const getRewardPotLeaderBoard = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -84,6 +98,14 @@ const getRewardPotLeaderBoard = function (data, response, cb) {
 exports.getRewardPotLeaderBoard = getRewardPotLeaderBoard;
 
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives active reward pot  
+ */
 const getActiveRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -127,6 +149,14 @@ const getActiveRewardPot = function (data, response, cb) {
   });
 };
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives reward pot leaderboard
+ */
 const getRewardLeaderBoard = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -216,6 +246,13 @@ const getRewardLeaderBoard = function (data, response, cb) {
 };
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives lottery pot leaderboard 
+ */
 const getLotteryPotLeaderBoard = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -228,6 +265,15 @@ const getLotteryPotLeaderBoard = function (data, response, cb) {
 };
 exports.getLotteryPotLeaderBoard = getLotteryPotLeaderBoard;
 
+
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives active lottery pot 
+ */
 
 const getActiveLotteryPot = function (data, response, cb) {
   if (!cb) {
@@ -352,7 +398,13 @@ const getLotteryleaderBoard = function (data, response, cb) {
 };
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives lottery pot board previous rounds 
+ */
 
 const getLotteryPotBoardPreviousRounds = function(data,response,cb){
   if(!cb){
@@ -370,7 +422,13 @@ const getLotteryPotBoardPreviousRounds = function(data,response,cb){
 exports.getLotteryPotBoardPreviousRounds = getLotteryPotBoardPreviousRounds;
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives previous rounds in reward 
+ */
 const getPreviousRounds =function(data,response,cb){
   if(!cb){
     cb=response;
@@ -459,6 +517,9 @@ const getPreviousRounds =function(data,response,cb){
       );
     })
 }
+
+
+
 
 const getLotteryPotWalletAddress =function(data,response,cb){
   if(!cb){
@@ -575,6 +636,8 @@ const getRewardPotBoardPreviousRounds = function(data,response,cb) {
 }
 exports.getRewardPotBoardPreviousRounds = getRewardPotBoardPreviousRounds;
 
+
+
 const getRewardPreviousRounds =function(data,response,cb){
   if(!cb){
     cb=response;
@@ -679,6 +742,9 @@ RewardPot.aggregate(pipeline).exec((err,res)=>{
 
 
 }
+
+
+
 const getRewardPotWalletAddress =function(data,response,cb){
   if(!cb){
     cb=response;
@@ -783,6 +849,15 @@ const getRewardPotWalletAddress =function(data,response,cb){
 
 /******************************************************************ADMIN****************************************************************************************** */
 
+
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns creates reward pot
+ */
 
 const createRewardPot = function (data, response, cb) {
   if (!cb) {
@@ -919,6 +994,14 @@ const potActionLogs = function (data, response, cb) {
   });
 };
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns update reward pot status 
+ */
 const updateRewardPotStatus = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -988,6 +1071,16 @@ const updatePotStatus = function (data, response, cb) {
   });
 };
 
+
+
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns update pot details
+ */
 const updateRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1066,6 +1159,9 @@ const checkIfPotIsActive = function (data, response, cb) {
     );
   });
 };
+
+
+
 const updatePot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1127,6 +1223,8 @@ const updatePot = function (data, response, cb) {
   });
 };
 
+// NOT IN USE
+
 const deleteRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1179,6 +1277,14 @@ const deleteRewardPot = function (data, response, cb) {
 };
 exports.deleteRewardPot = deleteRewardPot;
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns UPDATE claim of reward pot
+ */
 const updateClaimOfRewardPot = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1298,6 +1404,14 @@ const getRewardPotsById = function (data, response, cb) {
 };
 exports.getRewardPotsById = getRewardPotsById;
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives all reward pots 
+ */
 const getAllRewardPots = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1311,6 +1425,7 @@ const getAllRewardPots = function (data, response, cb) {
   async.waterfall(waterFallFunctions, cb);
 };
 exports.getAllRewardPots = getAllRewardPots;
+
 
 const getRewardPots = function (data, resonse, cb) {
   if (!cb) {
@@ -1409,6 +1524,15 @@ const getRewardPots = function (data, resonse, cb) {
     });
 };
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives user count in reward and lottery pot
+ */
+
 const getUserCountInPots = async function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1450,6 +1574,14 @@ const getUserCountInPots = async function (data, response, cb) {
   );
 };
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives archive pots
+ */
 const getArchivePots = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1462,6 +1594,13 @@ const getArchivePots = function (data, response, cb) {
 };
 exports.getArchivePots = getArchivePots;
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns gives upcoming reward pot 
+ */
 const getUpcomingRewardPots = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1474,6 +1613,13 @@ const getUpcomingRewardPots = function (data, response, cb) {
 };
 exports.getUpcomingRewardPots = getUpcomingRewardPots;
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns pot count of reward and lottery
+ */
 const getPotCounts = async function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -1522,6 +1668,14 @@ const getPotCounts = async function (data, response, cb) {
 
 exports.getPotCounts = getPotCounts;
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns checks whether nft present on nft claim contract
+ */
 const checkNftClaimContract =async function(data,response,cb){
   if(!cb){
     cb=response;

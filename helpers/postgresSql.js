@@ -1,5 +1,6 @@
 const client =require('../models/pg');
 const web3Service =require('../helpers/web3Service');
+const responseUtilities = require("./sendResponse");
 
 
 let updateCash=async(data,response,cb)=>{
@@ -81,8 +82,82 @@ console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_s
 
 
 }
+
+
+let getCash=async(data,response,cb)=>{
+    if(!cb){
+        cb=response;
+    }
+
+data.userId=data.userId.toString();
+console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_string_models WHERE email="${data.userId}" AND key='BANK_REPOSITORY_DATA'`);
+
+
+    client.query(`SELECT * FROM user_settings_string_models WHERE email='${data.userId}' AND key='BANK_REPOSITORY_DATA';`,(err,res)=>{
+        if(err){
+            console.log(err);
+        }
+        console.log("RESPONSE",res.rows);
+        if(res.rows.length){
+
+            let sendData={encryptedText:res.rows[0].value};
+
+            let decryptedResponse=web3Service.decrypt(sendData);
+
+            
+            let decryptedObject=JSON.parse((decryptedResponse));
+
+            let sendResposne={
+                amount:decryptedObject.strSoftCurrencyCount
+            }
+    
+
+            let sendRes={
+                walletAddress:data.walletAddress,
+                amount:decryptedObject.strSoftCurrencyCount
+              };
+              return cb(
+                null,
+                responseUtilities.responseStruct(
+                  200,
+                  "Game Cash fetched Successfully",
+                  "getGameCash",
+                  sendRes,
+                  data.req.signature
+                )
+              );
+
+
+               
+    
+    }else{
+
+        let sendRes={
+            walletAddress:data.walletAddress,
+            amount:0
+          };
+        return cb(
+            null,
+            responseUtilities.responseStruct(
+              200,
+              "Game Cash fetched Successfully",
+              "getGameCash",
+              sendRes,
+              data.req.signature
+            )
+          );
+    }
+    
+    })
+
+
+
+
+
+}
 module.exports={
-    updateCash
+    updateCash,
+    getCash
 }
 
 

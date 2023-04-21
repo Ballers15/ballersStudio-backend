@@ -1230,6 +1230,13 @@ const checkIfuserWonLottery = function (data, response, cb) {
 };
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns fetches game cash for particular user from psql
+ */
 const getGameCash =function(data,response,cb){
   if(!cb){
     cb=response;
@@ -1245,22 +1252,12 @@ const getGameCash =function(data,response,cb){
       )
     );
   }
-  let sendRes={
-    walletAddress:data.walletAddress,
-    amount:    Math.floor(Math.random() * 1000000)
 
 
-  };
-  return cb(
-    null,
-    responseUtilities.responseStruct(
-      200,
-      "Game Cash fetched Successfully",
-      "getGameCash",
-      sendRes,
-      data.req.signature
-    )
-  );
+  waterFallFunctions.push(async.apply(psqlService.getCash, data));
+  async.waterfall(waterFallFunctions, cb);
+
+
 }
 exports.getGameCash=getGameCash;
 

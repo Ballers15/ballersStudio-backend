@@ -7,6 +7,14 @@ const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
 // ` Users.find({ createdAt : {$gte: data.startDate, $lt:data.endDate}})`
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns baller token balance for particular address used in game
+ */
 const getTokenBalance =function(data,response,cb){
 	if(!cb){
 		cb=response;
@@ -47,6 +55,13 @@ const getTokenBalance =function(data,response,cb){
 exports.getTokenBalance=getTokenBalance;
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives nft in particular wallet address 
+ */
 const getNftsInWalletAddress = function(data,response,cb){
 	if(!cb){
 		cb=response;
@@ -89,7 +104,13 @@ exports.getNftsInWalletAddress=getNftsInWalletAddress;
 
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @return gives all users 
+ */
 const getAllUsers = function (data, response, cb) {
 	if (!cb) {
 		cb = response;
@@ -192,6 +213,13 @@ const getAllUsers = function (data, response, cb) {
 exports.getAllUsers = getAllUsers;
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns gives user game details (in game cash burned in our pots)
+ */
 const getUserGameDetails =function (data,response,cb){
 	if(!cb){
 		cb=response;
@@ -219,6 +247,14 @@ const getUserGameDetails =function (data,response,cb){
 }
 exports.getUserGameDetails=getUserGameDetails;
 
+
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns wallet details of user 
+ */
 const userWalletAddressDetails =function(data,response,cb){
 	if(!cb){
 		cb=response;
@@ -300,7 +336,13 @@ const userGameCashDetails =function(data,response,cb){
 
 
 
-
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb 
+ * @returns updates user status
+ */
 const updateUserStatus = function (data, response, cb) {
 	if (!cb) {
 	  cb = response;
@@ -357,6 +399,13 @@ const updateUserStatus = function (data, response, cb) {
 exports.updateUserStatus=updateUserStatus;
 
 
+/**
+ * 
+ * @param {*} data 
+ * @param {*} response 
+ * @param {*} cb
+ * @returns give user count total and unique wallet addresses in system 
+ */
 const getUserCount =function(data,response,cb){
 	if(!cb){
 		cb=response;

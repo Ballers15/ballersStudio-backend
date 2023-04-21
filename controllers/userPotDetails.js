@@ -1252,8 +1252,8 @@ const getGameCash =function(data,response,cb){
       )
     );
   }
-
-
+  data.walletAddress=data.walletAddress.toLowerCase();
+  let waterFallFunctions = [];
   waterFallFunctions.push(async.apply(psqlService.getCash, data));
   async.waterfall(waterFallFunctions, cb);
 

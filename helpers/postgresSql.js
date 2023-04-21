@@ -89,7 +89,7 @@ let getCash=async(data,response,cb)=>{
         cb=response;
     }
 
-data.userId=data.userId.toString();
+data.userId=data.walletAddress;
 console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_string_models WHERE email="${data.userId}" AND key='BANK_REPOSITORY_DATA'`);
 
 
@@ -116,7 +116,8 @@ console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_s
                 walletAddress:data.walletAddress,
                 amount:decryptedObject.strSoftCurrencyCount
               };
-              return cb(
+              console.log("SENDDDD",sendRes);
+                            return cb(
                 null,
                 responseUtilities.responseStruct(
                   200,

@@ -3,7 +3,6 @@ module.exports = development = {
   DEV: true,
   OTP_FIXED:123456,    
   mongoConnectionString: (process.env.DOCKER_URL)||'mongodb://localhost/ballers',
-  EMAIL_HOST: 'no-reply@backend.ith',
   MAILGUN_API_KEY:'f129efc967077b3162f11ad6bdfe6061-c2efc90c-f452cbcd',
   MAILGUN_DOMAIN:'ITH',
   NFT_COLLECTION_ADDRESS:"0x2953399124f0cbb46d2cbacd8a89cf0599974963",
@@ -17,8 +16,11 @@ module.exports = development = {
   tokenIdsUrl:JSON.stringify(["https://testnets.opensea.io/assets/mumbai/0x2953399124f0cbb46d2cbacd8a89cf0599974963/98277241363622211034989449555441005204792120988639821933054095663674471481476"]),
   OPENSEA_COLLECTION_URL:"https://testnets.opensea.io/collection/ball-2145094",
   POLYGON_RPC_URL:"https://rpc-mumbai.maticvigil.com",
-  MAILJET_APIKEY_PUBLIC: 'f0c638983a9a0639447e633138a0c4d5',
-  MAILJET_APIKEY_PRIVATE: '8b6553ae3f102799bec7eb9076f01648',
+
+  MAILJET_APIKEY_PUBLIC: '3729e819f31fac27b63b75bab2b67faf',
+  MAILJET_APIKEY_PRIVATE: '3e54a323b447b13f99178fc6310761e3',
+  EMAIL_HOST: 'mohit@ith.tech',
+
   MAILJET_CONTACT_LIST:JSON.stringify({
     ballers:10277430,
   }),

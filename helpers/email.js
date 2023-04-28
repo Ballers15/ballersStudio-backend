@@ -1,32 +1,62 @@
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
-const mailgun = new Mailgun(formData);
 const projectName = 'Ballers';
-const mg = mailgun.client({
-	username: process.env.MAILGUN_DOMAIN,
-	key: process.env.MAILGUN_API_KEY,
-});
+
+const User = require("../models/users");
 
 
-let sendMail = function(from, to, subject, message, cb) {
+const mailjet = require("node-mailjet").connect(
+    process.env.MAILJET_APIKEY_PUBLIC,
+    process.env.MAILJET_APIKEY_PRIVATE
+  );
 
-    const data = {
-        from: from,
-        to: to,
-        // cc: 'baz@example.com',
-        // bcc: 'bar@example.com',
-        subject: subject,
-        text: message,
-        html: message,
-        // attachment: attch
-    };
-    mg.messages
-	.create(sandboxf8c47bd53e894eb989031382157502b5.mailgun.org, {data})
-	.then(msg => console.log(msg)) // logs response data
-	.catch(err => console.log(err)); // logs any error`;
-}
 
-exports.sendAuthOtp = function(data, response, cb) {
+
+
+let sendMailByTemplate = function (
+    from,
+    to,
+    templateId,
+    variables,
+    cb
+  ) {
+    // if (process.env.DEV == "true") {
+    //   return cb(null, "Mail Disabled");
+  
+    // }else{
+    // console.log("Email Template called",  from,
+    // to,
+    // subject,
+    // templateId,
+    // variables,)
+    const request = mailjet.post("send", { version: "v3.1" }).request({
+      Messages: [
+        {
+          From: {
+            Email: `Ballers <${from}>`,
+          },
+          To: [
+            {
+              Email: to,
+            },
+          ],
+          TemplateID: templateId,
+          TemplateLanguage: true,
+          Variables: variables,
+        },
+      ],
+    });
+    request
+      .then((result) => {
+  
+        return cb(null, result.body);
+      })
+      .catch((err) => {
+        return cb(err, null);
+      });
+    // }
+  
+  };
+
+exports.sendOtpEmailRegistry = function(data, response, cb) {
 
     if(!cb){
         cb = response;
@@ -38,17 +68,74 @@ exports.sendAuthOtp = function(data, response, cb) {
     let generatedOTP = data.otp
     var hostUrl = process.env.EMAIL_HOST
   
-    let subject = `OTP ${projectName}`;
     let from = process.env.EMAIL_HOST;
     let to = `${user.email}`;
-    let message = `${hostUrl}, email:${user.email}, otp:${generatedOTP}`
+    // let message = `${hostUrl}, email:${user.email}, otp:${generatedOTP}`
+    let templateId = 3994422;
+    let variables = {
+        email: user.email,
+        otp: generatedOTP,
+      };
+    
 
-    console.log(message)
 
-    sendMail(from, to, subject, message, function(error, data) {
-        if (error) {
+    sendMailByTemplate(
+        from,
+        to,
+        templateId,
+        variables,
+        function (error, data) {
+          if (error) {
             return cb(error);
+          }
+          return cb(null, data);
+        }
+      );
+  
+};
+
+
+
+
+
+exports.sendOtpEmailForgotPasswordLink = async function (data, response, cb) {
+    if (!cb) {
+      cb = response;
+    }
+  
+    let user = {
+      email: data.email,
+    };
+  
+    const findData = {
+      email: user.email,
+    };
+  
+    const teamLead = await User.findOne(findData);
+
+  
+    let hostUrl = process.env.IMAGE_PATH;
+    let subject = `Reset Password !!`;
+    let from = process.env.EMAIL_HOST;
+    let to = `${user.email}`;
+    let templateId = 3994564;
+    let variables = {
+      firstname: teamLead.userName,
+      reset_link: data.resetLink,
+    };
+  
+  
+    console.log("varaiablesss", variables);
+    sendMailByTemplate(
+      from,
+      to,
+      templateId,
+      variables,
+      function (error, data) {
+        if (error) {
+          return cb(error);
         }
         return cb(null, data);
-    })
-};
+      }
+    );
+  };

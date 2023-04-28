@@ -18,7 +18,7 @@ const utilities = require('../helpers/security');
 const responseUtilities = require('../helpers/sendResponse');
 const mailJetService = require("../helpers/mailJetService");
 
-// const email = require('../helpers/email');
+const email = require('../helpers/email');
 
 
 //Contoller for user registry
@@ -49,7 +49,7 @@ exports.userRegistry = function (data, response, cb) {
         let waterFallFunctions = [];
         waterFallFunctions.push(async.apply(generateOTP, data));
         waterFallFunctions.push(async.apply(registerUser, data));
-        // waterFallFunctions.push(async.apply(sendRegistryMail, data));
+        waterFallFunctions.push(async.apply(sendRegistryMail, data));
 
         async.waterfall(waterFallFunctions, cb);
             
@@ -138,7 +138,12 @@ const sendRegistryMail = function (data, response, cb) {
     if (!cb) {
         cb = response;
     }
-    email.sendOtpEmailRegistry(data, function(err, res){
+    let sendData = {
+        email: data.email,
+        otp: data.otp,
+
+      };
+    email.sendOtpEmailRegistry(sendData, function(err, res){
         if (err) {
             console.error('sendRegistryMail', err);
             return cb(responseUtilities.responseStruct(500, "Something went wrong Unable to sent email", "user_registry.sendRegistryMail", null, data.req.signature));
@@ -788,7 +793,7 @@ const forgotPassword = function (data, response, cb) {
 
     waterfallFunctions.push(async.apply(validateUser, data));
     waterfallFunctions.push(async.apply(checkResetPasswordsRequest, data));
-    // waterfallFunctions.push(async.apply(sendForgotPasswordLink, data));
+    waterfallFunctions.push(async.apply(sendForgotPasswordLink, data));
 
     async.waterfall(waterfallFunctions, cb);
 };

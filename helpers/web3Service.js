@@ -651,7 +651,7 @@ const checkNftOnClaimContract =async function(data,response,cb){
                 null,
                 responseUtilities.responseStruct(
                     200,
-                    "No NFT found",
+                    "No NFT found on claim contract",
                     "checkNftOnClaimContract",
                     {exists:false},
                     data.req.signature

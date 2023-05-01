@@ -901,7 +901,7 @@ const sendForgotPasswordLink = function (data, response, cb) {
             return cb(responseUtilities.responseStruct(500, null, "sendForgotPasswordLink", null, data.req.signature));
         }
 
-        return cb(null, responseUtilities.responseStruct(200, "Verified Link send", "sendForgotPasswordLink", null, data.req.signature));
+        return cb(null, responseUtilities.responseStruct(200, "Forgot password link sent on mail", "sendForgotPasswordLink", null, data.req.signature));
     });
 };
 
@@ -947,11 +947,11 @@ const checkLink = function (data, response, cb) {
         }
 
         if ((new Date().getTime() > res.expiryTime) || (res.isActive == false) || res.isExpired) {
-            return cb(responseUtilities.responseStruct(400, "Link invalid", "checkLink", null, data.req.signature));
+            return cb(responseUtilities.responseStruct(400, "Invalid Reset Password Link", "checkLink", null, data.req.signature));
         }
 
         data.email = res.email;
-        return cb(null, responseUtilities.responseStruct(200, "Link Verify", "checkLink", null, data.req.signature));
+        return cb(null, responseUtilities.responseStruct(200, "Link Verified", "checkLink", null, data.req.signature));
 
     });
 }

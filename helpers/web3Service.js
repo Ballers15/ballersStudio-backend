@@ -280,22 +280,30 @@ let count=0;
     }
     userNftDetails[i].nftHolded=count;
 
-    console.log("nftGamePoints",nftGamePoints);
-    userNftDetails[i].nftPoints=nftGamePoints[count];
-    totalNftHeldInPoolPoints+=nftGamePoints[count];
     if(count!=0){
-
+        console.log("nftGamePoints",nftGamePoints);
+        userNftDetails[i].nftPoints=nftGamePoints[count];
+        totalNftHeldInPoolPoints+=nftGamePoints[count];
         totalInGameCashInPool=new BigNumber(userNftDetails[i].amount).plus(totalInGameCashInPool);
+    }else{
+        console.log("Suspicious user Found")
     }
     console.log("Total in game cash",totalInGameCashInPool.toString());
 }
 
 for(let i in userNftDetails){
-    console.log("totalNftHeldInPoolPoints",totalNftHeldInPoolPoints,userNftDetails[i].nftHolded);
-     userNftDetails[i].nftPointsPercentage=(userNftDetails[i].nftPoints/totalNftHeldInPoolPoints)*100;
-     userNftDetails[i].gamePointsPercentage=new BigNumber(userNftDetails[i].amount).div(totalInGameCashInPool).times(100);
-     console.log("userNftDetails[i].amount",userNftDetails[i].gamePointsPercentage.toString());
-     userNftDetails[i].rewardPointsPercentage =0.75*( userNftDetails[i].nftPointsPercentage)+0.25*( userNftDetails[i].gamePointsPercentage)
+    if(userNftDetails[i].nftHolded!=0){
+        console.log("totalNftHeldInPoolPoints",totalNftHeldInPoolPoints,userNftDetails[i].nftHolded);
+         userNftDetails[i].nftPointsPercentage=(userNftDetails[i].nftPoints/totalNftHeldInPoolPoints)*100;
+         userNftDetails[i].gamePointsPercentage=new BigNumber(userNftDetails[i].amount).div(totalInGameCashInPool).times(100);
+         console.log("userNftDetails[i].amount",userNftDetails[i].gamePointsPercentage.toString());
+         userNftDetails[i].rewardPointsPercentage =0.75*( userNftDetails[i].nftPointsPercentage)+0.25*( userNftDetails[i].gamePointsPercentage)
+    }
+    else{
+        console.log('Suspicious user found');
+        userNftDetails[i].rewardPointsPercentage=0;
+
+    }
   
 }
 

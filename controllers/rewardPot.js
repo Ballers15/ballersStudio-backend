@@ -91,7 +91,9 @@ const getRewardPotLeaderBoard = function (data, response, cb) {
   }
 
   let waterFallFunctions = [];
-  waterFallFunctions.push(async.apply(getActiveRewardPot, data));
+  if(!data.potId){
+    waterFallFunctions.push(async.apply(getActiveRewardPot, data));
+  }
   waterFallFunctions.push(async.apply(getRewardLeaderBoard, data));
   async.waterfall(waterFallFunctions, cb);
 };
@@ -162,10 +164,7 @@ const getRewardLeaderBoard = function (data, response, cb) {
     cb = response;
   }
 
-
-  console.log(response.data);
-
-  if(!response.data?._id){
+  if(!data.potId&&!response.data?._id){
     return cb(
       null,
       responseUtilities.responseStruct(
@@ -177,8 +176,9 @@ const getRewardLeaderBoard = function (data, response, cb) {
       )
     );
   }
+  let potId =data.potId?data.potId:response.data._id;
 
-  let potId = response.data?._id;
+//   let potId = response.data?._id;
   console.log(potId);
   let findData = { potId: potId };
   let projection={
@@ -259,7 +259,9 @@ const getLotteryPotLeaderBoard = function (data, response, cb) {
   }
 
   let waterFallFunctions = [];
-  waterFallFunctions.push(async.apply(getActiveLotteryPot, data));
+  if(!data.potId){
+    waterFallFunctions.push(async.apply(getActiveLotteryPot, data));
+  }
   waterFallFunctions.push(async.apply(getLotteryleaderBoard, data));
   async.waterfall(waterFallFunctions, cb);
 };
@@ -320,7 +322,7 @@ const getLotteryleaderBoard = function (data, response, cb) {
     cb = response;
   }
   console.log(response.data);
-  if(!response.data?._id){
+  if(!data.potId&&!response.data?._id){
     return cb(
       null,
       responseUtilities.responseStruct(
@@ -332,7 +334,11 @@ const getLotteryleaderBoard = function (data, response, cb) {
       )
     );
   }
-  let potId = response.data._id;
+  let potId =data.potId?data.potId:response.data._id;
+  // response.data._id;
+
+//  let potId=data.potId
+
   let findData = { 
     potId: potId ,
   

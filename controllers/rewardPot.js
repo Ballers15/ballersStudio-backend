@@ -670,7 +670,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
       let sendResponse=JSON.parse(JSON.stringify(finalRes));
       console.log("sendResponse",sendResponse)
       if(sendResponse.length){
-        sendResponse[0].userRes=sendRes
+        sendResponse[lastIndex].userRes=sendRes
       }
       
       return cb(
@@ -892,7 +892,7 @@ const getRewardPotWalletAddress =function(data,response,cb){
       let sendResponse=JSON.parse(JSON.stringify(finalRes));
       console.log("sendResponse",sendResponse)
       if(sendResponse.length){
-        sendResponse[0].userRes=sendRes
+        sendResponse[lastIndex].userRes=sendRes
       }
       
       return cb(

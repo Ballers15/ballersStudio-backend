@@ -296,6 +296,25 @@ function(req, res, next) {
 });
 
 
+/**
+ * get reward pot and lottery pot counts
+ */
+router.get("/v1/count/pool/participated",
+[authenticator, authenticateRole(["USER"])],
+function(req, res, next) {
+  let data = req.query;
+  data.req = req.data;
+  userPotDetails.countPoolParticiated(data, function(err,response) {
+    let status = 0;
+    if (err) {
+      status = err.status;
+      return res.status(status).send(err);
+    }
+    status = response.status;
+    return res.status(status).send(response);
+  })
+});
+
 
 
 

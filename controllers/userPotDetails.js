@@ -1974,6 +1974,83 @@ const checkUserClaimedReward =function(data,response,cb){
 exports.checkUserClaimedReward=checkUserClaimedReward;
 
 
+const countPoolParticiated =async function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(!data.walletAddress){
+    return cb(
+      responseUtilities.responseStruct(
+        400,
+        "count of Pool Particiated",
+        "countPoolParticipated",
+        null,
+        data.req.signature
+      )
+    );
+  }
+
+  data.walletAddress=data.walletAddress.toLowerCase();
+  let findRewardPot={
+    potType:process.env.REWARD_POT.split(',')[0]
+  };
+  let findLotteryPot={
+    potType:process.env.REWARD_POT.split(',')[1]
+  };
+  try{
+    let rewardPots=await RewardPot.find(findRewardPot);
+    let lotteryPots=await RewardPot.find(findLotteryPot);
+    let rewardPotIds=rewardPots.map((el)=>{
+      return el.id;
+    })
+    let lotteryPotIds=lotteryPots.map((el)=>{
+      return el.id;
+    })
+    let findRewardPools={
+      userId:data.req.auth.id,
+      walletAddress:data.walletAddress,
+      potId:{$in:rewardPotIds}
+    };
+    let rewardPools=await userPotDetails.count(findRewardPools)
+  
+    let findLotteryPools={
+      userId:data.req.auth.id,
+      walletAddress:data.walletAddress,
+      potId:{$in:lotteryPotIds}
+    };
+    let lotteryPools=await userPotDetails.count(findLotteryPools)
+    let sendResponse={
+      rewardPools,
+      lotteryPools
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "count of Pool Particiated",
+        "countPoolParticipated",
+        sendResponse,
+        data.req.signature
+      )
+    );
+  }
+  catch(err){
+    return cb(
+      responseUtilities.responseStruct(
+        500,
+        "count of Pool Particiated",
+        err,
+        null,
+        data.req.signature
+      )
+    );
+
+  }
+ 
+
+}
+exports.countPoolParticiated=countPoolParticiated;
+
 
 
 /****cron helpers */

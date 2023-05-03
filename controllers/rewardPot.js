@@ -476,7 +476,7 @@ const getPreviousRounds =function(data,response,cb){
         foreignField:"_id",
         as:"userDetails",
     }},
-    { $sort:{"createdAt":-1} },
+    { $sort:{"createdAt":1} },
     
     {
         $project:{
@@ -703,7 +703,7 @@ const getRewardPreviousRounds =function(data,response,cb){
         },
         
     },
-    {$sort:{"createdAt":-1}},
+    {$sort:{"createdAt":1}},
     {
       $project:{
           "potUserDetails.lotteryWon":0,

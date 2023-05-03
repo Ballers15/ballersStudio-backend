@@ -627,8 +627,8 @@ const getLotteryPotWalletAddress =function(data,response,cb){
         )
       ); 
     }
-
-    let potId=finalRes[0].potUserDetails?.potId;
+    let lastIndex=finalRes.length-1;
+    let potId=finalRes[lastIndex].potUserDetails?.potId;
     let walletAddress=data.walletAddress;
     let findData={
       potId:potId,
@@ -850,8 +850,9 @@ const getRewardPotWalletAddress =function(data,response,cb){
         )
       ); 
     }
+    let lastIndex=finalRes.length-1;
 
-    let potId=finalRes[0]?._id;
+    let potId=finalRes[lastIndex]?._id;
     
     let walletAddress=data.walletAddress;
     let findData={

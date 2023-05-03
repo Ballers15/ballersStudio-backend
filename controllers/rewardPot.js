@@ -628,6 +628,7 @@ const getLotteryPotWalletAddress =function(data,response,cb){
       ); 
     }
     let lastIndex=finalRes.length-1;
+    console.log("lastindex",lastIndex);
     let potId=finalRes[lastIndex].potUserDetails?.potId;
     let walletAddress=data.walletAddress;
     let findData={
@@ -851,6 +852,7 @@ const getRewardPotWalletAddress =function(data,response,cb){
       ); 
     }
     let lastIndex=finalRes.length-1;
+    console.log("lastIndex",lastIndex);
 
     let potId=finalRes[lastIndex]?._id;
     

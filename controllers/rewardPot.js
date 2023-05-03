@@ -17,12 +17,27 @@ const getActivePot = function (data, response, cb) {
   if (!cb) {
     cb = response;
   }
+
+  let waterFallFunctions = [];
+
+    waterFallFunctions.push(async.apply(getActivePotDetails, data));
+    waterFallFunctions.push(async.apply(getUpcomingPotDetails, data));
+     async.waterfall(waterFallFunctions, cb);
+
+};
+exports.getActivePot = getActivePot;
+
+
+const getActivePotDetails =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
   if (!data.potType) {
     return cb(
       responseUtilities.responseStruct(
         400,
         null,
-        "getActivePot",
+        "getActivePotDetails",
         null,
         data.req.signature
       )
@@ -73,9 +88,74 @@ const getActivePot = function (data, response, cb) {
       )
     );
   });
-};
-exports.getActivePot = getActivePot;
 
+}
+
+const getUpcomingPotDetails =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  if(response.data.length){
+
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Active Pot Fetched Successfuly",
+        "getActivePot",
+        response.data,
+        data.req.signature
+      )
+    );
+  }
+  let findData = {
+    $and: [
+      {
+        $or: [
+          { potStatus: process.env.POT_STATUS.split(",")[0] },
+        ],
+      },
+      { isActive: true, potType: data.potType },
+    ],
+  };
+  let projection = {
+    startDate: 1,
+    endDate: 1,
+    claimExpiryDate: 1,
+    assetType: 1,
+    potStatus: 1,
+    potType: 1,
+  };
+
+  RewardPot.find(findData, projection).exec((err, res) => {
+    if (err) {
+      console.log("RewardPot Error : ", err);
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          "Error in getting pot",
+          "getUpcomingPotDetails",
+          null,
+          data.req.signature
+        )
+      );
+    }
+    console.log("res", res);
+
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Upcoming Pot Fetched Successfuly",
+        "getUpcomingPotDetails",
+        res,
+        data.req.signature
+      )
+    );
+  });
+
+
+}
 
 /**
  * 

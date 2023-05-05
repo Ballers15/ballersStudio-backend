@@ -1,10 +1,14 @@
 const async = require("async");
 const mongoose = require("mongoose");
+//models
 const PotActionLogs = require("../models/potActionLogs");
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
+const Notifications=require("../models/notifications");
+//helpers
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
+const helper = require('../controllers/userPotDetails')
 
 /**
  * 
@@ -61,6 +65,8 @@ const getActivePotDetails =function(data,response,cb){
     assetType: 1,
     potStatus: 1,
     potType: 1,
+    "assetDetails.ticker":1,
+    rewardTokenQuantity:1
   };
   RewardPot.find(findData, projection).exec((err, res) => {
     if (err) {
@@ -307,18 +313,51 @@ const getRewardLeaderBoard = function (data, response, cb) {
         console.log("el",el);
         if(el.userId==null){
           console.log("ap",el);
-          //finalRes.splice(el,1);
         }else{
           sendRes.push(el);
-                }
+            }
       })
+
+      console.log("sendRes len",sendRes.length);
+      let finalUsers=sendRes;
+
+      let rank=0;
+      let userIndex=0;
+      if(data.userId && data.walletAddress && !data.search &&data.potId){
+        console.log("Inside this");
+        data.walletAddress=data.walletAddress.toLowerCase();
+        for(let i in sendRes){
+          let userId=sendRes[i].userId._id;
+          if(userId==data.userId && (sendRes[i].walletAddress).toLowerCase() == data.walletAddress){
+            console.log("search found");
+            rank=parseFloat(i)+1;
+            userIndex=i;
+            sendRes[i].rank=rank;
+          }
+        }
+        let limitedUsers=[];
+        let limit=10;
+        let rankExist=false;
+        let finalLength=sendRes.length>limit?limit:sendRes.length;
+        for(let i =0;i<finalLength;i++){
+      
+          limitedUsers.push(sendRes[i]);
+        }
+        if(parseFloat(rank)>parseFloat(limit)){
+          limitedUsers.push(sendRes[userIndex]);
+
+        }
+        finalUsers=limitedUsers;
+      }
+      console.log("User",finalUsers,finalUsers.length);
+
       return cb(
         null,
         responseUtilities.responseStruct(
           200,
           "Reward Leaderboard Fetched Successfuly",
           "getRewardPotLeaderBoard",
-          sendRes,
+          finalUsers,
           data.req.signature
         )
       );
@@ -467,8 +506,41 @@ const getLotteryleaderBoard = function (data, response, cb) {
           // finalRes.splice(el,1);
         }else{
           sendRes.push(el);
-                }
+          }
       })
+
+      console.log("sendRes len",sendRes.length);
+      let finalUsers=sendRes;
+
+      let rank=0;
+      let userIndex=0;
+      if(data.userId && data.walletAddress && !data.search &&data.potId){
+        console.log("Inside this",data.walletAddress);
+        data.walletAddress=data.walletAddress.toLowerCase();
+        for(let i in sendRes){
+          let userId=sendRes[i].userId._id;
+          if(userId==data.userId && (sendRes[i].walletAddress).toLowerCase() == data.walletAddress){
+            console.log("search found");
+            rank=parseFloat(i)+1;
+            userIndex=i;
+            sendRes[i].rank=rank;
+          }
+        }
+        let limitedUsers=[];
+        let limit=10;
+        let finalLength=parseFloat(sendRes.length)>parseFloat(limit)?limit:sendRes.length;
+        for(let i =0;i<finalLength;i++){
+      
+          limitedUsers.push(sendRes[i]);
+        }
+        if(parseFloat(rank)>parseFloat(limit)){
+          limitedUsers.push(sendRes[userIndex]);
+
+        }
+        finalUsers=limitedUsers;
+      }
+      console.log("User",finalUsers,finalUsers.length);
+
       console.log("res", sendRes);
       return cb(
         null,
@@ -972,13 +1044,40 @@ const createRewardPot = function (data, response, cb) {
       )
     );
   }
-
+//   // waterFallFunctions.push(async.apply(addRewardPot, data));
+// rewardTokenQuantity
   let waterFallFunctions = [];
+  waterFallFunctions.push(async.apply(getRewardTokenPrice, data));
   waterFallFunctions.push(async.apply(addRewardPot, data));
   waterFallFunctions.push(async.apply(potActionLogs, data));
+  waterFallFunctions.push(async.apply(addPotNotification, data));
   async.waterfall(waterFallFunctions, cb);
 };
 exports.createRewardPot = createRewardPot;
+
+const getRewardTokenPrice=async function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+  //     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],
+
+
+let tokenPrice= await helper.getTokenPrice();
+if(data.potType == process.env.REWARD_POT.split(',')[0]){
+  data.rewardTokenQuantity=parseFloat(data.rewardTokenAmount)/parseFloat(tokenPrice);
+}
+  return cb(
+    null,
+    responseUtilities.responseStruct(
+      200,
+      "Quantity fetched succesfully",
+      "getRewardToken",
+      null,
+      data.req.signature
+    )
+  );
+
+}
 
 const addRewardPot = function (data, response, cb) {
   if (!cb) {
@@ -994,6 +1093,7 @@ const addRewardPot = function (data, response, cb) {
 
   let insertData = {
     rewardTokenAmount: data.rewardTokenAmount,
+  
     assetDetails: assetDetails,
     startDate: (data.startDate),
     endDate: (data.endDate),
@@ -1006,7 +1106,11 @@ const addRewardPot = function (data, response, cb) {
     createdBy: data.req.auth.id,
   };
 
-  console.log("inserD", insertData);
+  if(data.potType == process.env.REWARD_POT.split(',')[0]){
+    insertData.rewardTokenQuantity=data.rewardTokenQuantity
+  
+  }
+    console.log("inserD", insertData);
   RewardPot.create(insertData, (err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
@@ -1020,7 +1124,7 @@ const addRewardPot = function (data, response, cb) {
         )
       );
     }
-
+    data.potDetails=res;        //using in notification waterfall
     data.insertActionLogData = {
       potId: res._id,
       addedBy: data.req.auth.id,
@@ -1082,6 +1186,81 @@ const potActionLogs = function (data, response, cb) {
     );
   });
 };
+
+
+// potId:{type:mongoose.Schema.Types.ObjectId,ref:'rewardPot'},
+// message: { type: String},
+// readBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+// recievers:[{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+// all:true,
+// type: {
+//     type: String,
+//     enum: {
+//       values: process.env.NOTIFICATION_TYPE.split(","),
+//       message: "NOTIFICATION_TYPE ENUM FAILED",
+//     },
+//   },
+//   notifyAll: { type: Boolean, default: true },
+//   createdBy:{ type: mongoose.Schema.Types.ObjectId,ref: 'users'},
+
+
+const addPotNotification =function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+  let findData={
+    potId:data.potId,
+  };
+  let message='';
+  //     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],
+  if(data.potDetails==process.env.REWARD_POT.split(',')[0]){
+    message=`A New ${data.potType} has been added Claim BALR tokens by participating`;
+
+  }
+
+  if(data.potDetails==process.env.REWARD_POT.split(',')[1]){
+    message=`A New Lottery Pot has been added earn BALR NFT by participating`;
+
+  }
+
+// POT_ANNOUCEMENTS
+  let updateData={
+    potId:data.potId,
+    message:message,
+    notifyAll:true,
+    type:process.env.NOTIFICATION_TYPE.split(',')[0]
+  }
+
+  Notifications.updateOne(findData,updateData,(err,res)=>{
+    if(err) {
+      return cb(
+        responseUtilities.responseStruct(
+          500,
+          null,
+          "addPotNotification",
+          "addPotNotification",
+          data.req.signature
+        )
+      );
+    }
+    return cb(
+      null,
+      responseUtilities.responseStruct(
+        200,
+        "Notification added",
+        "addPotNotification",
+        res,
+        data.req.signature
+      )
+    );
+  })
+
+
+}
+
+
+
 
 
 /**
@@ -1197,6 +1376,7 @@ const updateRewardPot = function (data, response, cb) {
 
   let waterFallFunctions = [];
   // waterFallFunctions.push(async.apply(checkIfPotIsActive, data));
+  waterFallFunctions.push(async.apply(getRewardTokenPrice, data));
   waterFallFunctions.push(async.apply(updatePot, data));
   waterFallFunctions.push(async.apply(potActionLogs, data));
   async.waterfall(waterFallFunctions, cb);
@@ -1274,6 +1454,10 @@ const updatePot = function (data, response, cb) {
       : process.env.POT_STATUS.split(",")[0],
   };
   console.log("updateData", updateData);
+  if(data.potType == process.env.REWARD_POT.split(',')[0]){
+    updateData.rewardTokenQuantity=data.rewardTokenQuantity
+  
+  }
 
   let findData = {
     _id: data.potId,

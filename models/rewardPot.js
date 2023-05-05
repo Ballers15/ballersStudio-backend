@@ -3,7 +3,8 @@ let mongoose = require('./db');
 let Schema = mongoose.Schema;
 
 var rewardPotSchema = new Schema({
-    rewardTokenAmount : Number,
+    rewardTokenAmount : Number,     //in dollar
+    rewardTokenQuantity:Number,       // in tokens for reward pool only
     assetDetails: { type: Object },
     startDate: Date,
     endDate: Date,

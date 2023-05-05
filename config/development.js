@@ -45,8 +45,11 @@ module.exports = development = {
     ballers:10277430,
   }),
   GOOGLE_CLIENT_ID:"66109923821-8qajlcid64c3o8646l09r03tb18ncgft.apps.googleusercontent.com",
-  GOOGLE_CLIENT_SECRET:"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"
+  GOOGLE_CLIENT_SECRET:"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",
+
 }
+
+
 
 
 

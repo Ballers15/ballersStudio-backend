@@ -9,7 +9,7 @@ const Notifications=require("../models/notifications");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 const helper = require('../controllers/userPotDetails')
-
+const responseMessages=require("../config/responseMessages");
 /**
  * 
  * @param {*} data 
@@ -68,7 +68,7 @@ const getActivePotDetails =function(data,response,cb){
     "assetDetails.ticker":1,
     rewardTokenQuantity:1
   };
-  RewardPot.find(findData, projection).exec((err, res) => {
+  RewardPot.findOne(findData, projection).exec((err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
       return cb(
@@ -81,6 +81,8 @@ const getActivePotDetails =function(data,response,cb){
         )
       );
     }
+    let sendRes=[];
+    sendRes.push(res);
     console.log("res", res);
 
     return cb(
@@ -89,7 +91,7 @@ const getActivePotDetails =function(data,response,cb){
         200,
         "Active Pot Fetched Successfuly",
         "getActivePot",
-        res,
+        sendRes,
         data.req.signature
       )
     );
@@ -124,6 +126,7 @@ const getUpcomingPotDetails =function(data,response,cb){
       { isActive: true, potType: data.potType },
     ],
   };
+  
   let projection = {
     startDate: 1,
     endDate: 1,
@@ -133,7 +136,7 @@ const getUpcomingPotDetails =function(data,response,cb){
     potType: 1,
   };
 
-  RewardPot.find(findData, projection).exec((err, res) => {
+  RewardPot.findOne(findData, projection).exec((err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
       return cb(
@@ -146,6 +149,8 @@ const getUpcomingPotDetails =function(data,response,cb){
         )
       );
     }
+    let sendRes=[];
+    sendRes.push(res);
     console.log("res", res);
 
     return cb(
@@ -154,7 +159,7 @@ const getUpcomingPotDetails =function(data,response,cb){
         200,
         "Upcoming Pot Fetched Successfuly",
         "getUpcomingPotDetails",
-        res,
+        sendRes,
         data.req.signature
       )
     );
@@ -1187,41 +1192,25 @@ const potActionLogs = function (data, response, cb) {
   });
 };
 
-
-// potId:{type:mongoose.Schema.Types.ObjectId,ref:'rewardPot'},
-// message: { type: String},
-// readBy:[{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
-// recievers:[{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
-// all:true,
-// type: {
-//     type: String,
-//     enum: {
-//       values: process.env.NOTIFICATION_TYPE.split(","),
-//       message: "NOTIFICATION_TYPE ENUM FAILED",
-//     },
-//   },
-//   notifyAll: { type: Boolean, default: true },
-//   createdBy:{ type: mongoose.Schema.Types.ObjectId,ref: 'users'},
-
-
 const addPotNotification =function(data,response,cb){
   if(!cb){
     cb=response;
   }
 
+  data.potId=data.potDetails._id;
+  
   let findData={
-    potId:data.potId,
+    potId:data.potDetails._id,
   };
-  let message='';
-  //     REWARD_POT: ["REWARDPOT", "LOTTERYPOT"],
-  if(data.potDetails==process.env.REWARD_POT.split(',')[0]){
-    message=`A New ${data.potType} has been added Claim BALR tokens by participating`;
 
+  let message='';
+
+  if(data.potDetails.potType==process.env.REWARD_POT.split(',')[0]){
+    message=responseMessages.REWARD_POT_NOTIFICATION;
   }
 
-  if(data.potDetails==process.env.REWARD_POT.split(',')[1]){
-    message=`A New Lottery Pot has been added earn BALR NFT by participating`;
-
+  if(data.potDetails.potType==process.env.REWARD_POT.split(',')[1]){
+    message=responseMessages.LOTTERY_POT_NOTIFICATION;
   }
 
 // POT_ANNOUCEMENTS
@@ -1231,9 +1220,14 @@ const addPotNotification =function(data,response,cb){
     notifyAll:true,
     type:process.env.NOTIFICATION_TYPE.split(',')[0]
   }
+  let options={
+    new:true,
+    upsert:true,
+  }
 
-  Notifications.updateOne(findData,updateData,(err,res)=>{
+  Notifications.updateOne(findData,updateData,options,(err,res)=>{
     if(err) {
+      console.log(err);
       return cb(
         responseUtilities.responseStruct(
           500,
@@ -1244,6 +1238,7 @@ const addPotNotification =function(data,response,cb){
         )
       );
     }
+    console.log("resssss",res);
     return cb(
       null,
       responseUtilities.responseStruct(

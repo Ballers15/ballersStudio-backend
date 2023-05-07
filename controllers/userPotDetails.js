@@ -1443,7 +1443,7 @@ const getPotUsers =function(data,response,cb){
 
   let sort = { createdAt: -1 };
 
-  console.log("findData",findData);
+  console.log("findData",findData,findUserQuery);
   let pipeline = [
     {
       $match: findData,

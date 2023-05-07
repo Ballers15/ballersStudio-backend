@@ -82,7 +82,10 @@ const getActivePotDetails =function(data,response,cb){
       );
     }
     let sendRes=[];
-    sendRes.push(res);
+    if(res){
+
+      sendRes.push(res);
+    }
     console.log("res", res);
 
     return cb(
@@ -116,6 +119,7 @@ const getUpcomingPotDetails =function(data,response,cb){
       )
     );
   }
+
   let findData = {
     $and: [
       {
@@ -134,9 +138,11 @@ const getUpcomingPotDetails =function(data,response,cb){
     assetType: 1,
     potStatus: 1,
     potType: 1,
+    "assetDetails.ticker":1,
+    rewardTokenQuantity:1
   };
 
-  RewardPot.findOne(findData, projection).exec((err, res) => {
+  RewardPot.find(findData, projection).sort({"startDate":1}).exec((err, res) => {
     if (err) {
       console.log("RewardPot Error : ", err);
       return cb(
@@ -150,7 +156,9 @@ const getUpcomingPotDetails =function(data,response,cb){
       );
     }
     let sendRes=[];
-    sendRes.push(res);
+    if(res.length){
+      sendRes.push(res[0]);
+    }
     console.log("res", res);
 
     return cb(

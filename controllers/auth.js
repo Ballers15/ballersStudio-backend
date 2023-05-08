@@ -264,12 +264,13 @@ const socialLoginOrSignup = function (data, response, cb) {
             //social login
 
             let userData = res;
-
+            console.log("username",userData);
             let update_payload = {
                 _id: userData._id,
                 name: userData.name,
                 email: userData.email,
                 accountId: userData.accountId,
+                userName:userData.userName,
                 role: userData.role,
                 provider: userData.provider,
                 ip: data.ip,
@@ -277,6 +278,7 @@ const socialLoginOrSignup = function (data, response, cb) {
                 browser: data.browser,
                 req: data.req
             };
+
 
             socialLogin(update_payload, response, cb);
         
@@ -311,7 +313,7 @@ const socialLoginOrSignup = function (data, response, cb) {
                     console.log("Something goes wildly wrong");
                     break;
             };
-
+            console.log("Insert",insert_payload);
             socialSignup(insert_payload, null, cb);
 
         }
@@ -347,7 +349,7 @@ const socialSignup = function (data, response, cb) {
 
     ], cb);
         
-
+// insert_payload.userName
 };
 
 const socialRegister = function (data, response, cb) {
@@ -384,9 +386,10 @@ const socialRegister = function (data, response, cb) {
                 return cb(responseUtilities.responseStruct(500, "Something went wrong", "socialRegister.registerUser", null, data.req.signature));
 
             }
-            data.role = response.data.role;
-            data._id = response.data._id;
-           
+            console.log("res-----------------------------",res);
+            data.role = res.role;
+            data._id = res._id;
+            data.accountId=res.accountId;
             return cb(null, responseUtilities.responseStruct(200, "Email just added in registry!", "socialRegister.registerUser", null, data.req.signature));
         })
 }
@@ -662,7 +665,10 @@ const encryptData = function (data, response, cb) {
         role: data.role,
         createdAt: timestamp,
         tokenType: "auth",
+
     };
+
+    console.log("duserDatauserDatauserDatauserDataata",userData);
 
     utilities.encryptData(userData, function (err, cipher) {
         if (err) {
@@ -716,6 +722,7 @@ const addLoginStats = function (data, response, cb) {
             console.error(err);
             return cb(responseUtilities.responseStruct(500, null, "addLoginStats", null, data.req.signature));
         }
+        console.log("response.data",response.data);
         return cb(null, responseUtilities.responseStruct(200, "Successfully Logged In!", "addLoginStats", response.data, data.req.signature));
     });
 };

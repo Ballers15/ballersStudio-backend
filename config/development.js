@@ -38,8 +38,8 @@ module.exports = development = {
   MAILJET_APIKEY_PUBLIC: '3729e819f31fac27b63b75bab2b67faf',
   MAILJET_APIKEY_PRIVATE: '3e54a323b447b13f99178fc6310761e3',
   EMAIL_HOST: 'mohit@ith.tech',
-  //  CLIENT_URL: 'https://dev.ballers.fun',
-  CLIENT_URL:'http://localhost:3000',
+   CLIENT_URL: 'https://dev.ballers.fun',
+  // CLIENT_URL:'http://localhost:3000',
 
   MAILJET_CONTACT_LIST:JSON.stringify({
     ballers:10277430,

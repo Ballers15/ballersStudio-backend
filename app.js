@@ -63,7 +63,8 @@ const cryptoWallet = require('./routes/cryptoWallet')
 const rewardPot = require('./routes/rewardPot')
 const userPotDetails=require('./routes/userPotDetails')
 const withdrawls = require('./routes/withdrawls')
-const users = require('./routes/user')
+const users = require('./routes/user');
+const notifications = require('./routes/notifications');
 
 app.use('/auth', auth);
 app.use('/crypto/wallet', cryptoWallet);
@@ -71,6 +72,7 @@ app.use('/pot', rewardPot);
 app.use('/user', userPotDetails);
 app.use('/withdrawls', withdrawls);
 app.use('/users', users);
+app.use('/notifications',notifications)
 
 
 

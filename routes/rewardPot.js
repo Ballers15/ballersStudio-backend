@@ -344,7 +344,6 @@ router.patch( "/v1/admin/stop/reward/pot/claim",
     });
   }
 );
-module.exports = router;
 
 
 /**
@@ -393,3 +392,6 @@ router.get("/v1/check/nft/claim/contract",
     });
   }
 );
+
+
+module.exports = router;

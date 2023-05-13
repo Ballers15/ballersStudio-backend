@@ -4,17 +4,19 @@ const async = require("async");
 const cron = require('node-cron');
 const RewardPot = require("../models/rewardPot");
 const userPotDetails = require("../models/userPotDetails");
-
+const User =require('../models/users');
+const Notifications = require('../models/notifications');
 const moment = require('moment');
+const responseMessages = require('../config/responseMessages');
 
 
 let taskJob = cron.schedule('*/10 * * * * *', () => {   // runs at 12:00 mid night
-    deactivateRewardPots()
+    deactivateLotteryPots()
 });
 
 
 
-let deactivateRewardPots = async (cb) => {
+let deactivateLotteryPots = async (cb) => {
 
 
     var currentTime = new Date();
@@ -40,7 +42,7 @@ let deactivateRewardPots = async (cb) => {
                 waterFallFunctions.push(async.apply(getUserDetailsFromPotId, data));
                 waterFallFunctions.push(async.apply(selectLotteryWinner, data));
                 waterFallFunctions.push(async.apply(updateUserDetails, data));
-    
+                waterFallFunctions.push(async.apply(sendNotificationToUser, data));    
                 async.waterfall(waterFallFunctions, cb);
         }else{
             console.log("No running pot found");
@@ -142,3 +144,59 @@ const updateUserDetails = function(data,response,cb){
         }
 	});
 }
+
+
+const sendNotificationToUser =async function(data,response,cb) {
+
+    if(!cb){
+        cb=response;
+    }
+    let findUser={
+        _id:data.winner.userId
+    }
+    console.log(findUser);
+
+    let userDetails=await User.findOne(findUser)
+    
+    console.log("sss",userDetails)
+
+
+      let message=`Congratulations ${userDetails.userName} you won a BALR NFT for this ${data.winner.walletAddress.slice(0,4) }.... ${data.winner.walletAddress.slice(-4)} address`;
+
+
+      let createData={
+        potId:data.winner.potId,
+        message:message,
+        notifyAll:false,
+        type:process.env.NOTIFICATION_TYPE.split(',')[1],
+        recievers:[data.winner.userId],
+        
+      }
+      Notifications.create(createData,(err,res)=>{
+        if(err) {
+          console.log(err);
+          return cb(
+            responseUtilities.responseStruct(
+              500,
+              null,
+              "sendNotificationToUser",
+              "sendNotificationToUser",
+              data.req.signature
+            )
+          );
+        }
+        console.log("response of creating notifications",res);
+        return cb(null);
+      })
+
+}
+
+
+
+
+
+
+
+
+
+

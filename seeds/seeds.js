@@ -50,7 +50,6 @@ let seedUsers = ()=>{
     // } else {
         User.create(insertUser, (err, response) => {
           if(err){
-            console.log(err)
             console.error("Unable to create user");
             // process.exit(0)
   

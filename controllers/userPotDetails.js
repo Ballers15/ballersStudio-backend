@@ -1669,7 +1669,7 @@ const getUsersPieChart =function(data,response,cb){
     }
 
     console.log(res);
-    console.log(res[0].gameCashBurned.toString())
+    // console.log(res[0].gameCashBurned.toString())
     return cb(
       null,
       responseUtilities.responseStruct(
@@ -2370,13 +2370,13 @@ const getAllPots =function(data,response,cb){
   })
 
 }
+
 const checkGameCash=function(data,response,cb){
   if(!cb){
     cb=response;
   }
   let walletAddress=(data.walletAddress).toLowerCase();
   let findData={
-
     walletAddress:walletAddress,
     potId:{$in:data.activepots}
   };

@@ -16,8 +16,8 @@ console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_s
         if(err){
             console.log(err);
         }
-        console.log("RESPONSE",res.rows);
-        if(res.rows.length){
+        console.log("res",res);
+        if(res && res.rows.length){
 
             let sendData={encryptedText:res.rows[0].value};
             let decryptedResponse=web3Service.decrypt(sendData);
@@ -93,12 +93,28 @@ data.userId=data.walletAddress;
 console.log("AAAA",data.userId,typeof data.userId,`SELECT * FROM user_settings_string_models WHERE email="${data.userId}" AND key='BANK_REPOSITORY_DATA'`);
 
 
+// let sendRes={
+//     walletAddress:data.walletAddress,
+//     amount:1000
+//   };
+//   console.log("SENDDDD",sendRes);
+//                 return cb(
+//     null,
+//     responseUtilities.responseStruct(
+//       200,
+//       "Game Cash fetched Successfully",
+//       "getGameCash",
+//       sendRes,
+//       data.req.signature
+//     )
+//   );
+
+
     client.query(`SELECT * FROM user_settings_string_models WHERE email='${data.userId}' AND key='BANK_REPOSITORY_DATA';`,(err,res)=>{
         if(err){
             console.log(err);
         }
-        console.log("RESPONSE",res.rows);
-        if(res.rows.length){
+        if(res && res.rows.length){
 
             let sendData={encryptedText:res.rows[0].value};
 

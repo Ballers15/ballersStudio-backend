@@ -362,6 +362,8 @@ const createUserSignature =async function(data,response,cb){
     console.log("amount amounttt",amount);
     const tokenbits = new BigNumber(10).pow(tokenDecimals);
     let tokenAmount = new BigNumber(amount).times(tokenbits);
+    const finaldeposit = "0x" + tokenAmount.toString(16);
+
     tokenAmount=tokenAmount.toString();
     console.log("after calculation amount is",tokenAmount);
     let nonce=data.nonce;
@@ -369,11 +371,11 @@ const createUserSignature =async function(data,response,cb){
     let privateKey=process.env.SIGNER_KEY;
     let callerAddress=data.walletAddress;
 
-    let txn = {tokenAddress,tokenAmount,callerAddress,nonce,contractAddress};
+    let txn = {tokenAddress,finaldeposit,callerAddress,nonce,contractAddress};
     console.log("TX",txn);
     let messages = ethers.utils.solidityKeccak256(
         ['address','uint256','address','uint256','address'],
-        [txn.tokenAddress,txn.tokenAmount,txn.callerAddress,txn.nonce,txn.contractAddress]
+        [txn.tokenAddress,txn.finaldeposit,txn.callerAddress,txn.nonce,txn.contractAddress]
     );   
 
     let messageBytes = ethers.utils.arrayify(messages);

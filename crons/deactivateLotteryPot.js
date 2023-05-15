@@ -151,6 +151,7 @@ const sendNotificationToUser =async function(data,response,cb) {
     if(!cb){
         cb=response;
     }
+
     let findUser={
         _id:data.winner.userId
     }

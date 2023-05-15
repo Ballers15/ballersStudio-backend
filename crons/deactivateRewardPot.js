@@ -43,6 +43,8 @@ let activateRewardPots = async (cb) => {
                 waterFallFunctions.push(async.apply(helper.updateNftBalanceInUserSchema, data));
                 waterFallFunctions.push(async.apply(helper.getRewardTokenBalance, data));
                 waterFallFunctions.push(async.apply(helper.updateRewardTokenBalance, data));    
+                waterFallFunctions.push(async.apply(helper.updateRewardPotNotifications, data));    
+
                 async.waterfall(waterFallFunctions, cb);
         }else{
             console.log("No Active reward pot found");

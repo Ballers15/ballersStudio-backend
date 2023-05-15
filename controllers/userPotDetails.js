@@ -5,7 +5,9 @@ const userPotDetails = require("../models/userPotDetails");
 const responseUtilities = require("../helpers/sendResponse");
 const web3Service = require("../helpers/web3Service");
 const rewardPot = require("../models/rewardPot");
+const Notifications =require('../models/notifications');
 const  psqlService =require('../helpers/postgresSql');
+const responseMessages = require("../config/responseMessages");
 const adduserPotDetails = function (data, response, cb) {
   if (!cb) {
     cb = response;
@@ -2302,6 +2304,49 @@ console.log(updateDate,findData);
 exports.updateRewardTokenBalance=updateRewardTokenBalance;
 
 
+
+
+const updateRewardPotNotifications=async  function(data,response,cb){
+  if(!cb){
+    cb=response;
+  }
+
+
+  let message=responseMessages.CLAIM_TOKEN_NOTIFICATION;
+
+  let receivers=data.updatedUserDetails.map((el)=>{
+    return el.userId.toString()
+  })
+  console.log("reeee",receivers)
+ 
+  let findData={
+    
+  }
+  let finalReceivers=new Set(receivers)
+  console.log(finalReceivers);
+  let finalArr=[...new Set(receivers)];
+  console.log("fffffffffffffff",finalArr);
+  let updateData={
+    message:message,
+    notifyAll:false,
+    type:process.env.NOTIFICATION_TYPE.split(',')[2],
+    recievers:finalArr
+  }
+
+  let options={new:true,upsert:true}
+  
+  console.log("create data",updateData,options,findData);
+  Notifications.create(updateData,(err,res)=>{
+    if(err) {
+      console.log(err);
+    }
+    console.log("response of creating notifications",res);
+    return cb(null);
+  })
+
+
+}
+exports.updateRewardPotNotifications=updateRewardPotNotifications
 
 
 

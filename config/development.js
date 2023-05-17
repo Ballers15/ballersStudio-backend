@@ -3,8 +3,6 @@ module.exports = development = {
   DEV: true,
   OTP_FIXED:123456,    
   mongoConnectionString: (process.env.DOCKER_URL)||'mongodb://localhost/ballers',
-  MAILGUN_API_KEY:'f129efc967077b3162f11ad6bdfe6061-c2efc90c-f452cbcd',
-  MAILGUN_DOMAIN:'ITH',
   NFT_COLLECTION_ADDRESS:"0x2953399124f0cbb46d2cbacd8a89cf0599974963",
   BALLERS_TOKEN_ADDRESS:"0xda1e30e5e858661c1791231dc3ec2884e225fe83",
   BALLERS_TOKEN_DECIMALS:"18",

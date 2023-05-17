@@ -15,7 +15,7 @@ Version 14.17.6
 MongoDB - Download & Install MongoDB, and make sure it's running on the default port (27017)
 Version MongoDB 4.4
 
-## Version 0.0.1
+## Version 0.0.2
 
 View Current & Previous Versions details [linky](./VERSION.md)
 

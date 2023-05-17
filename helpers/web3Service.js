@@ -656,28 +656,32 @@ const checkNftOnClaimContract =async function(data,response,cb){
         let tokenId=data.tokenId;
         let balance=await nftContract.methods.balanceOf(walletAddress,tokenId).call();
         console.log("balance",balance,typeof balance);
-        if(!(parseFloat(balance) > 0)){
+        if((parseFloat(balance) >= parseFloat(data.quantity) )){
             return cb(
                 null,
                 responseUtilities.responseStruct(
                     200,
-                    "No NFT found on claim contract",
+                    `${balance} Quantity of this NFT exist on claim contract`,
                     "checkNftOnClaimContract",
-                    {exists:false},
+                    {exists:true},
                     data.req.signature
                 )
             );
+        }else{
+
+            return cb(
+                null,
+                responseUtilities.responseStruct(
+                    200,
+                    `${balance} Quantity of this NFT exist on claim contract`,
+                    "checkNftOnClaimContract",
+                    {exists:false},
+                    data.req.signature
+            ));
+    
+
         }
     
-        return cb(
-            null,
-            responseUtilities.responseStruct(
-                200,
-                "check Nft On Claim Contract",
-                "checkNftOnClaimContract",
-                {exists:true},
-                data.req.signature
-        ));
 
 
     }

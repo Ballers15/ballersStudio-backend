@@ -2,7 +2,7 @@
 
 ## Description
 
-* Gaming Portal - Reward withdrawal portal.
+* Gaming Portal - Burn your In game cash and earn rewards .
 * This project is an Express backend for a web application.
 * This project was created with [EXPRESS SERVER](https://github.com/expressjs/express) version ^4.16.3.
 ## Prerequisites
@@ -14,8 +14,7 @@ Node.js - Download & Install Node.js and the npm package manager. If you encount
 Version 14.17.6
 MongoDB - Download & Install MongoDB, and make sure it's running on the default port (27017)
 Version MongoDB 4.4
-
-## Version 0.0.2
+## Version 0.0.3
 
 View Current & Previous Versions details [linky](./VERSION.md)
 
@@ -71,11 +70,11 @@ NODE_ENV=production npm start
 
 ## Documentation
 
-* Open you're browser to [https://testapi.ballers.in](https://testapi.ballers.in)
+* Open you're browser to [https://dev-api.ballers.in](https://dev-api.ballers.in)
 * Run api described in swagger doc
 * Invoke the `/examples` endpoint
   ```shell
-  curl https://testapi.ballers.in/api/v1/examples
+  curl https://dev-api.ballers.in/api/v1/examples
   ```
 
 ## Config
